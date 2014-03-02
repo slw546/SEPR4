@@ -1,4 +1,4 @@
-/*package tst;
+package tst;
 
 import static org.junit.Assert.*;
 
@@ -75,4 +75,3 @@ public class WaypointTest {
 	
 	
 }
-*/
