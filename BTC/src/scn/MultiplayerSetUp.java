@@ -60,7 +60,9 @@ public class MultiplayerSetUp extends Scene {
 	@Override
 	public void start() {
 		//Text for the textbox to write to the screen
-		textBox.addText("You are to work with fellow air traffic controllers in a particularly busy airspace.");
+		textBox.addText("You are working in a busier workspace with other ACTOs.");
+		textBox.addText("The risk is greater, but so to is the reward.");
+		textBox.addText("Success could buy some comfort in the harsh winter months ahead, for you and your family.");
 		textBox.addText("There are rumours that one of the controllers is very hairy with a gruff voice.");
 		textBox.addText("Do not trust the others. If the humans discover your secret, you will but put in a zoo.");
 		textBox.delay(0.5);
