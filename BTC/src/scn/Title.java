@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import lib.ButtonText;
 import lib.jog.audio;
 import lib.jog.audio.Sound;
 import lib.jog.graphics;
@@ -55,7 +56,15 @@ public class Title extends Scene {
 			beep.setVolume(0.2f);
 		}
 		
-		buttons = new lib.ButtonText[5];
+		buttons = new lib.ButtonText[6];
+		// Multiplayer Set up button
+		lib.ButtonText.Action runMPSetup = new lib.ButtonText.Action() {
+			
+			@Override
+			public void action() {
+				main.setScene(new MultiplayerSetUp(main));
+			}
+		};
 
 		// Start Game button (assessment 3 game)
 		lib.ButtonText.Action runGame = new lib.ButtonText.Action() {
@@ -79,6 +88,9 @@ public class Title extends Scene {
 		
 		buttons[1] = new lib.ButtonText("Play Demo", runDemo, window.height(),
 				window.height()/2 + 126, window.width() - window.height(), 24, 8, 6);
+		
+		buttons[5] = new lib.ButtonText("Play Multiplayer", runMPSetup, window.height(),
+				window.height()/2 + 66, window.width() - window.height(), 24, 8, 6);
 
 		/* Game Button
 		lib.ButtonText.Action play = new lib.ButtonText.Action() {

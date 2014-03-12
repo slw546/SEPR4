@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src</name>
-			<type>2</type>
-			<location>E:/Libraries/Documents/workspace/baretrafficcontrol/BTC/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>
