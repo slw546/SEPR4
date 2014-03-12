@@ -1,5 +1,10 @@
 package scn;
 
+import java.io.IOException;
+
+import thr.ClientThread;
+import thr.HostThread;
+import lib.ButtonText;
 import lib.jog.input;
 import lib.jog.window;
 import lib.jog.audio.Sound;
@@ -14,19 +19,30 @@ public class MultiplayerSetUp extends Scene {
 	private final int HOST_BUTTON_X = window.width() / 2;
 	private final int HOST_BUTTON_Y = window.height() / 2;
 	
+	private final int CLIENT_BUTTON_W = 128;
+	private final int CLIENT_BUTTON_H = 16;
+	private final int CLIENT_BUTTON_X = window.width() /2;
+	private final int CLIENT_BUTTON_Y = window.height() / 2 + 30;
+	
+	private HostThread host;
+	private ClientThread client;
+	
 	//Textbox for flavour text about chosen game mode.
 	private lib.TextBox textBox;
+	
+	//Textfield for text input
 
 	//list of buttons
 	private lib.ButtonText[] buttons;
 	
 	//flags
 	private boolean host_pressed = false;
+	private boolean client_pressed = true;
 
 	protected MultiplayerSetUp(Main main) {
 		super(main);
 		//Textbox to write flavour text and instructions to.
-		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);
+		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);	
 	}
 
 	@Override
@@ -69,17 +85,37 @@ public class MultiplayerSetUp extends Scene {
 		textBox.addText("Or worse..");
 		
 		//Initialise buttons
-		buttons = new lib.ButtonText[1];
+		buttons = new lib.ButtonText[2];
 		
 		lib.ButtonText.Action hostGame = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
 				host_pressed = true;
+				client_pressed = false;
+				host = new HostThread(4444);
+				buttons[0].setAvailability(false);
+				buttons[1].setAvailability(false);
+				host.start();
+			}
+		};
+		
+		lib.ButtonText.Action startClient = new lib.ButtonText.Action(){
+			@Override
+			public void action() {
+				client_pressed = true;	
+				host_pressed = false;
+				client = new ClientThread("localhost", 4444);
+				buttons[0].setAvailability(false);
+				buttons[1].setAvailability(false);
+				client.start();
 			}
 		};
 		
 		buttons[0] = new lib.ButtonText("Host LAN Game", hostGame, HOST_BUTTON_X,
 				HOST_BUTTON_Y, HOST_BUTTON_W, HOST_BUTTON_H, 8, 6);
+		
+		buttons[1] = new lib.ButtonText("Start Client", startClient, CLIENT_BUTTON_X, 
+				CLIENT_BUTTON_Y, CLIENT_BUTTON_W, CLIENT_BUTTON_H, 8, 6);
 		
 	}
 

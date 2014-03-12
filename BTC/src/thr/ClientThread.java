@@ -41,48 +41,23 @@ public class ClientThread extends Thread {
 	private ObjectOutputStream objOutputWriter; 
 	
 	
-	public ClientThread(String hostAddress, int portNumber) throws UnknownHostException, IOException{
+	public ClientThread(String hostAddress, int portNumber) {
 		super();
 		this.portNumber = portNumber;
 		this.hostAddress = hostAddress;
-		
-		// Try to create the socket by latching to the Host ServerSocket.
-		// If socket created, try to create IO streams
-		try (Socket socket = new Socket(hostAddress, portNumber)){
-			this.socket = socket;
-			
-
-			try {
-				// set up input streams
-				textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
-				objInputStream = new ObjectInputStream(socket.getInputStream());	
-			} catch (IOException e){
-				e.printStackTrace();
-				System.err.println("Could not set up input streams");
-			}
-			
-			try {
-				// set up output streams
-				textOutputWriter = new PrintWriter(socket.getOutputStream());
-				objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.err.println("Could not set up output streams");
-			}
-			
-			listening = true;
-			
-		} catch (UnknownHostException e){
-			e.printStackTrace();
-			System.err.println("Unknown Host. " + hostAddress  + " on port" + portNumber + ". Ensure the correct host address was used.");
-			System.err.println("Ensure that the host has hosted the game");
-		}
-
 	}
 	
 	public void run(){
+		setUp();
 		while (listening) {
-			// carry out pregame listening, e.g. lobby.
+			String ping = "null";
+			try {
+				ping = textInputStream.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Client read: " + ping);
 		}
 		while (listening && playing) {
 			// listen to synchronisation from host
@@ -92,5 +67,40 @@ public class ClientThread extends Thread {
 		// alter client that thread is exiting
 		System.out.println("ClientThread exiting");
 	}
+	
+	private void setUp(){
+		// Try to create the socket by latching to the Host ServerSocket.
+		// If socket created, try to create IO streams
+		try (Socket socket = new Socket(hostAddress, portNumber)){
+			this.socket = socket;
 
+			try {
+				// set up input streams
+				textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
+				objInputStream = new ObjectInputStream(socket.getInputStream());	
+			} catch (IOException e){
+				e.printStackTrace();
+				System.err.println("Could not set up input streams");
+			}
+
+			try {
+				// set up output streams
+				textOutputWriter = new PrintWriter(socket.getOutputStream());
+				objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("Could not set up output streams");
+			}
+
+			listening = true;
+
+		} catch (UnknownHostException e){
+			e.printStackTrace();
+			System.err.println("Unknown Host. " + hostAddress  + " on port" + portNumber + ". Ensure the correct host address was used.");
+			System.err.println("Ensure that the host has hosted the game");
+		} catch (IOException e1) { //caused by automatic close invocation on socket
+			System.err.println("Connection was refused - check host is hosting the game");
+			e1.printStackTrace();
+		}
+	}
 }
