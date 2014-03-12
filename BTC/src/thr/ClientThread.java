@@ -47,17 +47,30 @@ public class ClientThread extends Thread {
 		this.hostAddress = hostAddress;
 	}
 	
+	@Override
 	public void run(){
-		setUp();
+		try {
+			setUp2();
+			listening = true;
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		while (listening) {
-			String ping = "null";
+			String str = "failed";
 			try {
-				ping = textInputStream.readLine();
+				str = textInputStream.readLine();
+				System.out.println("Client read: " + str);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Failed to read textInputStream");
 				e.printStackTrace();
 			}
-			System.out.println("Client read: " + ping);
+			
+			//listening = false;
 		}
 		while (listening && playing) {
 			// listen to synchronisation from host
@@ -68,13 +81,28 @@ public class ClientThread extends Thread {
 		System.out.println("ClientThread exiting");
 	}
 	
+	private void setUp2() throws UnknownHostException, IOException{
+		socket = new Socket(hostAddress, portNumber);
+		textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
+		objInputStream = new ObjectInputStream(socket.getInputStream());
+		textOutputWriter = new PrintWriter(socket.getOutputStream());
+		objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
+	}
+	
 	private void setUp(){
 		// Try to create the socket by latching to the Host ServerSocket.
 		// If socket created, try to create IO streams
-		try (Socket socket = new Socket(hostAddress, portNumber)){
+		try (
+				Socket socket = new Socket(hostAddress, portNumber);
+				BufferedReader txtInStream =  new BufferedReader( new InputStreamReader(socket.getInputStream()));
+				ObjectInputStream objInStream = new ObjectInputStream(socket.getInputStream());
+				){
 			this.socket = socket;
+			this.textInputStream = txtInStream;
+			this.objInputStream = objInStream;
+			getIO(socket);
 
-			try {
+			/*try {
 				// set up input streams
 				textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
 				objInputStream = new ObjectInputStream(socket.getInputStream());	
@@ -90,7 +118,7 @@ public class ClientThread extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.err.println("Could not set up output streams");
-			}
+			}*/
 
 			listening = true;
 
@@ -101,6 +129,26 @@ public class ClientThread extends Thread {
 		} catch (IOException e1) { //caused by automatic close invocation on socket
 			System.err.println("Connection was refused - check host is hosting the game");
 			e1.printStackTrace();
+		}
+	}
+	
+	public void getIO(Socket socket){
+		//Set up IO
+		//try {
+			// set up input streams
+			//textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
+			//objInputStream = new ObjectInputStream(socket.getInputStream());	
+		//} catch (IOException e){
+		//	e.printStackTrace();
+		//	System.err.println("Could not set up input streams");
+		//}
+		try {
+			// set up output streams
+			textOutputWriter = new PrintWriter(socket.getOutputStream());
+			objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Could not set up output streams");
 		}
 	}
 }

@@ -49,23 +49,18 @@ public class HostThread extends Thread {
 	// An output stream to send objects through the client socket.
 	private ObjectOutputStream objOutputWriter; 
 	
+	//Constructor
 	public HostThread(int portNumber) {
-		
 		this.portNumber = portNumber;
-
 	}
 	
+	@Override
 	public void run(){
 		setUp();
 		while (hosting){
-			
-			textOutputWriter.write("PING!");
-			try {
-				sleep(500);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			textOutputWriter.println("Ping!");
+			//System.out.println("Wrote ping.");
+			//hosting = false;
 		}
 		while(hosting && playing){
 			// listen to synchronisation from client
@@ -78,9 +73,15 @@ public class HostThread extends Thread {
 	
 	private void setUp(){
 		// Try to initialise the ServerSocket
-		// If socket initialised, wait for a client to arrive at it.
-		try (ServerSocket socket = new ServerSocket(portNumber)) {
+		// Once socket initialised, wait for a client to arrive at it.
+		try (
+				ServerSocket socket = new ServerSocket(portNumber);
+				Socket clientSocket = socket.accept();
+				) {
+			getIO(clientSocket);
+			
 			this.socket = socket;
+			this.clientSocket = clientSocket;
 			System.out.println("Host waiting on connection to socket, port number: " + portNumber);
 			System.out.println("Host waiting on connection to socket, address: null");	
 		} catch (IOException e){
@@ -88,34 +89,28 @@ public class HostThread extends Thread {
 			System.err.println("Could not host on port " + portNumber);
 			System.err.println("Ensure no other service is using this port");
 		}
-
-		// Wait for, and try to accept, communication through the socket
-		// If client accepted, try to set up IO streams.
-		try (Socket clientSocket = socket.accept()) {
-			this.clientSocket = clientSocket;
-			System.out.println("Accepted communication through socket");
-
-			/*try {
-				// set up input streams
-				textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
-				objInputStream = new ObjectInputStream(clientSocket.getInputStream());	
-			} catch (IOException e){
-				e.printStackTrace();
-				System.err.println("Could not set up input streams");
-			}
-			try {
-				// set up output streams
-				textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
-				objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.err.println("Could not set up output streams");
-			}
-*/
-			hosting = true;
+		
+		// Raise flag to signal that we are now hosting a client.
+		hosting = true;
+	}
+	
+	private void getIO(Socket clientSocket){
+		//Set up IO
+		try {
+			// set up input streams
+			textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
+			//objInputStream = new ObjectInputStream(clientSocket.getInputStream());	
 		} catch (IOException e){
-			System.err.println("Error accepting connection on ServerSocket");
 			e.printStackTrace();
+			System.err.println("Could not set up input streams");
+		}
+		try {
+			// set up output streams
+			textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
+			objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Could not set up output streams");
 		}
 	}
 }

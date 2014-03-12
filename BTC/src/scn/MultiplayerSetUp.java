@@ -2,7 +2,9 @@ package scn;
 
 import java.io.IOException;
 
+import thr.Client;
 import thr.ClientThread;
+import thr.Host;
 import thr.HostThread;
 import lib.ButtonText;
 import lib.jog.input;
