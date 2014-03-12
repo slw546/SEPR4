@@ -3,6 +3,8 @@ package thr;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,41 +13,32 @@ public class Host extends Thread {
 	
 	private int portNumber;
 	
-	private static PrintWriter out;
-	private static BufferedReader in;
+	// INPUT
+	// A buffered input stream to read text incoming from the client socket
+	private BufferedReader textInputStream;
+	// An input stream to read objects incoming from the client socket.
+	private ObjectInputStream objInputStream;
+
+	//OUTPUT
+	// A print writer to send text through the client socket.
+	private PrintWriter textOutputWriter;
+	// An output stream to send objects through the client socket.
+	private ObjectOutputStream objOutputWriter; 
 	
-	public Host(int portNumber){
+	public Host(Socket clientSocket) throws IOException{
 		super();
 		this.portNumber = portNumber;
-	}
-	
-	@Override
-	public void start(){
-		try (
-				ServerSocket listener = new ServerSocket(portNumber);
-				Socket clientSocket = listener.accept();
-				PrintWriter out =
-						new PrintWriter(clientSocket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(clientSocket.getInputStream()));
-			){
-			this.out = out;
-			this.in= in;
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		run();
-		
+		textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
+		objInputStream = new ObjectInputStream(clientSocket.getInputStream());
+		textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
+		objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
 	}
 
 	@Override
 	public void run(){
 		System.out.println("Hello, Host Thread");
-		out.println("Ping");
+		textOutputWriter.println("Ping");
 		System.out.println("Bye");
 	}
-	
-	
+
 }

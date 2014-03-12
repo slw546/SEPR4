@@ -34,7 +34,6 @@ public class ClientThread extends Thread {
 	private ObjectInputStream objInputStream;
 
 	//OUTPUT
-
 	// A print writer to send text through the client socket.
 	private PrintWriter textOutputWriter;
 	// An output stream to send objects through the client socket.
@@ -77,7 +76,7 @@ public class ClientThread extends Thread {
 			// send required synchronisations back, e.g. aircraft enters opposing player's airspace.
 			// update local airspace
 		}
-		// alter client that thread is exiting
+		// alert client that thread is exiting
 		System.out.println("ClientThread exiting");
 	}
 	

@@ -1,6 +1,9 @@
 package scn;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import thr.Client;
 import thr.ClientThread;
@@ -98,6 +101,17 @@ public class MultiplayerSetUp extends Scene {
 				buttons[0].setAvailability(false);
 				buttons[1].setAvailability(false);
 				host.start();
+				/*try (ServerSocket ss = new ServerSocket(4444)){
+					host = new Host(ss.accept());
+					host_pressed = true;
+					client_pressed = false;
+					buttons[0].setAvailability(false);
+					buttons[1].setAvailability(false);
+					host.start();
+				} catch (IOException e) {
+					System.err.println("Could not listen on port 4444");
+					e.printStackTrace();
+				}*/
 			}
 		};
 		
@@ -106,12 +120,23 @@ public class MultiplayerSetUp extends Scene {
 			public void action() {
 				client_pressed = true;	
 				host_pressed = false;
-				client = new ClientThread("localhost", 4444);
+				client = new ClientThread("192.168.0.7", 4444);
 				buttons[0].setAvailability(false);
 				buttons[1].setAvailability(false);
 				client.start();
-			}
-		};
+				/*try {
+					client = new Client(new Socket("192.168.0.7", 4444));
+					client.start();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				}
+			};
+
 		
 		buttons[0] = new lib.ButtonText("Host LAN Game", hostGame, HOST_BUTTON_X,
 				HOST_BUTTON_Y, HOST_BUTTON_W, HOST_BUTTON_H, 8, 6);
@@ -125,7 +150,6 @@ public class MultiplayerSetUp extends Scene {
 	public void update(double dt) {
 		//update the textbox
 		textBox.update(dt);
-		
 	}
 
 	@Override

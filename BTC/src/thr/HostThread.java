@@ -43,7 +43,6 @@ public class HostThread extends Thread {
 	private ObjectInputStream objInputStream;
 	
 	//OUTPUT
-	
 	// A print writer to send text through the client socket.
 	private PrintWriter textOutputWriter;
 	// An output stream to send objects through the client socket.
@@ -79,19 +78,17 @@ public class HostThread extends Thread {
 				Socket clientSocket = socket.accept();
 				) {
 			getIO(clientSocket);
-			
+			// Raise flag to signal that we are now hosting a client.
+			hosting = true;
 			this.socket = socket;
 			this.clientSocket = clientSocket;
-			System.out.println("Host waiting on connection to socket, port number: " + portNumber);
-			System.out.println("Host waiting on connection to socket, address: null");	
+			System.out.println("Host got  connection to socket, port number: " + portNumber);
+			System.out.println("Host got connection to socket, address: null");	
 		} catch (IOException e){
 			e.printStackTrace();
 			System.err.println("Could not host on port " + portNumber);
 			System.err.println("Ensure no other service is using this port");
 		}
-		
-		// Raise flag to signal that we are now hosting a client.
-		hosting = true;
 	}
 	
 	private void getIO(Socket clientSocket){
