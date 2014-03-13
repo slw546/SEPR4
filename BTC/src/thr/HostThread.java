@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import cls.Aircraft;
+
+import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
 public class HostThread extends Thread {
@@ -30,12 +33,16 @@ public class HostThread extends Thread {
 	private Socket clientSocket = null;
 	
 	// The port to open the socket on.
-	private int portNumber = 4444;
+	private int portNumber = 4445;
 	// Flag to raise when we are hosting the service.
 	private boolean hosting = false;
 	//flag to raise when we are playing the game.
 	private boolean playing = false;
-
+	
+	//SCENES
+	private MultiplayerSetUp lobby;
+	private MultiplayerGame game;
+	
 	// INPUT
 	// A buffered input stream to read text incoming from the client socket
 	private BufferedReader textInputStream;
@@ -49,17 +56,34 @@ public class HostThread extends Thread {
 	private ObjectOutputStream objOutputWriter; 
 	
 	//Constructor
-	public HostThread(int portNumber) {
+	public HostThread(int portNumber, MultiplayerSetUp lobby) {
 		this.portNumber = portNumber;
+		this.lobby = lobby;
 	}
 	
 	@Override
 	public void run(){
-		setUp();
+		try {
+			setUp();
+		} catch (IOException e) {
+			System.err.println("Error setting up connection or IO with client");
+			e.printStackTrace();
+		}
 		while (hosting){
 			String outLine = "ping!";
-			System.out.println(outLine);
+			//System.out.println(outLine);
 			textOutputWriter.println(outLine);
+			
+			//If lobby has started the game, send game to client and leave this loop.
+			if (playing){
+				try {
+					startGame();
+				} catch (IOException e) {
+					System.err.println("IO failed trying to start game");
+					e.printStackTrace();
+				}
+				break;
+			}
 		}
 		while(hosting && playing){
 			// listen to synchronisation from client
@@ -70,61 +94,43 @@ public class HostThread extends Thread {
 		System.out.println("HostThread exiting");
 	}
 	
-	private void setUp(){
-		// Try to initialise the ServerSocket
-		// Once socket initialised, wait for a client to arrive at it.
-		System.out.println("Setting up");
-		try (
-				ServerSocket socket = new ServerSocket(portNumber);
-				Socket clientSocket = socket.accept();
-				
-				) {
-			System.out.println("Setting up2");
-			getIO(clientSocket);
-			System.out.println("Setting up3");
-			// Raise flag to signal that we are now hosting a client.
-			hosting = true;
-			this.socket = socket;
-			this.clientSocket = clientSocket;
-			System.out.println("Host got  connection to socket, port number: " + portNumber);
-			//System.out.println("Host got connection to socket, address: null");	
-		} catch (IOException e){
-			e.printStackTrace();
-			System.err.println("Could not host on port " + portNumber);
-			System.err.println("Ensure no other service is using this port");
-		}
+	private void setUp() throws IOException {
+		System.out.println("Set up 1");
+		//Init the ServerSocket and await a connection
+		ServerSocket socket = new ServerSocket(portNumber);
+		//accept an incoming connection request.
+		Socket clientSocket = socket.accept();
+		this.socket = socket;
+		this.clientSocket = clientSocket;
+		System.out.println("Set up 2");
+		//set up IO
+		//Outputs
+		textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
+		textOutputWriter.flush();
+		System.out.println("Set up 3");
+		objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
+		objOutputWriter.flush();
+		System.out.println("Set up 4");
+		//Inputs
+		textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
+		objInputStream = new ObjectInputStream(clientSocket.getInputStream());
+		System.out.println("Set up 5");
+		//Raise hosting flag
+		hosting = true;
+		lobby.setConnection_established(true);
 	}
 	
-	private void getIO(Socket clientSocket){
-		//Set up IO
-		System.out.println("Getting IO");
-		
-		try {
-			System.out.println("Getting IO4");
-			// set up output streams
-			textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
-			objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
-			
-			objOutputWriter.flush();
-			textOutputWriter.flush();
-			
-			System.out.println("Getting IO5");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Could not set up output streams");
-		}
-	
-		try {
-			System.out.println("Getting IO2");
-			// set up input streams
-			textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
-			objInputStream = new ObjectInputStream(clientSocket.getInputStream());
-			System.out.println("Getting IO3");
-		} catch (IOException e){
-			e.printStackTrace();
-			System.err.println("Could not set up input streams");
-		}
-
-		System.out.println("Getting IO6");
+	public void startGame() throws IOException{
+		objOutputWriter.writeObject(game);
 	}
+	
+	//Getters and Setters
+	public void setGameScene(MultiplayerGame game){
+		this.game = game;
+	}
+	
+	public void setPlaying(boolean playing){
+		this.playing = playing;
+	}
+	
 }

@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import scn.MultiplayerGame;
+import scn.MultiplayerSetUp;
+
 public class ClientThread extends Thread {
 	/**
 	 * Thread which latches to a ServerSocket and communicates with an instance of a HostThread
@@ -27,6 +30,10 @@ public class ClientThread extends Thread {
 	// Flag to hold whether the game is in a play state or not.
 	private boolean playing;
 	
+	//SCENES
+	private MultiplayerSetUp lobby;
+	private MultiplayerGame game;
+	
 	// INPUT
 	// A buffered input stream to read text incoming from the client socket
 	private BufferedReader textInputStream;
@@ -40,10 +47,11 @@ public class ClientThread extends Thread {
 	private ObjectOutputStream objOutputWriter; 
 	
 	
-	public ClientThread(String hostAddress, int portNumber) {
+	public ClientThread(String hostAddress, int portNumber, MultiplayerSetUp lobby) {
 		super();
 		this.portNumber = portNumber;
 		this.hostAddress = hostAddress;
+		this.lobby = lobby;
 		System.out.println("Constructed a client");
 	}
 	
@@ -51,7 +59,7 @@ public class ClientThread extends Thread {
 	public void run(){
 		System.out.println("Run started");
 		try {
-			setUp2();
+			setUp();
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -61,19 +69,17 @@ public class ClientThread extends Thread {
 		}
 		System.out.println("Set up finished");
 		listening = true;
+		lobby.setConnection_established(true);
 		while (listening) {
+			
 			String str = "failed";
 			try {
 				sleep(500);
 				String recv = null;
 				System.out.println("checking textInputStream");
-				while ((recv = textInputStream.readLine()) != null){
-					recv = recv + textInputStream.readLine();
-					System.out.println("got: " + recv);
-				}
-				System.out.println("end textInputStream check");
 				str = textInputStream.readLine();
 				System.out.println("Client read: " + str);
+				System.out.println("end textInputStream check");
 			} catch (IOException e) {
 				System.err.println("Failed to read textInputStream");
 				e.printStackTrace();
@@ -93,69 +99,25 @@ public class ClientThread extends Thread {
 		System.out.println("ClientThread exiting");
 	}
 	
-	private void setUp2() throws UnknownHostException, IOException{
+	private void setUp() throws UnknownHostException, IOException{
 		System.out.println("Set up 1");
-		socket = new Socket(hostAddress, portNumber);
+		Socket socket = new Socket(hostAddress, portNumber);
+		this.socket = socket;
 		System.out.println("Set up 2");
-		textOutputWriter = new PrintWriter(socket.getOutputStream());
+		textOutputWriter = new PrintWriter(this.socket.getOutputStream());
 		textOutputWriter.flush();
 		System.out.println("Set up 3");
-		objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
+		objOutputWriter = new ObjectOutputStream(this.socket.getOutputStream());
 		objOutputWriter.flush();
 		System.out.println("Set up 4");
-		textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
-		objInputStream = new ObjectInputStream(socket.getInputStream());
+		textInputStream = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
+		objInputStream = new ObjectInputStream(this.socket.getInputStream());
 		System.out.println("Set up 5");
-		
 	}
 	
-	private void setUp(){
-		// Try to create the socket by latching to the Host ServerSocket.
-		// If socket created, try to create IO streams
-		System.out.println("Setting up");
-		try (
-				Socket socket = new Socket(hostAddress, portNumber);
-				){
-			this.socket = socket;
-			System.out.println("Setting up2");
-			getIO(socket);
-			listening = true;
-			System.out.println("Setting up3");
-		} catch (UnknownHostException e){
-			e.printStackTrace();
-			System.err.println("Unknown Host. " + hostAddress  + " on port" + portNumber + ". Ensure the correct host address was used.");
-			System.err.println("Ensure that the host has hosted the game");
-		} catch (IOException e1) { //caused by automatic close invocation on socket
-			System.err.println("Connection was refused - check host is hosting the game");
-			e1.printStackTrace();
-		}
+	//Getters and Setters
+	public void setGameScene(MultiplayerGame game){
+		this.game = game;
 	}
-	
-	public void getIO(Socket socket){
-		//Set up IO
-		System.out.println("Getting IO");
-		try {
-			// set up output streams
-			System.out.println("Getting IO2");
-			textOutputWriter = new PrintWriter(socket.getOutputStream());
-			textOutputWriter.flush();
-			objOutputWriter = new ObjectOutputStream(socket.getOutputStream());
-			objOutputWriter.flush();
-			System.out.println("Getting IO3");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Could not set up output streams");
-		}
-		
-		try {
-			// set up input streams
-			System.out.println("Getting IO4");
-			textInputStream = new BufferedReader( new InputStreamReader(socket.getInputStream()));
-			objInputStream = new ObjectInputStream(socket.getInputStream());
-			System.out.println("Getting IO5");
-		} catch (IOException e){
-			e.printStackTrace();
-			System.err.println("Could not set up input streams");
-		}
-	}
+
 }

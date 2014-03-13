@@ -1,5 +1,7 @@
 package scn;
 
+import java.io.Serializable;
+
 import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;

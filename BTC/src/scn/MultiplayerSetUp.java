@@ -10,6 +10,7 @@ import thr.ClientThread;
 import thr.Host;
 import thr.HostThread;
 import lib.ButtonText;
+import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
 import lib.jog.audio.Sound;
@@ -29,6 +30,11 @@ public class MultiplayerSetUp extends Scene {
 	private final int CLIENT_BUTTON_X = window.width() /2;
 	private final int CLIENT_BUTTON_Y = window.height() / 2 + 30;
 	
+	private final int START_BUTTON_W = 128;
+	private final int START_BUTTON_H = 16;
+	private final int START_BUTTON_X = window.width() /2;
+	private final int START_BUTTON_Y = window.height() / 2 + 60;
+	
 	private HostThread host;
 	private ClientThread client;
 	
@@ -41,8 +47,10 @@ public class MultiplayerSetUp extends Scene {
 	private lib.ButtonText[] buttons;
 	
 	//flags
-	private boolean host_pressed = false;
-	private boolean client_pressed = true;
+	private boolean host_active = false;
+	private boolean client_active = false;
+	
+	private boolean connection_established = false;
 
 	protected MultiplayerSetUp(Main main) {
 		super(main);
@@ -90,53 +98,35 @@ public class MultiplayerSetUp extends Scene {
 		textBox.addText("Or worse..");
 		
 		//Initialise buttons
-		buttons = new lib.ButtonText[2];
+		buttons = new lib.ButtonText[3];
 		
 		lib.ButtonText.Action hostGame = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
-				host_pressed = true;
-				client_pressed = false;
-				host = new HostThread(4445);
-				buttons[0].setAvailability(false);
-				buttons[1].setAvailability(false);
-				host.start();
-				/*try (ServerSocket ss = new ServerSocket(4444)){
-					host = new Host(ss.accept());
-					host_pressed = true;
-					client_pressed = false;
-					buttons[0].setAvailability(false);
-					buttons[1].setAvailability(false);
-					host.start();
-				} catch (IOException e) {
-					System.err.println("Could not listen on port 4444");
-					e.printStackTrace();
-				}*/
+				createHost();
 			}
 		};
 		
 		lib.ButtonText.Action startClient = new lib.ButtonText.Action(){
 			@Override
 			public void action() {
-				client_pressed = true;	
-				host_pressed = false;
-				client = new ClientThread("localhost", 4445);
-				buttons[0].setAvailability(false);
-				buttons[1].setAvailability(false);
-				client.start();
-				/*try {
-					client = new Client(new Socket("192.168.0.7", 4444));
-					client.start();
-				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
+				createClient();
 				}
-			};
-
+		};
+		
+		lib.ButtonText.Action startGame = new lib.ButtonText.Action(){
+			@Override
+			public void action() {
+				MultiplayerGame game = new MultiplayerGame(main);
+				
+				if (host_active){
+					host.setGameScene(game);
+					host.setPlaying(true);
+				}
+				
+				main.setScene(game);
+			}
+		};
 		
 		buttons[0] = new lib.ButtonText("Host LAN Game", hostGame, HOST_BUTTON_X,
 				HOST_BUTTON_Y, HOST_BUTTON_W, HOST_BUTTON_H, 8, 6);
@@ -144,6 +134,32 @@ public class MultiplayerSetUp extends Scene {
 		buttons[1] = new lib.ButtonText("Start Client", startClient, CLIENT_BUTTON_X, 
 				CLIENT_BUTTON_Y, CLIENT_BUTTON_W, CLIENT_BUTTON_H, 8, 6);
 		
+		buttons[2] = new lib.ButtonText("Start Game", startGame, START_BUTTON_X,
+				START_BUTTON_Y, START_BUTTON_W, START_BUTTON_H, 8, 6);
+		
+		buttons[2].setAvailability(false);
+		
+	}
+	
+	private void createHost(){
+		//Hide buttons
+		buttons[0].setAvailability(false);
+		buttons[1].setAvailability(false);
+		buttons[2].setAvailability(true);
+		//Create and start a host thread
+		host = new HostThread(4445, this);
+		host.start();
+		host_active = true;
+	}
+	
+	private void createClient(){
+		//hide buttons
+		buttons[0].setAvailability(false);
+		buttons[1].setAvailability(false);
+		//create and start a hosting thread
+		client = new ClientThread("localhost", 4445, this);
+		client.start();
+		client_active = true;
 	}
 
 	@Override
@@ -160,6 +176,9 @@ public class MultiplayerSetUp extends Scene {
 		for (lib.ButtonText b : buttons) {
 			b.draw();
 		}
+		if(connection_established){
+			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);
+		}
 	}
 
 	@Override
@@ -168,6 +187,13 @@ public class MultiplayerSetUp extends Scene {
 
 	@Override
 	public void playSound(Sound sound) {
+	}
+	
+	
+	//Getters and Setters
+
+	public void setConnection_established(boolean connection_established) {
+		this.connection_established = connection_established;
 	}
 
 }
