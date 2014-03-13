@@ -102,20 +102,28 @@ public class Game extends Scene {
     /** The background to draw in the airspace. */
     private Image background;
    
-    /** A list of location names for waypoint flavour */
-    public static final String[] LOCATION_NAMES = new String[] {
-    		"Moscow",
-    		"Malino",
-    		"Khorlovo",
-    		"Peski"
+    /** List of names to be assigned to flight entry points */
+    public static final String[] FLIGHT_ENTRY_POINT_NAMES = new String[] {
+    	"Moscow",
+    	"Khorlovo",
+    };
+    
+    /** List of names to be assigned to flight exit points */
+    public static final String[] FLIGHT_EXIT_POINT_NAMES = new String[] {
+    	"Malino",
+		"Peski",
     };
    
-    /** The set of waypoints in the airspace which are origins / destinations */
-    public static Waypoint[] locationWaypoints = new Waypoint[] {
+    /** Create the set of waypoints that are flight entry points */
+    public static Waypoint[] flightEntryPoints = new Waypoint[] {
     	new Waypoint(8, 8, 1), // top left
+    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, 1), // bottom right
+    };
+    
+    /** Create the set of waypoints that are flight exit points */
+    public static Waypoint[] flightExitPoints = new Waypoint[] {
     	new Waypoint(8, window.height() - ORDERSBOX_H - 40, 1), // bottom left
     	new Waypoint(window.width() - 40, 8, 1), // top right
-    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, 1), // bottom right
     };
     
     /** The set of airports in the airspace */
@@ -133,11 +141,11 @@ public class Game extends Scene {
     	new Waypoint(600, 700, 0),
     	new Waypoint(670, 400, 0),
 
-    	// Destination/origin waypoints
-    	locationWaypoints[0],
-    	locationWaypoints[1],
-    	locationWaypoints[2],
-    	locationWaypoints[3],
+    	//Flight entry and exit points
+    	flightEntryPoints[0],
+    	flightEntryPoints[1],
+    	flightExitPoints[0],
+    	flightExitPoints[1],
     };
 
 	/**
@@ -473,18 +481,18 @@ public class Game extends Scene {
         graphics.setViewport();
         graphics.setColour(0, 128, 0);
         
-        graphics.print(LOCATION_NAMES[0],
-        		locationWaypoints[0].position().x() + 25,
-        		locationWaypoints[0].position().y() + 10);
-        graphics.print(LOCATION_NAMES[1],
-        		locationWaypoints[1].position().x() + 25,
-        		locationWaypoints[1].position().y() + 10);
-        graphics.print(LOCATION_NAMES[2],
-        		locationWaypoints[2].position().x() - 70,
-        		locationWaypoints[2].position().y() + 10);
-        graphics.print(LOCATION_NAMES[3],
-        		locationWaypoints[3].position().x() - 50,
-        		locationWaypoints[3].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[0],
+        		flightEntryPoints[0].position().x() + 25,
+        		flightEntryPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[0],
+        		flightExitPoints[0].position().x() + 25,
+        		flightExitPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[1],
+        		flightEntryPoints[1].position().x() - 70,
+        		flightEntryPoints[1].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[1],
+        		flightExitPoints[1].position().x() - 50,
+        		flightExitPoints[1].position().y() + 10);
         
         for (Airport airport : airports) {
         	String[] names = airport.entryPointNames();
@@ -922,16 +930,16 @@ public class Game extends Scene {
     	if (Math.random() < p) {
     		do {
     			// Random used to determine the origin point
-    			o = (new Random()).nextInt(locationWaypoints.length);
+    			o = (new Random()).nextInt(flightEntryPoints.length);
 
     			// Random used to determine the destination point
-    			d = (new Random()).nextInt(locationWaypoints.length);
+    			d = (new Random()).nextInt(flightExitPoints.length);
     		} while (d == o);
 
-    		originName = LOCATION_NAMES[o];
-    		originPoint = locationWaypoints[o];
-    		destinationName = LOCATION_NAMES[d];
-    		destinationPoint = locationWaypoints[d];
+    		originName = FLIGHT_ENTRY_POINT_NAMES[o];
+    		originPoint = flightEntryPoints[o];
+    		destinationName = FLIGHT_EXIT_POINT_NAMES[d];
+    		destinationPoint = flightExitPoints[d];
     		
     		return new Aircraft(name, destinationName, originName,
             		destinationPoint, originPoint, aircraftImage,
@@ -939,13 +947,13 @@ public class Game extends Scene {
             		null);
     	} else {
     		// Random used to determine the origin point
-			o = (new Random()).nextInt(locationWaypoints.length);
+    		o = (new Random()).nextInt(flightEntryPoints.length);
 			
 			// Random used to determine the destination airport
 			d = (new Random()).nextInt(airports.length);
 			
-			originName = LOCATION_NAMES[o];
-    		originPoint = locationWaypoints[o];			
+			originName = FLIGHT_ENTRY_POINT_NAMES[o];
+    		originPoint = flightEntryPoints[o];				
     		destinationPoint = airports[d].getPosition(originPoint.position());
     		destinationName = airports[d].name();
     		
