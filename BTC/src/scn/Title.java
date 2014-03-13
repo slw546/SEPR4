@@ -135,7 +135,10 @@ public class Title extends Scene {
 			public void action() {
 				try {
 					Desktop.getDesktop().browse(new URI(HELP_URL));
-				} catch (IOException | URISyntaxException e) {
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
 			}
