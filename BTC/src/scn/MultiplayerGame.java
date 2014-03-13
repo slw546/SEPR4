@@ -16,6 +16,9 @@ public class MultiplayerGame extends Game {
 	/** The current x co-ordinate of the line to split the game screen of the two players **/
 	private int splitLine = window.width()/2 - 16;
 	
+	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
+	private int moveSplitLineTo = splitLine;
+	
 	/** Enumerator for the two players, constructed with the colour of their controlled waypoints **/
 	public enum Player {
 		LEFT(0, 0, 128),
@@ -48,6 +51,15 @@ public class MultiplayerGame extends Game {
 
 	public MultiplayerGame(Main main) {
 		super(main, 0);
+	}
+	
+	public void update(double dt) {
+		super.update(dt);
+		// Increment or decrement the splitLine towards moveSplitLineTo every update, giving a smooth transition of the split line
+		if (moveSplitLineTo < splitLine)
+			splitLine -= 1;
+		if (moveSplitLineTo > splitLine)
+			splitLine += 1;
 	}
 	
 	/**
@@ -119,11 +131,11 @@ public class MultiplayerGame extends Game {
         switch (key) {
         	case input.KEY_Q:
         		if (splitLine > (window.width()*0.25))
-        			splitLine -= 50;
+        			moveSplitLineTo -= 50;
         		break;
         	case input.KEY_E:
         		if (splitLine < (window.width()*0.75))
-        			splitLine += 50;
+        			moveSplitLineTo += 50;
         		break;
         }
 	}
