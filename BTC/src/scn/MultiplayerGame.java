@@ -85,18 +85,18 @@ public class MultiplayerGame extends Game {
         graphics.setViewport();
         graphics.setColour(0, 128, 0);
         
-        graphics.print(LOCATION_NAMES[0],
-        		locationWaypoints[0].position().x() + 25,
-        		locationWaypoints[0].position().y() + 10);
-        graphics.print(LOCATION_NAMES[1],
-        		locationWaypoints[1].position().x() + 25,
-        		locationWaypoints[1].position().y() + 10);
-        graphics.print(LOCATION_NAMES[2],
-        		locationWaypoints[2].position().x() - 70,
-        		locationWaypoints[2].position().y() + 10);
-        graphics.print(LOCATION_NAMES[3],
-        		locationWaypoints[3].position().x() - 50,
-        		locationWaypoints[3].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[0],
+        		flightEntryPoints[0].position().x() + 25,
+        		flightEntryPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[0],
+        		flightExitPoints[0].position().x() + 25,
+        		flightExitPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[1],
+        		flightEntryPoints[1].position().x() - 70,
+        		flightEntryPoints[1].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[1],
+        		flightExitPoints[1].position().x() - 50,
+        		flightExitPoints[1].position().y() + 10);
         
         for (Airport airport : airports) {
         	String[] names = airport.entryPointNames();
