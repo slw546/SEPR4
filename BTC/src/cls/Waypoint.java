@@ -112,6 +112,16 @@ public class Waypoint {
 	}
 	
 	/**
+	 * Draws the waypoint with a specified colour at its current position
+	 * @param colour the colour of the waypoint
+	 */
+	public void draw(double[] colour) {
+		graphics.setColour(colour[0], colour[1], colour[2], colour[3]);
+		graphics.circle(false, position.x(), position.y(), RADIUS);
+		graphics.circle(true, position.x(), position.y(), RADIUS - 2);
+	}
+	
+	/**
 	 * Outputs the waypoint's key details in a readable format.
 	 * @return the textual representation of the vector
 	 */

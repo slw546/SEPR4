@@ -56,7 +56,18 @@ public class Title extends Scene {
 			beep.setVolume(0.2f);
 		}
 		
-		buttons = new lib.ButtonText[6];
+		buttons = new lib.ButtonText[7];
+		
+		// Temporary Multiplayer Game button
+		lib.ButtonText.Action runMPGame = new lib.ButtonText.Action() {
+			
+			@Override
+			public void action() {
+				main.setScene(new MultiplayerGame(main));
+			}
+		};
+
+		
 		// Multiplayer Set up button
 		lib.ButtonText.Action runMPSetup = new lib.ButtonText.Action() {
 			
@@ -91,7 +102,10 @@ public class Title extends Scene {
 		
 		buttons[5] = new lib.ButtonText("Play Multiplayer", runMPSetup, window.height(),
 				window.height()/2 + 66, window.width() - window.height(), 24, 8, 6);
-
+		
+		buttons[6] = new lib.ButtonText("Play Multiplayer Game (Temp)", runMPGame, window.height(),
+				window.height()/2 + 36, window.width() - window.height(), 24, 8, 6);
+		
 		/* Game Button
 		lib.ButtonText.Action play = new lib.ButtonText.Action() {
 			@Override
@@ -282,6 +296,8 @@ public class Title extends Scene {
 		}
 
 		graphics.setColour(0, 128, 0);
+		graphics.line(window.height(), window.height()/2 + 30, window.width() - 16, window.height()/2 + 30);
+		graphics.line(window.height(), window.height()/2 + 60, window.width() - 16, window.height()/2 + 60);
 		graphics.line(window.height(), window.height()/2 + 90, window.width() - 16, window.height()/2 + 90);
 		graphics.line(window.height(), window.height()/2 + 120, window.width() - 16, window.height()/2 + 120);
 		graphics.line(window.height(), window.height()/2 + 150, window.width() - 16, window.height()/2 + 150);

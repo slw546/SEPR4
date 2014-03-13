@@ -57,16 +57,16 @@ public class Game extends Scene {
     private int totalScore;
 
     /** The currently selected aircraft */
-    private Aircraft selectedAircraft;
+    protected Aircraft selectedAircraft;
     
     /** The currently selected waypoint */
-    private Waypoint selectedWaypoint;
+    protected Waypoint selectedWaypoint;
     
     /** Selected path point, in an aircraft's route, used for altering the route */
-    private int selectedPathpoint;
+    protected int selectedPathpoint;
     
     /** A list of all aircraft present in the airspace */
-    private ArrayList<Aircraft> aircraftInAirspace;
+    protected ArrayList<Aircraft> aircraftInAirspace;
    
     /** The image to be used for aircraft */
     private Image aircraftImage;
@@ -445,7 +445,7 @@ public class Game extends Scene {
      * Draw waypoints, and route of a selected aircraft between waypoints
      * print waypoint names next to waypoints
      */
-    private void drawMap() {
+    protected void drawMap() {
         for (Waypoint waypoint : airspaceWaypoints) {
             waypoint.draw();
         }
