@@ -540,16 +540,16 @@ public class Airport {
 					// Reset aircraft to new route
 					airc.clearAirport();
 
-					int d = (new Random()).nextInt(Game.locationWaypoints.length);
+					int d = (new Random()).nextInt(Game.flightEntryPoints.length);
 					Waypoint currentPos = new Waypoint(
 							airc.position().x(), airc.position().y(), 1);
 
 					airc.setOriginName(name);
 					
-					airc.setDestinationName(Game.LOCATION_NAMES[d]);
+					airc.setDestinationName(Game.FLIGHT_EXIT_POINT_NAMES[d]);
 					airc.setRoute(airc.findGreedyRoute(currentPos,
-							Game.locationWaypoints[d], Game.airspaceWaypoints));
-					airc.setDestination(Game.locationWaypoints[d]);
+							Game.flightExitPoints[d], Game.airspaceWaypoints));
+					airc.setDestination(Game.flightExitPoints[d]);
 					airc.setCurrentTarget(airc.getRoute()[0].position());
 					airc.setManuallyControlled(false);
 					airc.clearCurrentRouteStage();
