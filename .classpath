@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="BTC/src">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SEPR4/BTC/ext/natives"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="baretrafficcontrol/BTC/ext/natives"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="BTC/ext/jogg-0.0.7.jar"/>
 	<classpathentry kind="lib" path="BTC/ext/jorbis-0.0.15.jar"/>
 	<classpathentry kind="lib" path="BTC/ext/junit-4.11.jar"/>
-	<classpathentry kind="lib" path="BTC/ext/lwjgl.jar" />
+	<classpathentry kind="lib" path="BTC/ext/lwjgl.jar"/>
 	<classpathentry kind="lib" path="BTC/ext/slick.jar"/>
 	<classpathentry kind="output" path="BTC/bin"/>
 </classpath>

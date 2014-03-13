@@ -97,7 +97,7 @@ public class MultiplayerSetUp extends Scene {
 			public void action() {
 				host_pressed = true;
 				client_pressed = false;
-				host = new HostThread(4444);
+				host = new HostThread(4445);
 				buttons[0].setAvailability(false);
 				buttons[1].setAvailability(false);
 				host.start();
@@ -120,7 +120,7 @@ public class MultiplayerSetUp extends Scene {
 			public void action() {
 				client_pressed = true;	
 				host_pressed = false;
-				client = new ClientThread("192.168.0.7", 4444);
+				client = new ClientThread("localhost", 4445);
 				buttons[0].setAvailability(false);
 				buttons[1].setAvailability(false);
 				client.start();
