@@ -13,11 +13,15 @@ import btc.Main;
 
 public class MultiplayerGame extends Game {
 	
+	private static final int[] SPLIT_LINE_POSITIONS = new int[] {
+		320, 350, 380, 420, 460, 500, 540, 580, 640, 700, 740, 780, 820, 860, 900, 930, 960
+	};
+	
 	/** The current x co-ordinate of the line to split the game screen of the two players **/
-	private int splitLine = window.width()/2 - 16;
+	private int splitLine = SPLIT_LINE_POSITIONS[8];
 	
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
-	private int moveSplitLineTo = splitLine;
+	private int moveSplitLineTo = 8;
 	
 	/** Enumerator for the two players, constructed with the colour of their controlled waypoints **/
 	public enum Player {
@@ -56,9 +60,9 @@ public class MultiplayerGame extends Game {
 	public void update(double dt) {
 		super.update(dt);
 		// Increment or decrement the splitLine towards moveSplitLineTo every update, giving a smooth transition of the split line
-		if (moveSplitLineTo < splitLine)
+		if (SPLIT_LINE_POSITIONS[moveSplitLineTo] < splitLine)
 			splitLine -= 1;
-		if (moveSplitLineTo > splitLine)
+		if (SPLIT_LINE_POSITIONS[moveSplitLineTo] > splitLine)
 			splitLine += 1;
 	}
 	
@@ -130,12 +134,12 @@ public class MultiplayerGame extends Game {
 		super.keyReleased(key);
         switch (key) {
         	case input.KEY_Q:
-        		if (splitLine > (window.width()*0.25))
-        			moveSplitLineTo -= 50;
+        		if (moveSplitLineTo > 0)
+        			moveSplitLineTo -= 1;
         		break;
         	case input.KEY_E:
-        		if (splitLine < (window.width()*0.75))
-        			moveSplitLineTo += 50;
+        		if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
+        			moveSplitLineTo += 1;
         		break;
         }
 	}
