@@ -15,9 +15,6 @@ public class ScoreTest {
 	/** The game instance to run tests in */
 	Game testGame; 
 	
-	/** The name to give to the first testing aircraft */
-	private String testAircraftName;
-	
 	/** The origin to give to testing aircraft */
 	private String testAircraftOrigin;
 	
@@ -33,7 +30,6 @@ public class ScoreTest {
 	 */
 	@Before
 	public void beforeTests() {
-		this.testAircraftName = "TestAircraft1";
 		this.testAircraftOrigin = "Dublin";
 		this.testAircraftDest = "Berlin";
 		this.testGame = new Game(null, 1);
@@ -48,8 +44,7 @@ public class ScoreTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 		
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(-100, 0, 1),
 				null, 10.0, waypointList, null);
 		
@@ -70,8 +65,7 @@ public class ScoreTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 		
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(-70, 0, 1),
 				null, 10.0, waypointList, null);
 		
@@ -92,8 +86,7 @@ public class ScoreTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 		
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(65, 0, 1),
 				null, 10.0, waypointList, null);
 		

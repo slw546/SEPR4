@@ -72,9 +72,6 @@ public class AirportTest {
 			testParkingWaypoints,
 			testTakeoffWaypoints);
 
-	/** The name to give to the first testing aircraft */
-	private String testAircraftName;
-
 	/** The origin to give to testing aircraft */
 	private String testAircraftOrigin;
 
@@ -91,7 +88,6 @@ public class AirportTest {
 	@Before
 	public void beforeTests() {
 		this.testGame = new Game(null, 1);
-		this.testAircraftName = "TestAircraft1";
 		this.testAircraftOrigin = "Dublin";
 		this.testAircraftDest = "Berlin";
 		this.testGame = new Game(null, 1);
@@ -106,8 +102,7 @@ public class AirportTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
 				null, 10.0, waypointList, null);
 
@@ -123,8 +118,7 @@ public class AirportTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
 				null, 10.0, waypointList, null);
 
@@ -140,8 +134,7 @@ public class AirportTest {
 				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
 				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
 
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
 				null, 10.0, waypointList, null);
 
@@ -155,8 +148,7 @@ public class AirportTest {
 	private Aircraft generateTestAircraft3() {
 		Waypoint[] waypointList = {new Waypoint(767, 0, 2)};
 
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
 				new Waypoint(767, 0, 2), new Waypoint(670, 44, 2),
 				null, 10.0, waypointList, testAirport, true);
 

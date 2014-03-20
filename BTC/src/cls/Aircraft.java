@@ -117,6 +117,8 @@ public class Aircraft {
 		NORMAL, FINISHED, WAITING, LANDING, TAKEOFF, PARKED
 	};
 	
+	private static ArrayList<String> usedNames = new ArrayList<String>();
+	
 	/**
 	 * Flags whether the collision warning sound has been played before.
 	 * If set, aircraft will not play warning again until it the separation 
@@ -140,32 +142,32 @@ public class Aircraft {
 	 * @param sceneWaypoints the waypoints on the map
 	 * @param airport the airport the aircraft is travelling to
 	 */
-	public Aircraft(String name, String nameDestination,
+	public Aircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
 			Waypoint originPoint, graphics.Image img,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport) {
-		generateAircraft(name, nameDestination, nameOrigin,
+		generateAircraft(nameDestination, nameOrigin,
 				destinationPoint, originPoint, img, speed,
 				sceneWaypoints, airport, false);
 	}
 
-	public Aircraft(String name, String nameDestination,
+	public Aircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
 			Waypoint originPoint, graphics.Image img,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
-		generateAircraft(name, nameDestination, nameOrigin,
+		generateAircraft(nameDestination, nameOrigin,
 				destinationPoint, originPoint, img, speed,
 				sceneWaypoints, airport, testing);
 	}
 	
-	private void generateAircraft(String name, String nameDestination,
+	private void generateAircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
 			Waypoint originPoint, graphics.Image img,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
-		flightName = name;
+		flightName = generateName();
 		destinationName = nameDestination;
 		originName = nameOrigin;
 		image = img;
@@ -233,6 +235,20 @@ public class Aircraft {
 		score = 100;
 		
 		applyDifficultySettings(true);
+	}
+	
+	private String generateName() {
+		String name = "";
+		boolean nameTaken = true;
+		while (nameTaken) {
+			name = "Flight " + (int)(900 * Math.random() + 100);
+			nameTaken = false;
+			for (String used : usedNames) {
+				if (name == used) nameTaken = true;
+			}
+		}
+		usedNames.add(name);
+		return name;
 	}
 	
 	public void applyDifficultySettings(boolean setVelocity) {

@@ -627,17 +627,7 @@ public class Demo extends Scene {
 		Waypoint originPoint = locationWaypoints[o];
 		Waypoint destinationPoint = locationWaypoints[d];
 
-		// Name
-		String name = "";
-		boolean nameTaken = true;
-		while (nameTaken) {
-			name = "Flight " + (int)(900 * Math.random() + 100);
-			nameTaken = false;
-			for (Aircraft a : aircraftInAirspace) {
-				if (a.name() == name) nameTaken = true;
-			}
-		}
-		return new Aircraft(name, destinationName, originName, destinationPoint,
+		return new Aircraft(destinationName, originName, destinationPoint,
 				originPoint, aircraftImage, 32 + (int)(10 * Math.random()),
 				airspaceWaypoints, null);
 	}

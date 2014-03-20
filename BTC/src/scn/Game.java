@@ -889,17 +889,6 @@ public class Game extends Scene {
     	Waypoint originPoint;
     	String destinationName;
     	Waypoint destinationPoint;
-    	
-        // Name
-        String name = "";
-        boolean nameTaken = true;
-        while (nameTaken) {
-            name = "Flight " + (int)(900 * Math.random() + 100);
-            nameTaken = false;
-            for (Aircraft a : aircraftInAirspace) {
-                if (a.name() == name) nameTaken = true;
-            }
-        }
         
         // Reduce probability that an aircraft will be heading to an airport
         // based on how full the airport is
@@ -942,7 +931,7 @@ public class Game extends Scene {
     		destinationName = FLIGHT_EXIT_POINT_NAMES[d];
     		destinationPoint = flightExitPoints[d];
     		
-    		return new Aircraft(name, destinationName, originName,
+    		return new Aircraft(destinationName, originName,
             		destinationPoint, originPoint, aircraftImage,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		null);
@@ -957,7 +946,7 @@ public class Game extends Scene {
     		destinationPoint = airports[d].getPosition(originPoint.position());
     		destinationName = airports[d].name();
     		
-    		return new Aircraft(name, destinationName, originName,
+    		return new Aircraft(destinationName, originName,
             		destinationPoint, originPoint, aircraftImage,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		airports[d]);
