@@ -4,6 +4,13 @@ import lib.jog.graphics;
 
 public class Waypoint {
 	
+	public enum WaypointType {
+		AIRSPACE,
+		ENTRY,
+		EXIT,
+		AIRPORT,
+	}
+	
 	/** Leniency to allow mouse input to be accepted in a small area around the waypoint */
 	public final static int MOUSE_LENIENCY = 16;
 	
@@ -15,7 +22,7 @@ public class Waypoint {
 	
 	/** Marks whether the waypoint is a point where aircraft may enter and
 	 * exit the airspace */
-	private int type;
+	private WaypointType type;
 	
 	/**
 	 * Constructor for waypoints
@@ -26,13 +33,13 @@ public class Waypoint {
 	 * 					1: a point where aircraft may enter and leave the airspace, 
 	 * 					2: an airport waypoint
 	 */
-	public Waypoint(double x, double y, int type) {
+	public Waypoint(double x, double y, WaypointType type) {
 		this.position = new Vector(x, y, 0);
 		this.type = type;
 		
 		// Scale points to fit on screen
 		// Entry and exit points are scaled automatically
-		if (type != 1) {
+		if (type != WaypointType.AIRSPACE) {
 			Vector scaledPosition = position.remapPosition();
 			position = scaledPosition;
 		}
@@ -59,17 +66,10 @@ public class Waypoint {
 	}
 	
 	/**
-	 * Gets the waypoints type:
-	 * <p>
-	 * <ul>
-	 * <li>0: Normal waypoint</li>
-	 * <li>1: Entry/Exit point</li>
-	 * <li>2: Airport waypoint</li>
-	 * </ul>
-	 * </p>
-	 * @return Waypoint type
+	 * Gets the waypoints type.
+	 * @return Waypoint type.
 	 */
-	public int type() {
+	public WaypointType type() {
 		return this.type;
 	}
 	

@@ -599,9 +599,9 @@ public class Aircraft {
 		// Update target
 		if (isAt(currentTarget) && (status == AirportState.NORMAL)) {	
 			if (currentTarget.equals(destination.position())) {
-				if (destination.type() == 1) {
+				if (destination.type() == Waypoint.WaypointType.EXIT) {
 					status = AirportState.FINISHED;
-				} else if (destination.type() == 2) {
+				} else if (destination.type() == Waypoint.WaypointType.AIRPORT) {
 					altitudeState = AltitudeState.LEVEL;
 					airport.addAircraft(this);
 				}
@@ -915,7 +915,7 @@ public class Aircraft {
 				if (skip == true
 						|| point.position().equals(currentPos.position())
 						|| point.position().equals(origin.position())
-						|| ((point.type() > 0)
+						|| ((point.type() != Waypoint.WaypointType.AIRSPACE)
 								&& (!point.position().equals(destination.position())))) {
 					skip = false;
 					continue;

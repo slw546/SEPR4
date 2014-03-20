@@ -117,14 +117,14 @@ public class Game extends Scene {
     
     /** Create the set of waypoints that are flight entry points */
     public static Waypoint[] flightEntryPoints = new Waypoint[] {
-    	new Waypoint(8, 8, 1), // top left
-    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, 1), // bottom right
+    	new Waypoint(8, 8, Waypoint.WaypointType.ENTRY), // top left
+    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.ENTRY), // bottom right
     };
     
     /** Create the set of waypoints that are flight exit points */
     public static Waypoint[] flightExitPoints = new Waypoint[] {
-    	new Waypoint(8, window.height() - ORDERSBOX_H - 40, 1), // bottom left
-    	new Waypoint(window.width() - 40, 8, 1), // top right
+    	new Waypoint(8, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.EXIT), // bottom left
+    	new Waypoint(window.width() - 40, 8, Waypoint.WaypointType.EXIT), // top right
     };
     
     /** The set of airports in the airspace */
@@ -133,14 +133,14 @@ public class Game extends Scene {
     /** All waypoints in the airspace, <b>including</b> location waypoints. */
     public static Waypoint[] airspaceWaypoints = new Waypoint[] {
     	// Airspace waypoints
-    	new Waypoint(125, 70, 0),
-    	new Waypoint(200, 635, 0),
-    	new Waypoint(250, 400, 0),
-    	new Waypoint(300, 100, 0),
-    	new Waypoint(450, 605, 0),
-    	new Waypoint(515, 300, 0),
-    	new Waypoint(600, 700, 0),
-    	new Waypoint(670, 400, 0),
+    	new Waypoint(125, 70, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(200, 635, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(250, 400, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(300, 100, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(450, 605, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(515, 300, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(600, 700, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(670, 400, Waypoint.WaypointType.AIRSPACE),
 
     	//Flight entry and exit points
     	flightEntryPoints[0],
@@ -237,60 +237,91 @@ public class Game extends Scene {
         		flightGenerationInterval = flightGenerationInterval / 1.6;
         		break;
         }
-        
-        // Set up airports
+        // Airport Setup
         // Waypoints an aircraft will turn through to reach the runway
         Waypoint[] entryWaypoints = new Waypoint[] {
-        		new Waypoint(677, 44, 2),
-        		new Waypoint(767, 0, 2),
-        		new Waypoint(873, 0, 2),
-        		new Waypoint(957, 44, 2)
+        		new Waypoint(677, 44, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(767, 0, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(873, 0, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(957, 44, Waypoint.WaypointType.AIRPORT),
         };
-        
-        String[] entryWaypointNames = new String[] {
-        		"Chkalovsky West",
-        		"Chkalovsky East"
-        };
-        
+        // Names of above waypoints
+        String[] entryWaypointNames = new String[] { "Chkalovsky West", "Chkalovsky East" };
         // Waypoints an aircraft will pass through while landing
         Waypoint[] landingWaypoints = new Waypoint[] {
-        		new Waypoint(817, 104, 2),
-        		new Waypoint(795, 726, 2),
-        		new Waypoint(825, 754, 2),
-        		new Waypoint(842, 652, 2),
-        		new Waypoint(866, 656, 2),
-        		new Waypoint(882, 546, 2),
-        		new Waypoint(950, 496, 2),
-        		new Waypoint(970, 486, 2),
-        		new Waypoint(1010, 486, 2)
+        		new Waypoint(817, 104, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(795, 726, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(825, 754, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(842, 652, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(866, 656, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(882, 546, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(950, 496, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(970, 486, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT),
         };
-        
-     // Waypoints an aircraft can park at
+        // Waypoints an aircraft can park at
         Waypoint[] parkingWaypoints = new Waypoint[] {
-        		new Waypoint(1092, 358, 2),
-        		new Waypoint(1113, 425, 2),
-        		new Waypoint(1108, 493, 2),
-        		new Waypoint(1085, 567, 2)
+        		new Waypoint(1092, 358, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1113, 425, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1108, 493, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1085, 567, Waypoint.WaypointType.AIRPORT),
         };
-        
         // Waypoints an aircraft will pass through while taking off
         Waypoint[] takeoffWaypoints = new Waypoint[] {
-        		new Waypoint(1010, 486, 2),
-        		new Waypoint(1001, 488, 2),
-        		new Waypoint(991, 671, 2),
-        		new Waypoint(954, 678, 2),
-        		new Waypoint(954, 655, 2),
-        		new Waypoint(976, 46, 2)
+        		new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1001, 488, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(991, 671, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(954, 678, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(954, 655, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(976, 46, Waypoint.WaypointType.AIRPORT),
         };
         
-        airports = new Airport[] {
-        	new Airport("Chkalovsky Airport", 4,
+        airports = new Airport[2];
+        airports[0] = new Airport("Chkalovsky Airport", 4,
         			entryWaypointNames,
         			entryWaypoints,
         			landingWaypoints,
         			parkingWaypoints,
-        			takeoffWaypoints)	
+        			takeoffWaypoints);
+        
+        entryWaypoints = new Waypoint[] {
+        		new Waypoint(677, 44, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(767, 0, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(873, 0, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(957, 44, Waypoint.WaypointType.AIRPORT),
         };
+        entryWaypointNames = new String[] { "Syrrilicovich West", "Syrrilicovich East" };
+        landingWaypoints = new Waypoint[] {
+        		new Waypoint(817, 104, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(795, 726, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(825, 754, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(842, 652, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(866, 656, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(882, 546, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(950, 496, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(970, 486, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT)
+        };
+        parkingWaypoints = new Waypoint[] {
+        		new Waypoint(1092, 358, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1113, 425, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1108, 493, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1085, 567, Waypoint.WaypointType.AIRPORT),
+        };
+        takeoffWaypoints = new Waypoint[] {
+        		new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1001, 488, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(991, 671, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(954, 678, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(954, 655, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(976, 46, Waypoint.WaypointType.AIRPORT),
+        };
+        airports[1] = new Airport("Syrrilicovich Airport", 4,
+        			entryWaypointNames,
+        			entryWaypoints,
+        			landingWaypoints,
+          			parkingWaypoints,
+          			takeoffWaypoints);
     }
    
     /**
@@ -309,16 +340,15 @@ public class Game extends Scene {
     			if(aircraft.score() > 50) {
     				switch ((new Random()).nextInt(3)) {
     				case 0:
-    					ordersBox.addOrder(">>> Mental planing bruv");
+    					ordersBox.addOrder(">>> Success to us!");
     					break;
     				case 1:
-    					ordersBox.addOrder(">>> Bare jokes man");
+    					ordersBox.addOrder(">>> Good job comrade.");
     					break;
     				case 2:
-    					ordersBox.addOrder(">>> Such plane");
+    					ordersBox.addOrder(">>> Many thanks.");
     					break;
     				}
-    				
     				// Update cumulative score
     				totalScore += aircraft.score();
     				aircraft.clearScore();
@@ -611,7 +641,7 @@ public class Game extends Scene {
             
             if (selectedAircraft != null) {
                 for (Waypoint w : airspaceWaypoints) {
-                    if ((w.type() == 0)
+                    if ((w.type() == Waypoint.WaypointType.AIRSPACE)
                     		&& w.isMouseOver(x-16, y-16)
                     		&& selectedAircraft.flightPathContains(w) > -1) {
                         selectedWaypoint = w;
@@ -649,7 +679,7 @@ public class Game extends Scene {
     			// entry or exit point, and when aircraft is in its
     			// 'normal' state
     			if (selectedAircraft.status() == AirportState.NORMAL) {
-    				if ((w.type() == 0) && w.isMouseOver(x-16, y-16)) {
+    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && w.isMouseOver(x-16, y-16)) {
     					selectedAircraft.alterPath(selectedPathpoint, w);
     					ordersBox.addOrder(">>> " + selectedAircraft.name()
     							+ " please alter your course");

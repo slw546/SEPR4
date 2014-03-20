@@ -542,7 +542,7 @@ public class Airport {
 
 					int d = (new Random()).nextInt(Game.flightEntryPoints.length);
 					Waypoint currentPos = new Waypoint(
-							airc.position().x(), airc.position().y(), 1);
+							airc.position().x(), airc.position().y(), Waypoint.WaypointType.ENTRY);
 
 					airc.setOriginName(name);
 					

@@ -142,10 +142,14 @@ public class Demo extends Scene {
 	 */
 	public static Waypoint[] locationWaypoints = new Waypoint[] {
 		/* A set of Waypoints which are origin / destination points */
-		new Waypoint(8, 8, 1), //top left
-		new Waypoint(8, window.height() - ORDERSBOX_H - 40, 1), //bottom left
-		new Waypoint(window.width() - 40, 8, 1), // top right
-		new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, 1), //bottom right
+		new Waypoint(8, 8, Waypoint.WaypointType.ENTRY), //top left
+		new Waypoint(8, 8, Waypoint.WaypointType.EXIT), //top left
+		new Waypoint(8, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.ENTRY), //bottom left
+		new Waypoint(8, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.EXIT), //bottom left
+		new Waypoint(window.width() - 40, 8, Waypoint.WaypointType.ENTRY), // top right
+		new Waypoint(window.width() - 40, 8, Waypoint.WaypointType.EXIT), // top right
+		new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.ENTRY), //bottom right
+		new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.EXIT), //bottom right
 	};
 
 	/**
@@ -155,16 +159,16 @@ public class Demo extends Scene {
 		/* All waypoints in the airspace, including location Way Points*/
 
 		//airspace waypoints
-		new Waypoint(125, 70, 0),   // 0
-		new Waypoint(700, 100, 0),  // 1
-		new Waypoint(1040, 80, 0),  // 2
-		new Waypoint(670, 400, 0),  // 3
-		new Waypoint(1050, 400, 0), // 4
-		new Waypoint(250, 400, 0),  // 5
-		new Waypoint(200, 635, 0),  // 6
-		new Waypoint(500, 655, 0),  // 7
-		new Waypoint(800, 750, 0),  // 8
-		new Waypoint(1000, 750, 0), // 9
+		new Waypoint(125, 70, Waypoint.WaypointType.AIRSPACE),   // 0
+		new Waypoint(700, 100, Waypoint.WaypointType.AIRSPACE),  // 1
+		new Waypoint(1040, 80, Waypoint.WaypointType.AIRSPACE),  // 2
+		new Waypoint(670, 400, Waypoint.WaypointType.AIRSPACE),  // 3
+		new Waypoint(1050, 400, Waypoint.WaypointType.AIRSPACE), // 4
+		new Waypoint(250, 400, Waypoint.WaypointType.AIRSPACE),  // 5
+		new Waypoint(200, 635, Waypoint.WaypointType.AIRSPACE),  // 6
+		new Waypoint(500, 655, Waypoint.WaypointType.AIRSPACE),  // 7
+		new Waypoint(800, 750, Waypoint.WaypointType.AIRSPACE),  // 8
+		new Waypoint(1000, 750, Waypoint.WaypointType.AIRSPACE), // 9
 		//destination/origin waypoints - present in this list for pathfinding.
 		locationWaypoints[0],           // 10
 		locationWaypoints[1],           // 11

@@ -48,13 +48,15 @@ public class AircraftTest {
 	 * </p>
 	 */
 	private Aircraft generateTestAircraft() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
+		Waypoint[] waypointList = new Waypoint[] {
+				new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+				new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+				new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+				new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+				new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
-				null, 10.0, waypointList, null);
+				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
 		
 		return testAircraft;
 	}

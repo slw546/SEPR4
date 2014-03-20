@@ -40,16 +40,18 @@ public class ScoreTest {
 	 * @return the first test aircraft
 	 */
 	private Aircraft generateTestAircraft() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(-100, 0, 1),
-				null, 10.0, waypointList, null);
+				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
 		
 		return testAircraft;
-		
 	}
 	
 	/**
@@ -61,16 +63,18 @@ public class ScoreTest {
 	 * @return the test aircraft
 	 */
 	private Aircraft generateTestAircraft2() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(-70, 0, 1),
-				null, 10.0, waypointList, null);
+				waypointList[1], new Waypoint(-70, 0, Waypoint.WaypointType.ENTRY), null, 10.0, waypointList, null);
 		
 		return testAircraft;
-		
 	}
 	
 	/**
@@ -82,16 +86,18 @@ public class ScoreTest {
 	 * @return the test aircraft
 	 */
 	private Aircraft generateTestAircraft3() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(65, 0, 1),
-				null, 10.0, waypointList, null);
+				waypointList[1], new Waypoint(65, 0, Waypoint.WaypointType.ENTRY), null, 10.0, waypointList, null);
 		
 		return testAircraft;
-		
 	}
 	
 	/**
@@ -243,7 +249,7 @@ public class ScoreTest {
 	@Test
 	public void testScoreDecrementsUponFlightPlanManipulation() {
 		Aircraft testAircraft = generateTestAircraft();
-		testAircraft.alterPath(1, new Waypoint(65, 0, 1));
+		testAircraft.alterPath(1, new Waypoint(65, 0, Waypoint.WaypointType.EXIT));
 		assertTrue("Score = 98", testAircraft.score() == 98);
 	}
 	
@@ -257,7 +263,7 @@ public class ScoreTest {
 	public void testScoreDecrementsUponFlightPlanManipulation2() {
 		Aircraft testAircraft = generateTestAircraft();
 		testAircraft.setScore(50);
-		testAircraft.alterPath(1, new Waypoint(65, 0, 1));
+		testAircraft.alterPath(1, new Waypoint(65, 0, Waypoint.WaypointType.EXIT));
 		assertTrue("Score = 49", testAircraft.score() == 49);
 	}
 	
@@ -271,7 +277,7 @@ public class ScoreTest {
 	public void testScoreDecrementsUponFlightPlanManipulation3() {
 		Aircraft testAircraft = generateTestAircraft();
 		testAircraft.setScore(0);
-		testAircraft.alterPath(1, new Waypoint(65, 0, 1));
+		testAircraft.alterPath(1, new Waypoint(65, 0, Waypoint.WaypointType.EXIT));
 		assertTrue("Score = 0", testAircraft.score() == 0);
 	}	
 

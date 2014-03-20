@@ -20,9 +20,9 @@ public class AirportTest {
 
 	/** The entry points to assign to the test airport */
 	Waypoint[] testEntryWaypoints = new Waypoint[] {
-			new Waypoint(677, 44, 2),
-			new Waypoint(767, 0, 2),
-			new Waypoint(957, 44, 2)
+			new Waypoint(677, 44, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(767, 0, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(957, 44, Waypoint.WaypointType.AIRPORT)
 	};
 
 	/** The entry point names to assign to the test airport */
@@ -33,34 +33,34 @@ public class AirportTest {
 
 	/** The landing points to assign to the test airport */
 	Waypoint[] testLandingWaypoints = new Waypoint[] {
-			new Waypoint(817, 104, 2),
-			new Waypoint(790, 743, 2),
-			new Waypoint(800, 733, 2),
-			new Waypoint(793, 723, 2),
-			new Waypoint(804, 608, 2),
-			new Waypoint(869, 657, 2),
-			new Waypoint(882, 546, 2),
-			new Waypoint(950, 496, 2),
-			new Waypoint(970, 486, 2),
-			new Waypoint(1010, 486, 2)
+			new Waypoint(817, 104, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(790, 743, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(800, 733, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(793, 723, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(804, 608, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(869, 657, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(882, 546, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(950, 496, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(970, 486, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT),
 	};
 
 	/** The parking points to assign to the test airport */
 	Waypoint[] testParkingWaypoints = new Waypoint[] {
-			new Waypoint(1102, 358, 2),
-			new Waypoint(1103, 425, 2),
-			new Waypoint(1098, 493, 2),
-			new Waypoint(1095, 567, 2)
+			new Waypoint(1102, 358, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(1103, 425, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(1098, 493, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(1095, 567, Waypoint.WaypointType.AIRPORT),
 	};
 
 	/** The takeoff points to assign to the test airport */
 	Waypoint[] testTakeoffWaypoints = new Waypoint[] {
-			new Waypoint(1010, 486, 2),
-			new Waypoint(1001, 488, 2),
-			new Waypoint(991, 671, 2),
-			new Waypoint(954, 678, 2),
-			new Waypoint(954, 655, 2),
-			new Waypoint(976, 46, 2)
+			new Waypoint(1010, 486, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(1001, 488, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(991, 671, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(954, 678, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(954, 655, Waypoint.WaypointType.AIRPORT),
+			new Waypoint(976, 46, Waypoint.WaypointType.AIRPORT),
 	};
 
 	/** A test airport */
@@ -98,14 +98,17 @@ public class AirportTest {
 	 * @return the first test aircraft
 	 */
 	private Aircraft generateTestAircraft() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
-
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
+		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
-				null, 10.0, waypointList, null);
-
+				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
+		
 		return testAircraft;
 	}
 
@@ -114,14 +117,17 @@ public class AirportTest {
 	 * @return the test aircraft
 	 */
 	private Aircraft generateTestAircraftZeroAltitude() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
-
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
+		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
-				null, 10.0, waypointList, null);
-
+				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
+		
 		return testAircraft;
 	}
 
@@ -130,14 +136,17 @@ public class AirportTest {
 	 * @return the second test aircraft
 	 */
 	private Aircraft generateTestAircraft2() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
-
+		Waypoint[] waypointList = new Waypoint[] {
+			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
+		};
+		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
-				null, 10.0, waypointList, null);
-
+				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
+		
 		return testAircraft;
 	}
 
@@ -146,11 +155,13 @@ public class AirportTest {
 	 * @return the third test aircraft
 	 */
 	private Aircraft generateTestAircraft3() {
-		Waypoint[] waypointList = {new Waypoint(767, 0, 2)};
+		Waypoint[] waypointList = {
+			new Waypoint(767, 0, Waypoint.WaypointType.ENTRY),
+			new Waypoint(670, 44, Waypoint.WaypointType.EXIT), 
+		};
 
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(767, 0, 2), new Waypoint(670, 44, 2),
-				null, 10.0, waypointList, testAirport, true);
+				waypointList[1], waypointList[0], null, 10.0, waypointList, testAirport, true);
 
 		return testAircraft;
 	}
