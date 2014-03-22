@@ -104,6 +104,9 @@ public class Aircraft {
 	 * i.e. if the aircraft is climbing or falling */
 	private AltitudeState altitudeState;
 	
+	/** The current owner of the aircraft, 0 is left, 1 is right */
+	private int owner;
+	
 	/** The speed to climb or fall by */
 	private int altitudeChangeSpeed;
 	
@@ -116,6 +119,7 @@ public class Aircraft {
 	public enum AirportState {
 		NORMAL, FINISHED, WAITING, LANDING, TAKEOFF, PARKED
 	};
+	
 	
 	private static ArrayList<String> usedNames = new ArrayList<String>();
 	
@@ -339,6 +343,14 @@ public class Aircraft {
 	
 	public AltitudeState altitudeState() {
 		return altitudeState;
+	}
+	
+	public int owner(){
+		return owner;
+	}
+	
+	public void setOwner(int newOwner){
+		this.owner = newOwner;
 	}
 	
 	public Vector getCurrentTarget() {

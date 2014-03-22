@@ -130,6 +130,29 @@ public class MultiplayerGame extends Game {
         }
 	}
 	
+    /**
+     * Create a new aircraft object and introduce it to the airspace
+     */
+	@Override
+    protected void generateFlight() {
+        Aircraft a = createAircraft();
+        if (!Main.testing) ordersBox.addOrder(
+        		"<<< " + a.name() + " incoming from "+ a.originName()
+        		+ " heading towards " + a.destinationName() + ".");
+        
+        // Check which player has control of aircraft
+        if(a.position().x() < splitLine){
+        	// If the aircraft is left of the line, it belongs to the left player
+        	a.setOwner(0);
+        }
+        else{
+        	// If the aircraft is right of the line, it belongs to the right player
+        	a.setOwner(1);
+        }
+        
+        aircraftInAirspace.add(a);
+    }
+	
 	public void keyReleased(int key) {
 		super.keyReleased(key);
         switch (key) {
@@ -143,5 +166,7 @@ public class MultiplayerGame extends Game {
         		break;
         }
 	}
+	
+	
 
 }

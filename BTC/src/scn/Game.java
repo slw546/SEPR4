@@ -48,7 +48,7 @@ public class Game extends Scene {
     public static int difficulty = DIFFICULTY_MEDIUM;
    
     /** Orders box to print orders from ACTO to aircraft to */
-    private OrdersBox ordersBox;
+    protected OrdersBox ordersBox;
    
     /** Time since the scene began */
     private double timeElapsed;
@@ -900,7 +900,7 @@ public class Game extends Scene {
     /**
      * Create a new aircraft object and introduce it to the airspace
      */
-    private void generateFlight() {
+    protected void generateFlight() {
         Aircraft a = createAircraft();
         if (!Main.testing) ordersBox.addOrder(
         		"<<< " + a.name() + " incoming from "+ a.originName()
@@ -913,7 +913,7 @@ public class Game extends Scene {
      * including randomisation of entry, exit, altitude, etc.
      * @return the created aircraft object
      */
-    private Aircraft createAircraft() {
+    protected Aircraft createAircraft() {
     	int d, o;
     	String originName;
     	Waypoint originPoint;
