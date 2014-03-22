@@ -64,8 +64,46 @@ public class MultiplayerGame extends Game {
 			splitLine -= 1;
 		if (SPLIT_LINE_POSITIONS[moveSplitLineTo] > splitLine)
 			splitLine += 1;
+		
+		// Updates the owners for each aircraft
+		for (int i = 0; i < aircraftList().size(); i ++){
+			Aircraft tempAircraft = aircraftList().get(i);
+			if ((tempAircraft.position().x() > splitLine) && (tempAircraft.owner() == 0)){
+				// If right side player aircraft passes to left side
+				if (tempAircraft.isManuallyControlled() == true){
+					// The aircraft has been manually flown over to the left side
+					// Player 1 looses points
+					// New flight plan generated for new aircraft
+				}
+				else{
+					// The aircraft has automatically flown over to the left side
+					// Player 0 gets points
+				}
+				aircraftList().get(i).setOwner(1);
+			}
+			else if ((tempAircraft.position().x()< splitLine) && (tempAircraft.owner() == 1)){
+				// If left side aircraft pases to right side
+				if (tempAircraft.isManuallyControlled() == true){
+					// The aircraft has been manually flown over to the right side
+					// Player 0 looses points
+					// New flight plan generated for new aircraft
+				}
+				else{
+					// The aircraft has been automatically flown over to the right side
+					// Player 0 gets points
+				}
+				aircraftList().get(i).setOwner(0);
+			}
+		}
 	}
 	
+	/**
+	 * When an aircraft crosses over the split line manually a new flight plan needs to be generated
+	 * This function generates a new flightplan for the aircraft
+	 */
+	private void alterFlightPlan(Aircraft inputAircraft){
+		inputAircraft.regenerateRoute();
+	}
 	/**
      * Draw waypoints, and route of a selected aircraft between waypoints
      * print waypoint names next to waypoints

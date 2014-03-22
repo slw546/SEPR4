@@ -1118,4 +1118,12 @@ public class Aircraft {
 		return position.z();
 	}
 	
+	/**
+	 * Generates a new route for the aircraft
+	 */
+	public void regenerateRoute(){
+		
+	}
+	
+	
 }
