@@ -1,13 +1,12 @@
 package cls;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
 import btc.Main;
-
 import scn.Game;
-
 import lib.jog.audio;
 import lib.jog.graphics;
 import lib.jog.graphics.Image;
@@ -20,7 +19,13 @@ import lib.jog.window;
  * Represents an in-game aircraft. Calculates velocity, route-following, etc.
  * </p>
  */
-public class Aircraft {
+public class Aircraft implements Serializable {
+
+	/**
+	 * serialVersionUID used to check consistency between host and reciever
+	 * Required for network communication of objects
+	 */
+	private static final long serialVersionUID = -3814805202501151884L;
 
 	/** The physical size of the aircraft in pixels. This determines crashes */
 	public final static int RADIUS = 16;
@@ -119,8 +124,8 @@ public class Aircraft {
 	public enum AirportState {
 		NORMAL, FINISHED, WAITING, LANDING, TAKEOFF, PARKED
 	};
-	
-	
+
+
 	private static ArrayList<String> usedNames = new ArrayList<String>();
 	
 	/**
@@ -166,6 +171,11 @@ public class Aircraft {
 				sceneWaypoints, airport, testing);
 	}
 	
+	public Aircraft(){
+		flightName = generateName();
+		position = new Vector(100,100,0);
+	}
+		
 	private void generateAircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
 			Waypoint originPoint, graphics.Image img,

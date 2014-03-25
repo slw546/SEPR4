@@ -1,9 +1,17 @@
 package cls;
 
+import java.io.Serializable;
+
 import lib.jog.graphics;
 
-public class Waypoint {
+public class Waypoint implements Serializable {
 	
+	/**
+	 * serialVersionUID used to check consistency between host and reciever
+	 * Required for network communication of objects
+	 */
+	private static final long serialVersionUID = 5196702347805188897L;
+
 	public enum WaypointType {
 		AIRSPACE,
 		ENTRY,
