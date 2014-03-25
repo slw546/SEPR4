@@ -5,9 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import thr.Client;
 import thr.ClientThread;
-import thr.Host;
 import thr.HostThread;
 import lib.ButtonText;
 import lib.jog.graphics;
@@ -38,6 +36,8 @@ public class MultiplayerSetUp extends Scene {
 	private HostThread host;
 	private ClientThread client;
 	
+	private MultiplayerGame game = new MultiplayerGame(main);
+	
 	//Textbox for flavour text about chosen game mode.
 	private lib.TextBox textBox;
 	
@@ -49,6 +49,7 @@ public class MultiplayerSetUp extends Scene {
 	//flags
 	private boolean host_active = false;
 	private boolean client_active = false;
+	private boolean startOrdered = false;
 	
 	private boolean connection_established = false;
 
@@ -120,11 +121,11 @@ public class MultiplayerSetUp extends Scene {
 				MultiplayerGame game = new MultiplayerGame(main);
 				
 				if (host_active){
+					//If a host thread is active, have it carry out actions
+					//to start client game
 					host.setGameScene(game);
 					host.setPlaying(true);
 				}
-				
-				main.setScene(game);
 			}
 		};
 		
@@ -147,7 +148,7 @@ public class MultiplayerSetUp extends Scene {
 		buttons[1].setAvailability(false);
 		buttons[2].setAvailability(true);
 		//Create and start a host thread
-		host = new HostThread(4445, this);
+		host = new HostThread(4445, this, main);
 		host.start();
 		host_active = true;
 	}
@@ -157,7 +158,7 @@ public class MultiplayerSetUp extends Scene {
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
 		//create and start a hosting thread
-		client = new ClientThread("localhost", 4445, this);
+		client = new ClientThread("localhost", 4445, this, game, main);
 		client.start();
 		client_active = true;
 	}
@@ -166,6 +167,10 @@ public class MultiplayerSetUp extends Scene {
 	public void update(double dt) {
 		//update the textbox
 		textBox.update(dt);
+		
+		if (startOrdered){
+			main.setScene(game);
+		}
 	}
 
 	@Override
@@ -189,11 +194,14 @@ public class MultiplayerSetUp extends Scene {
 	public void playSound(Sound sound) {
 	}
 	
-	
 	//Getters and Setters
 
 	public void setConnection_established(boolean connection_established) {
 		this.connection_established = connection_established;
+	}
+	
+	public void setStartOrdered(boolean order){
+		this.startOrdered = order;
 	}
 
 }

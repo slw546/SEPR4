@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import btc.Main;
 import cls.Aircraft;
-
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
@@ -42,6 +42,7 @@ public class HostThread extends Thread {
 	//SCENES
 	private MultiplayerSetUp lobby;
 	private MultiplayerGame game;
+	private Main main;
 	
 	// INPUT
 	// A buffered input stream to read text incoming from the client socket
@@ -56,9 +57,10 @@ public class HostThread extends Thread {
 	private ObjectOutputStream objOutputWriter; 
 	
 	//Constructor
-	public HostThread(int portNumber, MultiplayerSetUp lobby) {
+	public HostThread(int portNumber, MultiplayerSetUp lobby, Main main) {
 		this.portNumber = portNumber;
 		this.lobby = lobby;
+		this.main = main;
 	}
 	
 	@Override
@@ -68,20 +70,22 @@ public class HostThread extends Thread {
 		} catch (IOException e) {
 			System.err.println("Error setting up connection or IO with client");
 			e.printStackTrace();
+		} catch (InterruptedException e){
+			System.err.println("Host was interrupted in post set-up wait.");
+			e.printStackTrace();
 		}
+		
+		//Sending a test object
+		//System.out.println("Test object send 1");
+		//testComms();
+		//System.out.println("test object send finished");
+		
 		while (hosting){
-			String outLine = "ping!";
-			//System.out.println(outLine);
-			textOutputWriter.println(outLine);
-			
 			//If lobby has started the game, send game to client and leave this loop.
+			System.out.println("inside hosting loop");
 			if (playing){
-				try {
-					startGame();
-				} catch (IOException e) {
-					System.err.println("IO failed trying to start game");
-					e.printStackTrace();
-				}
+				System.out.println("inside if playing");
+				startGame();
 				break;
 			}
 		}
@@ -94,11 +98,19 @@ public class HostThread extends Thread {
 		System.out.println("HostThread exiting");
 	}
 	
-	private void setUp() throws IOException {
+	/**
+	 * Sets up the ServerSocket, accepts a client connection,
+	 * and sets up the IO streams for that connection.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private void setUp() throws IOException, InterruptedException {
 		System.out.println("Set up 1");
 		//Init the ServerSocket and await a connection
 		ServerSocket socket = new ServerSocket(portNumber);
 		//accept an incoming connection request.
+		//Blocking: Will wait here until a client connects.
+		//May be given a timeout via clientSocket.setSOTimeout(time) before trying to accept
 		Socket clientSocket = socket.accept();
 		this.socket = socket;
 		this.clientSocket = clientSocket;
@@ -120,9 +132,56 @@ public class HostThread extends Thread {
 		lobby.setConnection_established(true);
 	}
 	
-	public void startGame() throws IOException{
-		objOutputWriter.writeObject(game);
+	/**
+	 * Tell the client to start the game, after the host game has begun.
+	 * @throws IOException
+	 */
+	public void startGame(){
+		//Alert client that game has started.
+		String start = "start";
+		System.out.println(start);
+		//send a string which tells client to start the game
+		sendObject(start);
+		lobby.setStartOrdered(true);
 	}
+	
+	/**
+	 * Send an object on the objOutputStream
+	 * Non-Blocking IO
+	 * Buffered - sent objects are preserved until read.
+	 * Objects MUST be read by the client in the order they are sent
+	 * @param object the object to be sent
+	 */
+	private void sendObject(Object object){
+		System.out.println("Sending object");
+		try {
+			objOutputWriter.writeObject(object);
+		} catch (IOException e){
+			System.out.println("Comms test: Failed to write Aircraft or Text; IOException.");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Test communications by sending some objects to the client
+	 */
+	public void testComms(){
+		//generate an aircraft for comm test
+		Aircraft test = new Aircraft();
+		System.out.println("Generated an aircraft to send");
+
+		System.out.println("test object send 2: network io");
+		//Send the aircraft to the client
+		//objOutputWriter.writeObject(test);
+		sendObject(test);
+		//Send some text to the client
+		//cheaty way
+		String test2 = "Hello Client";
+		sendObject(test2);
+		System.out.println("Both IO finished");
+
+	}
+	
 	
 	//Getters and Setters
 	public void setGameScene(MultiplayerGame game){
@@ -131,6 +190,7 @@ public class HostThread extends Thread {
 	
 	public void setPlaying(boolean playing){
 		this.playing = playing;
+		System.out.println("set playing");
 	}
 	
 }
