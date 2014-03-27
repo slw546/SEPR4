@@ -56,7 +56,7 @@ public class AircraftTest {
 				new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
+				waypointList[1], waypointList[0], 10.0, waypointList, null);
 		
 		return testAircraft;
 	}

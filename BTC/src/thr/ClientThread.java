@@ -8,7 +8,9 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
+import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
 import scn.MultiplayerGame;
@@ -34,13 +36,13 @@ public class ClientThread extends NetworkThread {
 	
 	
 	public ClientThread(String hostAddress, int portNumber, 
-			MultiplayerSetUp lobby, MultiplayerGame game, Main main) {
-		super();
+			MultiplayerSetUp lobby, Main main) {
 		this.portNumber = portNumber;
 		this.hostAddress = hostAddress;
 		this.lobby = lobby;
 		this.main = main;
-		this.game = game;
+		//init aircraftBuffer
+		aircraftBuffer = new ArrayList<Aircraft>();
 		System.out.println("Constructed a client");
 	}
 	
@@ -54,11 +56,13 @@ public class ClientThread extends NetworkThread {
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.UNKNOWN_HOST);
 			System.err.println("Unknown Host: check host local IP address and game Port");
 			e1.printStackTrace();
+			killThread();
 		} catch (IOException e1) {
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
 			System.err.println("Error setting up IO on socket");
 			e1.printStackTrace();
+			killThread();
 		}
 		
 		if (listening){
@@ -82,6 +86,25 @@ public class ClientThread extends NetworkThread {
 			// listen to synchronisation from host
 			// send required synchronisations back, e.g. aircraft enters opposing player's airspace.
 			// update local airspace
+			String ack = "ACK";
+			
+			//Blocking IO - wait on being told to expect N aircraft
+			int expected = recieveInt();
+			//send ACK
+			sendObject(ack);
+			
+			//read in the expected number of aircraft
+			for (int i = 0; i < expected; i++){
+				
+				//read the aircraft into the aircraftInAirspace array
+				//adds aircraft directly into the airspace
+				
+				game.aircraftInAirspace().add(recieveAircraft());
+			}
+			
+			
+			
+			
 		}
 		// alert client that thread is exiting
 		System.out.println("ClientThread exiting");
@@ -140,12 +163,28 @@ public class ClientThread extends NetworkThread {
 		} catch (ClassNotFoundException e) {
 			System.err.println("Aircraft class not found");
 			e.printStackTrace();
+			killThread();
 		} catch (IOException e) {
 			System.err.println("IOException communicating with host");
 			e.printStackTrace();
+			killThread();
 		}
 	}
 	
+	@Override
+	public void killThread(){
+		System.out.println("Thread killed due to error");
+		//if the game is running, escape to lobby
+		if (playing){
+			game.keyReleased(input.KEY_ESCAPE);
+		}
+		//end while loops to exit the thread
+		this.playing = false;
+		this.listening = false;
+	}
+	
 	//Getters and Setters
-
+	public void setGameScene(MultiplayerGame game){
+		this.game = game;
+	}
 }

@@ -63,7 +63,7 @@ public class Title extends Scene {
 			
 			@Override
 			public void action() {
-				main.setScene(new MultiplayerGame(main));
+				//main.setScene(new MultiplayerGame(main, MultiplayerGame.Type.HOST));
 			}
 		};
 
@@ -105,6 +105,7 @@ public class Title extends Scene {
 		
 		buttons[6] = new lib.ButtonText("Play Multiplayer Game (Temp)", runMPGame, window.height(),
 				window.height()/2 + 36, window.width() - window.height(), 24, 8, 6);
+		buttons[6].setAvailability(false);
 		
 		/* Game Button
 		lib.ButtonText.Action play = new lib.ButtonText.Action() {

@@ -8,7 +8,9 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
+import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
 import scn.MultiplayerGame;
@@ -44,6 +46,8 @@ public class HostThread extends NetworkThread {
 		this.portNumber = portNumber;
 		this.lobby = lobby;
 		this.main = main;
+		//init aircraftBuffer
+		aircraftBuffer = new ArrayList<Aircraft>();
 	}
 	
 	@Override
@@ -55,18 +59,20 @@ public class HostThread extends NetworkThread {
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
 			System.err.println("Error setting up connection or IO with client");
 			e.printStackTrace();
+			killThread();
 		}
 		
 		//Sending a test object
 		System.out.println("Test object send 1");
 		testCommunication();
 		System.out.println("test object send finished");
-		
+		int somethingToDo = 0;
 		while (hosting){
 			//If lobby has started the game, send game to client and leave this loop.
 			
 			//Something to do, prevents loop from closing..
-			System.out.println("inside hosting loop");
+			//somethingToDo++;
+			System.out.print("");
 			
 			//See if the lobby has clicked start game
 			if (playing){
@@ -76,11 +82,31 @@ public class HostThread extends NetworkThread {
 				break;
 			}
 		}
+		System.out.println("left hosting loop");
+		
 		while(hosting && playing){
 			// listen to synchronisation from client
 			// send changes to client e.g. aircraft changing airspace
 			// update the local airspace
-			System.out.println("Inside host+play loop");
+			
+			//Client waiting for the number of aircraft to expect
+			//if buffer is not empty, send number.
+			if (!aircraftBuffer.isEmpty()){
+				//tell client how many aircraft to expect
+				sendObject(aircraftBuffer.size());
+				//Blocking IO to sync threads.
+				//Wait for an ack from client
+				String ack = recieveString();
+				if (ack.equals("ACK")){
+					//send the aircraft
+					for (int i = 0; i < aircraftBuffer.size(); i++){
+						//send aircraft, remove it from buffer
+						sendObject(aircraftBuffer.get(i));
+						aircraftBuffer.remove(i);
+					}
+				}
+			}
+			
 		}
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
@@ -153,6 +179,17 @@ public class HostThread extends NetworkThread {
 		sendObject(test2);
 		System.out.println("Both IO finished");
 
+	}
+	
+	@Override
+	public void killThread(){
+		//if game is running, escape to lobby
+		if (playing) {
+			game.keyReleased(input.KEY_ESCAPE);
+		}
+		//end while loops to exit thread
+		this.playing = false;
+		this.hosting = false;
 	}
 	
 	

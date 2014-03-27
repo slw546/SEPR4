@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
@@ -17,7 +18,10 @@ public abstract class NetworkThread extends Thread {
 	//SCENES
 	protected MultiplayerSetUp lobby;
 	protected MultiplayerGame game;
-	protected Main main;	
+	protected Main main;
+	
+	//Buffer of aircraft to be sent
+	protected ArrayList<Aircraft> aircraftBuffer;
 	
 	// INPUT
 	// A buffered input stream to read text incoming from the client socket
@@ -33,13 +37,19 @@ public abstract class NetworkThread extends Thread {
 	
 	//Constructor
 	public NetworkThread(){
-		
 	}
 	
 	//Set up
 	abstract public void setUp() throws UnknownHostException, IOException;
 	//Test
 	abstract public void testCommunication();
+	
+	public void addToBuffer(Aircraft aircraft){
+		aircraftBuffer.add(aircraft);
+	}
+	
+	//Error handling
+	abstract public void killThread();
 	
 	//SEND
 	/**
@@ -58,6 +68,7 @@ public abstract class NetworkThread extends Thread {
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_SEND);
 			System.out.println("Comms test: Failed to object; IOException.");
 			e.printStackTrace();
+			killThread();
 		}
 	}
 	
@@ -81,11 +92,13 @@ public abstract class NetworkThread extends Thread {
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
 			System.err.println("Recieved object does not match expected: Aircraft");
 			e.printStackTrace();
+			killThread();
 		} catch (IOException e) {
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
 			System.err.println("IOException communicating with host");
 			e.printStackTrace();
+			killThread();
 		}
 		return null;
 	}
@@ -108,13 +121,44 @@ public abstract class NetworkThread extends Thread {
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
 			System.err.println("Recieved object does not match expected: String");
 			e.printStackTrace();
+			killThread();
 		} catch (IOException e) {
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
 			System.err.println("IOException communicating with host");
 			e.printStackTrace();
+			killThread();
 		}
 		return null;
+	}
+	
+	/**
+	 * Read an integer in from the objectInputStream
+	 * Order is important: objects must be read in the order they are sent.
+	 * Be certain an integer is at the front of the stream before use.
+	 * Blocking: If the stream is empty, will wait until something arrives.
+	 * @return one integer from the stream
+	 */
+	protected int recieveInt(){
+		try {
+			int recieved;
+			recieved = (int) objInputStream.readObject();
+			System.out.println(recieved);
+			return recieved;
+		}  catch (ClassNotFoundException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
+			System.err.println("Recieved object does not match expected: String");
+			e.printStackTrace();
+			killThread();
+		} catch (IOException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			System.err.println("IOException communicating with host");
+			e.printStackTrace();
+			killThread();
+		}
+		return 0;
 	}
 
 }

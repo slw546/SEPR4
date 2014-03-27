@@ -69,7 +69,7 @@ public class Game extends Scene {
     protected ArrayList<Aircraft> aircraftInAirspace;
    
     /** The image to be used for aircraft */
-    private Image aircraftImage;
+    public static Image aircraftImage;
     
     /** Tracks if manual heading compass of a manually controller
      * aircraft has been dragged */
@@ -84,7 +84,7 @@ public class Game extends Scene {
     /** The time elapsed since the last flight was generated */
     private double flightGenerationTimeElapsed = 10;
     
-    /** Maximum number of aircraft allowed in the airspace at once */
+	/** Maximum number of aircraft allowed in the airspace at once */
     private int maxAircraft = 6;
     
     /** Total number of aircraft to generate */
@@ -962,7 +962,7 @@ public class Game extends Scene {
     		destinationPoint = flightExitPoints[d];
     		
     		return new Aircraft(destinationName, originName,
-            		destinationPoint, originPoint, aircraftImage,
+            		destinationPoint, originPoint,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		null);
     	} else {
@@ -977,7 +977,7 @@ public class Game extends Scene {
     		destinationName = airports[d].name();
     		
     		return new Aircraft(destinationName, originName,
-            		destinationPoint, originPoint, aircraftImage,
+            		destinationPoint, originPoint,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		airports[d]);
     	}
@@ -1007,5 +1007,12 @@ public class Game extends Scene {
     		music.stop();
     	}
     }
+    
+    public void setFlightGenerationTimeElapsed(double flightGenerationTimeElapsed) {
+		this.flightGenerationTimeElapsed = flightGenerationTimeElapsed;
+	}
 	
+    public void errorEscape(){
+    	main.closeScene();
+    }
 }

@@ -2,6 +2,7 @@ package lib.jog;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -202,7 +203,7 @@ public abstract class graphics {
 	 * @see Texture
 	 */
 	public static class Image {
-		
+
 		private Texture texture;
 		
 		/** The x-xoordinate of the image */

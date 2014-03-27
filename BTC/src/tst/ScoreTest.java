@@ -49,7 +49,7 @@ public class ScoreTest {
 		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], waypointList[0], null, 10.0, waypointList, null);
+				waypointList[1], waypointList[0], 10.0, waypointList, null);
 		
 		return testAircraft;
 	}
@@ -72,7 +72,7 @@ public class ScoreTest {
 		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], new Waypoint(-70, 0, Waypoint.WaypointType.ENTRY), null, 10.0, waypointList, null);
+				waypointList[1], new Waypoint(-70, 0, Waypoint.WaypointType.ENTRY), 10.0, waypointList, null);
 		
 		return testAircraft;
 	}
@@ -95,7 +95,7 @@ public class ScoreTest {
 		};
 		
 		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], new Waypoint(65, 0, Waypoint.WaypointType.ENTRY), null, 10.0, waypointList, null);
+				waypointList[1], new Waypoint(65, 0, Waypoint.WaypointType.ENTRY), 10.0, waypointList, null);
 		
 		return testAircraft;
 	}

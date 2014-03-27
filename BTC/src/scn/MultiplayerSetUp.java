@@ -139,7 +139,6 @@ public class MultiplayerSetUp extends Scene {
 		lib.ButtonText.Action startGame = new lib.ButtonText.Action(){
 			@Override
 			public void action() {
-				MultiplayerGame game = new MultiplayerGame(main);
 				
 				if (host_active){
 					//If a host thread is active, have it carry out actions
@@ -170,6 +169,9 @@ public class MultiplayerSetUp extends Scene {
 		buttons[2].setAvailability(true);
 		//Create and start a host thread
 		host = new HostThread(4445, this, main);
+		//create a game scene to be used when the game starts
+		game = new MultiplayerGame(main, MultiplayerGame.Type.HOST, host);
+		
 		host.start();
 		host_active = true;
 	}
@@ -179,10 +181,13 @@ public class MultiplayerSetUp extends Scene {
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
 		
-		//create a game scene to be used when the game starts
-		game = new MultiplayerGame(main);
+
 		//create and start a client thread
-		client = new ClientThread("localhost", 4445, this, game, main);
+		client = new ClientThread("localhost", 4445, this, main);
+		//create a game scene to be used when the game starts
+		game = new MultiplayerGame(main, MultiplayerGame.Type.CLIENT, client);
+		client.setGameScene(game);
+		
 		client.start();
 		client_active = true;
 	}

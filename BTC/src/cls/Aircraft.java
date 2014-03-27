@@ -93,7 +93,7 @@ public class Aircraft implements Serializable {
 	private Airport airport;
 	
 	/** The image to be drawn representing the aircraft */
-	private Image image;
+	//private Image image;
 	
 	/** Whether the aircraft has reached its destination and can be disposed of */
 	private AirportState status;
@@ -153,11 +153,11 @@ public class Aircraft implements Serializable {
 	 */
 	public Aircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
-			Waypoint originPoint, graphics.Image img,
+			Waypoint originPoint,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport) {
 		generateAircraft(nameDestination, nameOrigin,
-				destinationPoint, originPoint, img, speed,
+				destinationPoint, originPoint, speed,
 				sceneWaypoints, airport, false);
 	}
 
@@ -167,7 +167,7 @@ public class Aircraft implements Serializable {
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
 		generateAircraft(nameDestination, nameOrigin,
-				destinationPoint, originPoint, img, speed,
+				destinationPoint, originPoint, speed,
 				sceneWaypoints, airport, testing);
 	}
 	
@@ -178,13 +178,13 @@ public class Aircraft implements Serializable {
 		
 	private void generateAircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
-			Waypoint originPoint, graphics.Image img,
+			Waypoint originPoint,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
 		flightName = generateName();
 		destinationName = nameDestination;
 		originName = nameOrigin;
-		image = img;
+		//image = img;
 		initialSpeed = speed;
 		
 		// Find route
@@ -720,7 +720,7 @@ public class Aircraft implements Serializable {
 	public void draw(int controlAltitude) {
 		double scale = 2*(Math.max(position.z(), 28000) / 30000);
 		graphics.setColour(128, 128, 128, 255);
-		graphics.draw(image, scale, position.x(), position.y(), bearing(), 8, 8);
+		graphics.draw(Game.aircraftImage, scale, position.x(), position.y(), bearing(), 8, 8);
 		graphics.setColour(128, 128, 128, 255/2.5);
 		graphics.print(String.format("%.0f", position.z()) + "+", position.x()+8, position.y()-8);
 		

@@ -2,6 +2,7 @@ package scn;
 
 import java.io.Serializable;
 
+import thr.NetworkThread;
 import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
@@ -41,6 +42,21 @@ public class MultiplayerGame extends Game {
 		}
 	}
 	
+	public enum Type {
+		CLIENT, HOST
+	}
+	
+	private Type gameType;
+	
+	private NetworkThread networkThread;
+	
+	//Constructor
+	public MultiplayerGame(Main main, Type type, NetworkThread thread) {
+		super(main, 0);
+		gameType = type;
+		networkThread = thread;
+	}
+	
 	/** 
 	 * Determine which player controls a waypoint
 	 * @param waypoint the waypoint to decide upon
@@ -52,13 +68,18 @@ public class MultiplayerGame extends Game {
 		else
 			return Player.RIGHT;
 	}
-
-	public MultiplayerGame(Main main) {
-		super(main, 0);
-	}
 	
+	//Update and draw
+	@Override
 	public void update(double dt) {
 		super.update(dt);
+		
+		//If we are the client, never allow a flight to be generated.
+		//Sidesteps the flight generator present in Game, which this class is inheriting from.
+		if (gameType.equals(Type.CLIENT)){
+			this.setFlightGenerationTimeElapsed(0);
+		}
+		
 		// Increment or decrement the splitLine towards moveSplitLineTo every update, giving a smooth transition of the split line
 		if (SPLIT_LINE_POSITIONS[moveSplitLineTo] < splitLine)
 			splitLine -= 1;
@@ -97,13 +118,6 @@ public class MultiplayerGame extends Game {
 		}
 	}
 	
-	/**
-	 * When an aircraft crosses over the split line manually a new flight plan needs to be generated
-	 * This function generates a new flightplan for the aircraft
-	 */
-	private void alterFlightPlan(Aircraft inputAircraft){
-		inputAircraft.regenerateRoute();
-	}
 	/**
      * Draw waypoints, and route of a selected aircraft between waypoints
      * print waypoint names next to waypoints
@@ -168,6 +182,16 @@ public class MultiplayerGame extends Game {
         }
 	}
 	
+	
+	//Aircraft functions
+	/**
+	 * When an aircraft crosses over the split line manually a new flight plan needs to be generated
+	 * This function generates a new flightplan for the aircraft
+	 */
+	private void alterFlightPlan(Aircraft inputAircraft){
+		inputAircraft.regenerateRoute();
+	}
+	
     /**
      * Create a new aircraft object and introduce it to the airspace
      */
@@ -188,9 +212,15 @@ public class MultiplayerGame extends Game {
         	a.setOwner(1);
         }
         
+        //add the aircraft to the thread's buffer to be sent.
+        networkThread.addToBuffer(a);
+        //add the aircraft to the list of the aircraft in the airspace
         aircraftInAirspace.add(a);
     }
 	
+	
+	//Input handler
+	@Override
 	public void keyReleased(int key) {
 		super.keyReleased(key);
         switch (key) {
@@ -205,6 +235,4 @@ public class MultiplayerGame extends Game {
         }
 	}
 	
-	
-
 }

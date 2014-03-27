@@ -632,7 +632,7 @@ public class Demo extends Scene {
 		Waypoint destinationPoint = locationWaypoints[d];
 
 		return new Aircraft(destinationName, originName, destinationPoint,
-				originPoint, aircraftImage, 32 + (int)(10 * Math.random()),
+				originPoint, 32 + (int)(10 * Math.random()),
 				airspaceWaypoints, null);
 	}
 	/**
