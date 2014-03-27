@@ -174,5 +174,4 @@ public abstract class NetworkThread extends Thread {
 		}
 		return 0;
 	}
-
 }

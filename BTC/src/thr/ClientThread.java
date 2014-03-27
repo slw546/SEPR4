@@ -88,31 +88,39 @@ public class ClientThread extends NetworkThread {
 			// update local airspace
 			String ack = "ACK";
 			
-			//Blocking IO - wait on being told to expect N aircraft
-			int expected = recieveInt();
-			
-			//if we are sent -1, host has exited.
-			if (expected == -1){
-				lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-				lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
-				killThread();
-			}
-			
-			//send ACK
-			sendObject(ack);
-			
-			//read in the expected number of aircraft
-			for (int i = 0; i < expected; i++){
+			//wait for order from host
+			String order = recieveString();
+			if (order.equals("aircraft")){
+				//acknowledge the order
+				sendObject(ack);
+				//Blocking IO - wait on being told to expect N aircraft
+				int expected = recieveInt();
 				
-				//read the aircraft into the aircraftInAirspace array
-				//adds aircraft directly into the airspace
+				//if we are sent -1, host has exited.
+				if (expected == -1){
+					lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+					lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+					killThread();
+				}
 				
-				game.aircraftInAirspace().add(recieveAircraft());
+				//send ACK
+				sendObject(ack);
+				
+				//read in the expected number of aircraft
+				for (int i = 0; i < expected; i++){
+					//read the aircraft into the aircraftInAirspace array
+					//adds aircraft directly into the airspace
+					game.aircraftInAirspace().add(recieveAircraft());
+				}
+				
+			} else if (order.equals("score")){
+				//acknowledge the order
+				sendObject(ack);
+				int oppScore = recieveInt();
+				game.setOpponentScore(oppScore);
+				sendObject(game.getTotalScore());
 			}
-			
-			
-			
-			
+
 		}
 		// alert client that thread is exiting
 		System.out.println("ClientThread exiting");
@@ -186,7 +194,6 @@ public class ClientThread extends NetworkThread {
 		if (playing){
 			lobby.setStartOrdered(false);
 			main.keyReleased(input.KEY_ESCAPE);
-			sendObject(-1);
 		}
 		//end while loops to exit the thread
 		this.playing = false;

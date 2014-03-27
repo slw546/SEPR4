@@ -50,6 +50,8 @@ public class MultiplayerGame extends Game {
 	
 	private NetworkThread networkThread;
 	
+	private int opponentScore = 0;
+	
 	//Constructor
 	public MultiplayerGame(Main main, Type type, NetworkThread thread) {
 		super(main, 0);
@@ -116,6 +118,28 @@ public class MultiplayerGame extends Game {
 				aircraftList().get(i).setOwner(0);
 			}
 		}
+	}
+	
+	@Override
+	protected void drawScore() {
+		int hours = (int)(timeElapsed / (60 * 60));
+        int minutes = (int)(timeElapsed / 60);
+        minutes %= 60;
+        double seconds = timeElapsed % 60;
+        java.text.DecimalFormat df = new java.text.DecimalFormat("00.00");
+        String timePlayed = String.format("%d:%02d:", hours, minutes) + df.format(seconds);
+        graphics.print(timePlayed, window.width() - (timePlayed.length() * 8 + 32), 0);
+        graphics.print(String.valueOf(aircraftInAirspace.size())
+        		+ " aircraft in the airspace.", 32, 0);
+       
+        // GOA CODE FOLLOWS
+        
+        // Write total score to string for printing
+        String earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, opponentScore);
+        
+        // Print previous string in bottom centre of display
+        graphics.print(earnings, ((window.width()/2)-((earnings.length()*8)/2)),
+        		ORDERSBOX_Y - 20);
 	}
 	
 	/**
@@ -236,6 +260,10 @@ public class MultiplayerGame extends Game {
         		networkThread.escapeThread();
         		break;
         }
+	}
+
+	public void setOpponentScore(int opponentScore) {
+		this.opponentScore = opponentScore;
 	}
 	
 }

@@ -36,7 +36,7 @@ public class Game extends Scene {
     private final int ALTIMETER_H = 112;
    
     private final int ORDERSBOX_X = ALTIMETER_X + ALTIMETER_W + 8;
-    private final static int ORDERSBOX_Y = window.height() - 120;
+    protected final static int ORDERSBOX_Y = window.height() - 120;
     private final int ORDERSBOX_W = window.width() - (ORDERSBOX_X + 16);
     private final static int ORDERSBOX_H = 112;
    
@@ -51,10 +51,10 @@ public class Game extends Scene {
     protected OrdersBox ordersBox;
    
     /** Time since the scene began */
-    private double timeElapsed;
+    protected double timeElapsed;
    
     /** Score attained by the user as a result of successful flights */
-    private int totalScore;
+    protected int totalScore;
 
     /** The currently selected aircraft */
     protected Aircraft selectedAircraft;
@@ -174,8 +174,8 @@ public class Game extends Scene {
     public int totalScore() {
     	return this.totalScore;
     }
-   
-    public ArrayList<Aircraft> aircraftInAirspace() {
+
+	public ArrayList<Aircraft> aircraftInAirspace() {
 		return aircraftInAirspace;
 	}
 
@@ -582,7 +582,7 @@ public class Game extends Scene {
      * Draw a readout of the time the game has been played for,
      * aircraft in the sky, etc.
      */
-    private void drawScore() {
+    protected void drawScore() {
         int hours = (int)(timeElapsed / (60 * 60));
         int minutes = (int)(timeElapsed / 60);
         minutes %= 60;
@@ -592,7 +592,6 @@ public class Game extends Scene {
         graphics.print(timePlayed, window.width() - (timePlayed.length() * 8 + 32), 0);
         graphics.print(String.valueOf(aircraftInAirspace.size())
         		+ " aircraft in the airspace.", 32, 0);
-        //graphics.print("Control Altitude: " + String.valueOf(controlAltitude) + "+", 544, 0);
        
         // GOA CODE FOLLOWS
         
@@ -1011,5 +1010,9 @@ public class Game extends Scene {
     public void setFlightGenerationTimeElapsed(double flightGenerationTimeElapsed) {
 		this.flightGenerationTimeElapsed = flightGenerationTimeElapsed;
 	}
+    
+    public int getTotalScore() {
+ 		return totalScore;
+ 	}
 
 }

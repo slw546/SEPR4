@@ -88,27 +88,53 @@ public class HostThread extends NetworkThread {
 			// send changes to client e.g. aircraft changing airspace
 			// update the local airspace
 			
-			//Client waiting for the number of aircraft to expect
-			//if buffer is not empty, send number.
+			//send order
+			String order;
+			//aircraft to send - sync aircraft.
+			
 			if (!aircraftBuffer.isEmpty()){
-				//tell client how many aircraft to expect
-				sendObject(aircraftBuffer.size());
-				//Blocking IO to sync threads.
-				//Wait for an ack from client
+				order = "aircraft";
+				//client waiting for order
+				sendObject(order);
+				//wait for client's ack
 				String ack = recieveString();
 				if (ack.equals("ACK")){
-					//send the aircraft
-					for (int i = 0; i < aircraftBuffer.size(); i++){
-						//send aircraft, remove it from buffer
-						sendObject(aircraftBuffer.get(i));
-						aircraftBuffer.remove(i);
-					}
+					//threads synced, send aircraft
+					syncAircraftBuffer();
+				}
+			} else {
+				//sync scores
+				order = "score";
+				//client waiting for order
+				sendObject(order);
+				//wait for client's ack
+				String ack = recieveString();
+				if (ack.equals("ACK")){
+					//threads synced, send score
+					sendObject(game.getTotalScore());//send local score
+					int oppScore = recieveInt(); //recieve opponent's score
+					game.setOpponentScore(oppScore);
 				}
 			}
-			
 		}
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
+	}
+	
+	private void syncAircraftBuffer(){
+		//tell client how many aircraft to expect
+		sendObject(aircraftBuffer.size());
+		//Blocking IO to sync threads.
+		//Wait for an ack from client
+		String ack = recieveString();
+		if (ack.equals("ACK")){
+			//send the aircraft
+			for (int i = 0; i < aircraftBuffer.size(); i++){
+				//send aircraft, remove it from buffer
+				sendObject(aircraftBuffer.get(i));
+				aircraftBuffer.remove(i);
+			}
+		}
 	}
 	
 	/**
