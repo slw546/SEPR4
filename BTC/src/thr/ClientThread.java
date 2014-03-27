@@ -14,7 +14,7 @@ import cls.Aircraft;
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
-public class ClientThread extends Thread {
+public class ClientThread extends NetworkThread {
 	/**
 	 * Thread which latches to a ServerSocket and communicates with an instance of a HostThread
 	 */
@@ -31,23 +31,6 @@ public class ClientThread extends Thread {
 	private boolean listening;
 	// Flag to hold whether the game is in a play state or not.
 	private boolean playing;
-	
-	//SCENES
-	private MultiplayerSetUp lobby;
-	private MultiplayerGame game;
-	private Main main;
-	
-	// INPUT
-	// A buffered input stream to read text incoming from the client socket
-	private BufferedReader textInputStream;
-	// An input stream to read objects incoming from the client socket.
-	private ObjectInputStream objInputStream;
-
-	//OUTPUT
-	// A print writer to send text through the client socket.
-	private PrintWriter textOutputWriter;
-	// An output stream to send objects through the client socket.
-	private ObjectOutputStream objOutputWriter; 
 	
 	
 	public ClientThread(String hostAddress, int portNumber, 
@@ -67,17 +50,20 @@ public class ClientThread extends Thread {
 		try {
 			setUp();
 		} catch (UnknownHostException e1) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.UNKNOWN_HOST);
 			System.err.println("Unknown Host: check host local IP address and game Port");
 			e1.printStackTrace();
 		} catch (IOException e1) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
 			System.err.println("Error setting up IO on socket");
 			e1.printStackTrace();
 		}
-		System.out.println("Set up finished");
-		listening = true;
-		lobby.setConnection_established(true);
 		
-		//testCommunication();
+		if (listening){
+			testCommunication();
+		}
 		
 		while (listening){
 			//carry out pre-game lobby operations.
@@ -106,7 +92,8 @@ public class ClientThread extends Thread {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	private void setUp() throws UnknownHostException, IOException{
+	@Override
+	public void setUp() throws UnknownHostException, IOException{
 		//Set up connection to the host
 		//System.out.println("Set up 1");
 		Socket socket = new Socket(hostAddress, portNumber);
@@ -125,59 +112,17 @@ public class ClientThread extends Thread {
 		textInputStream = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
 		objInputStream = new ObjectInputStream(this.socket.getInputStream());
 		//System.out.println("Set up 5");
-	}
-	
-	/**
-	 * Read an aircraft in from the objectInputStream
-	 * Order is important: objects must be read in the order they are sent.
-	 * Be certain an aircraft is at the front of the stream before use.
-	 * Blocking: If the stream is empty, will wait until something arrives.
-	 * @return one aircraft from the stream.
-	 */
-	private Aircraft recieveAircraft(){
-		try {
-			Aircraft recieved;
-			//read an aircraft from the stream
-			recieved = (Aircraft) objInputStream.readObject();
-			System.out.println(recieved);
-			return recieved;
-		} catch (ClassNotFoundException e) {
-			System.err.println("Recieved object does not match expected: Aircraft");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("IOException communicating with host");
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * Read a string in from the objectInputStream
-	 * Order is important: objects must be read in the order they are sent.
-	 * Be certain a string is at the front of the stream before use.
-	 * Blocking: If the stream is empty, will wait until something arrives.
-	 * @return one string from the stream.
-	 */
-	private String recieveString(){
-		try {
-			String recieved;
-			recieved = (String) objInputStream.readObject();
-			System.out.println(recieved);
-			return recieved;
-		}  catch (ClassNotFoundException e) {
-			System.err.println("Recieved object does not match expected: String");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("IOException communicating with host");
-			e.printStackTrace();
-		}
-		return null;
+		
+		System.out.println("Set up finished");
+		listening = true;
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
 	}
 	
 	/**
 	 * Test communication with the host by recieving some objects.
 	 */
-	private void testCommunication() {
+	@Override
+	public void testCommunication() {
 		//Comms test
 		System.out.println("Begin comms test");
 		try {

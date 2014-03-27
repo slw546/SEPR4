@@ -33,10 +33,30 @@ public class MultiplayerSetUp extends Scene {
 	private final int START_BUTTON_X = window.width() /2;
 	private final int START_BUTTON_Y = window.height() / 2 + 60;
 	
+	//Network threads
 	private HostThread host;
 	private ClientThread client;
 	
-	private MultiplayerGame game = new MultiplayerGame(main);
+	//enum for state of connection
+	public enum networkStates {
+			NO_CONNECTION, CONNECTION_ESTABLISHED, CONNECTION_LOST
+	}
+	
+	//enum for errors thrown by network thread
+	public enum errorCauses {
+		UNKNOWN_HOST, //host address incorrect - connection not established
+		SOCKET_IO_UNAVAILABLE, //unable to get IO streams of socket during set up - connection not established
+		CLASS_NOT_FOUND, //unknown class sent via object stream
+		IO_ERROR_ON_SEND, //unable to send something - connection lost
+		IO_ERROR_ON_RECIEVE //failed to recieve something - connection lost
+	}
+	
+	//current state, variable to hold an error from network thread
+	private networkStates state;
+	private errorCauses error;
+	
+	//game scene
+	private MultiplayerGame game;
 	
 	//Textbox for flavour text about chosen game mode.
 	private lib.TextBox textBox;
@@ -57,6 +77,7 @@ public class MultiplayerSetUp extends Scene {
 		super(main);
 		//Textbox to write flavour text and instructions to.
 		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);	
+		state = networkStates.NO_CONNECTION;
 	}
 
 	@Override
@@ -157,7 +178,10 @@ public class MultiplayerSetUp extends Scene {
 		//hide buttons
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
-		//create and start a hosting thread
+		
+		//create a game scene to be used when the game starts
+		game = new MultiplayerGame(main);
+		//create and start a client thread
 		client = new ClientThread("localhost", 4445, this, game, main);
 		client.start();
 		client_active = true;
@@ -181,8 +205,36 @@ public class MultiplayerSetUp extends Scene {
 		for (lib.ButtonText b : buttons) {
 			b.draw();
 		}
-		if(connection_established){
+		switch (state){
+		case CONNECTION_ESTABLISHED:
 			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);
+			break;
+		case CONNECTION_LOST:
+			graphics.print("Connection lost", window.width()/2-60, window.height()/2-90);
+			printError();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	private void printError(){
+		switch(error){
+		case UNKNOWN_HOST:
+			graphics.print("Error: Unknown Host. Check host address and port. ", window.width()/2-60, window.height()/2-60);
+			break;
+		case SOCKET_IO_UNAVAILABLE:
+			graphics.print("Error setting up IO streams.", window.width()/2-60, window.height()/2-60);
+			break;
+		case CLASS_NOT_FOUND:
+			graphics.print("Error: Unknown class recieved.", window.width()/2-60, window.height()/2-60);
+			break;
+		case IO_ERROR_ON_SEND:
+			graphics.print("Error: IO send failed. Connection lost.", window.width()/2-60, window.height()/2-60);
+			break;
+		case IO_ERROR_ON_RECIEVE:
+			graphics.print("Error: IO recieve failed. Connection lost. ", window.width()/2-60, window.height()/2-60);
+			break;
 		}
 	}
 
@@ -195,9 +247,13 @@ public class MultiplayerSetUp extends Scene {
 	}
 	
 	//Getters and Setters
-
-	public void setConnection_established(boolean connection_established) {
-		this.connection_established = connection_established;
+	
+	public void setNetworkState(networkStates state){
+		this.state = state;
+	}
+	
+	public void setErrorCause(errorCauses cause){
+		this.error = cause;
 	}
 	
 	public void setStartOrdered(boolean order){

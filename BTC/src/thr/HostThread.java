@@ -14,7 +14,7 @@ import cls.Aircraft;
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
-public class HostThread extends Thread {
+public class HostThread extends NetworkThread {
 	/**
 	 * Thread which hosts the multiplayer service on a TCP socket.
 	 * Communication with client is not delegated to separate threads
@@ -39,23 +39,6 @@ public class HostThread extends Thread {
 	//flag to raise when we are playing the game.
 	private boolean playing = false;
 	
-	//SCENES
-	private MultiplayerSetUp lobby;
-	private MultiplayerGame game;
-	private Main main;
-	
-	// INPUT
-	// A buffered input stream to read text incoming from the client socket
-	private BufferedReader textInputStream;
-	// An input stream to read objects incoming from the client socket.
-	private ObjectInputStream objInputStream;
-	
-	//OUTPUT
-	// A print writer to send text through the client socket.
-	private PrintWriter textOutputWriter;
-	// An output stream to send objects through the client socket.
-	private ObjectOutputStream objOutputWriter; 
-	
 	//Constructor
 	public HostThread(int portNumber, MultiplayerSetUp lobby, Main main) {
 		this.portNumber = portNumber;
@@ -68,24 +51,28 @@ public class HostThread extends Thread {
 		try {
 			setUp();
 		} catch (IOException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
 			System.err.println("Error setting up connection or IO with client");
-			e.printStackTrace();
-		} catch (InterruptedException e){
-			System.err.println("Host was interrupted in post set-up wait.");
 			e.printStackTrace();
 		}
 		
 		//Sending a test object
-		//System.out.println("Test object send 1");
-		//testComms();
-		//System.out.println("test object send finished");
+		System.out.println("Test object send 1");
+		testCommunication();
+		System.out.println("test object send finished");
 		
 		while (hosting){
 			//If lobby has started the game, send game to client and leave this loop.
+			
+			//Something to do, prevents loop from closing..
 			System.out.println("inside hosting loop");
+			
+			//See if the lobby has clicked start game
 			if (playing){
 				System.out.println("inside if playing");
 				startGame();
+				//exit loop and move to the next loop.
 				break;
 			}
 		}
@@ -93,6 +80,7 @@ public class HostThread extends Thread {
 			// listen to synchronisation from client
 			// send changes to client e.g. aircraft changing airspace
 			// update the local airspace
+			System.out.println("Inside host+play loop");
 		}
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
@@ -104,7 +92,8 @@ public class HostThread extends Thread {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void setUp() throws IOException, InterruptedException {
+	@Override
+	public void setUp() throws IOException {
 		System.out.println("Set up 1");
 		//Init the ServerSocket and await a connection
 		ServerSocket socket = new ServerSocket(portNumber);
@@ -129,7 +118,7 @@ public class HostThread extends Thread {
 		System.out.println("Set up 5");
 		//Raise hosting flag
 		hosting = true;
-		lobby.setConnection_established(true);
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
 	}
 	
 	/**
@@ -146,26 +135,10 @@ public class HostThread extends Thread {
 	}
 	
 	/**
-	 * Send an object on the objOutputStream
-	 * Non-Blocking IO
-	 * Buffered - sent objects are preserved until read.
-	 * Objects MUST be read by the client in the order they are sent
-	 * @param object the object to be sent
-	 */
-	private void sendObject(Object object){
-		System.out.println("Sending object");
-		try {
-			objOutputWriter.writeObject(object);
-		} catch (IOException e){
-			System.out.println("Comms test: Failed to write Aircraft or Text; IOException.");
-			e.printStackTrace();
-		}
-	}
-	
-	/**
 	 * Test communications by sending some objects to the client
 	 */
-	public void testComms(){
+	@Override
+	public void testCommunication(){
 		//generate an aircraft for comm test
 		Aircraft test = new Aircraft();
 		System.out.println("Generated an aircraft to send");
