@@ -116,8 +116,20 @@ public class ClientThread extends NetworkThread {
 			} else if (order.equals("score")){
 				//acknowledge the order
 				sendObject(ack);
+				//read in opponent's score
 				int oppScore = recieveInt();
+				
+				if (oppScore == -1){
+					//Other player is quitting, and their quit signal has been picked up here.
+					//therefore, quit the game
+					lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+					lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+					killThread();
+				}
+				
+				//update game scene with new opponent score.
 				game.setOpponentScore(oppScore);
+				//send local score to opponent.
 				sendObject(game.getTotalScore());
 			}
 
@@ -134,23 +146,18 @@ public class ClientThread extends NetworkThread {
 	@Override
 	public void setUp() throws UnknownHostException, IOException{
 		//Set up connection to the host
-		//System.out.println("Set up 1");
 		Socket socket = new Socket(hostAddress, portNumber);
 		this.socket = socket;
 		
 		//Set up Output streams
-		//System.out.println("Set up 2");
 		textOutputWriter = new PrintWriter(this.socket.getOutputStream());
 		textOutputWriter.flush();
-		//System.out.println("Set up 3");
 		objOutputWriter = new ObjectOutputStream(this.socket.getOutputStream());
 		objOutputWriter.flush();
 		
 		//Set up input streams
-		//System.out.println("Set up 4");
 		textInputStream = new BufferedReader( new InputStreamReader(this.socket.getInputStream()));
 		objInputStream = new ObjectInputStream(this.socket.getInputStream());
-		//System.out.println("Set up 5");
 		
 		System.out.println("Set up finished");
 		listening = true;
@@ -170,17 +177,18 @@ public class ClientThread extends NetworkThread {
 			System.out.println("Got an aircraft object: ");
 			System.out.println(test);
 			//attempt to read text from host
-			//String fromHost;
 			System.out.println("Trying to read text from host");
-			//fromHost = textInputStream.readLine();
 			String fromHost = (String) objInputStream.readObject();
-			System.out.println("Read text from host");
-			System.out.println(fromHost);
+			System.out.println("Read text from host: " + fromHost);
 		} catch (ClassNotFoundException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
 			System.err.println("Aircraft class not found");
 			e.printStackTrace();
 			killThread();
 		} catch (IOException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
 			System.err.println("IOException communicating with host");
 			e.printStackTrace();
 			killThread();
@@ -209,12 +217,12 @@ public class ClientThread extends NetworkThread {
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
 		
-		//send an object to either break the listening thread, or signal game closed.
-		sendObject(-1);
-		
 		//set flags to exit while loops
 		this.playing = false;
 		this.listening = false;
+		
+		//send an object to either break the listening thread, or signal game closed.
+		sendObject(-1);
 	}
 	
 	//Getters and Setters

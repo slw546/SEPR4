@@ -63,7 +63,6 @@ public class HostThread extends NetworkThread {
 		}
 		
 		//Sending a test object
-		System.out.println("Test object send 1");
 		testCommunication();
 		System.out.println("test object send finished");
 		
@@ -88,15 +87,16 @@ public class HostThread extends NetworkThread {
 			// send changes to client e.g. aircraft changing airspace
 			// update the local airspace
 			
-			//send order
+			//Order - client is waiting for an order from the host.
+			//client matches recieved order in if-else statement to carry out appropriate action
 			String order;
-			//aircraft to send - sync aircraft.
 			
+			//aircraft to send - sync aircraft.
 			if (!aircraftBuffer.isEmpty()){
 				order = "aircraft";
-				//client waiting for order
+				//deliver order to client
 				sendObject(order);
-				//wait for client's ack
+				//wait for client's ack.
 				String ack = recieveString();
 				if (ack.equals("ACK")){
 					//threads synced, send aircraft
@@ -105,7 +105,7 @@ public class HostThread extends NetworkThread {
 			} else {
 				//sync scores
 				order = "score";
-				//client waiting for order
+				//deliver order to client
 				sendObject(order);
 				//wait for client's ack
 				String ack = recieveString();
@@ -113,6 +113,16 @@ public class HostThread extends NetworkThread {
 					//threads synced, send score
 					sendObject(game.getTotalScore());//send local score
 					int oppScore = recieveInt(); //recieve opponent's score
+					
+					if (oppScore == -1){
+						//opponent is quitting and their quit signal has been found here.
+						//therefore, quit the game.
+						lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+						lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+						killThread();
+					}
+					
+					//update game scene with new opponent score.
 					game.setOpponentScore(oppScore);
 				}
 			}
@@ -145,7 +155,7 @@ public class HostThread extends NetworkThread {
 	 */
 	@Override
 	public void setUp() throws IOException {
-		System.out.println("Set up 1");
+		System.out.println("Set up start");
 		//Init the ServerSocket and await a connection
 		ServerSocket socket = new ServerSocket(portNumber);
 		//accept an incoming connection request.
@@ -154,19 +164,15 @@ public class HostThread extends NetworkThread {
 		Socket clientSocket = socket.accept();
 		this.socket = socket;
 		this.clientSocket = clientSocket;
-		System.out.println("Set up 2");
 		//set up IO
 		//Outputs
 		textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
 		textOutputWriter.flush();
-		System.out.println("Set up 3");
 		objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
 		objOutputWriter.flush();
-		System.out.println("Set up 4");
 		//Inputs
 		textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
 		objInputStream = new ObjectInputStream(clientSocket.getInputStream());
-		System.out.println("Set up 5");
 		//Raise hosting flag
 		hosting = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
@@ -196,14 +202,11 @@ public class HostThread extends NetworkThread {
 
 		System.out.println("test object send 2: network io");
 		//Send the aircraft to the client
-		//objOutputWriter.writeObject(test);
 		sendObject(test);
 		//Send some text to the client
-		//cheaty way
 		String test2 = "Hello Client";
 		sendObject(test2);
 		System.out.println("Both IO finished");
-
 	}
 	
 	/**

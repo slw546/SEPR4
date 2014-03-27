@@ -60,6 +60,12 @@ public abstract class NetworkThread extends Thread {
 	abstract public void escapeThread();
 	
 	//SEND
+	
+	/*
+	 * SENDS VIA OBJECT OUTPUT STREAM ARE NOT BLOCKING
+	 * SENT OBJECTS ARE BUFFERED IN ORDER SENT UNTIL READ
+	 */
+	
 	/**
 	 * Send an object on the objOutputStream
 	 * Non-Blocking IO
@@ -72,15 +78,24 @@ public abstract class NetworkThread extends Thread {
 		try {
 			objOutputWriter.writeObject(object);
 		} catch (IOException e){
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_SEND);
-			System.out.println("Comms test: Failed to object; IOException.");
+			//report error in console
+			System.out.println("IO error when sending object");
 			e.printStackTrace();
+			//kill the thread which caused the error.
 			killThread();
 		}
 	}
 	
 	//RECIEVE
+	
+	/*
+	 * ALL RECIEVES ON THE OBJECT INPUT STREAM ARE BLOCKING
+	 * OBJECT MUST BE READ IN THE ORDER THEY ARE SENT TO AVOID CLASS CAST EXCEPTIONS
+	 */
+	
 	/**
 	 * Read an aircraft in from the objectInputStream
 	 * Order is important: objects must be read in the order they are sent.
@@ -96,21 +111,35 @@ public abstract class NetworkThread extends Thread {
 			System.out.println(recieved);
 			return recieved;
 		} catch (ClassNotFoundException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
-			System.err.println("Recieved object does not match expected: Aircraft");
+			//report error in console
+			System.err.println("Recieved object does not found: Aircraft");
 			e.printStackTrace();
+			//kill the thread which caused the error.
 			killThread();
 		} catch (IOException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			//report error in console
 			System.err.println("IOException communicating with host");
+			//kill the thread which caused the error.
 			e.printStackTrace();
 			killThread();
 		} catch (ClassCastException e){
+			//May be called due to a player quitting
+			//On quit, -1 is sent to other player intentionally to cause an error
+			//If the other thread is waiting for an integer, it can quit gracefully
+			//Otherwise a ClassCastException will cause the other player to quit out.
+			
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
-			System.err.println("IOException communicating with host");
+			//report error in console
+			System.err.println("Recieved class does not match Aircraft");
+			//kill the thread which caused the error.
 			e.printStackTrace();
 			killThread();
 		}
@@ -131,15 +160,35 @@ public abstract class NetworkThread extends Thread {
 			System.out.println(recieved);
 			return recieved;
 		}  catch (ClassNotFoundException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
-			System.err.println("Recieved object does not match expected: String");
+			//report error in console
+			System.err.println("Could not find class String");
 			e.printStackTrace();
+			//kill the thread which caused the error.
 			killThread();
 		} catch (IOException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			//report error in console
 			System.err.println("IOException communicating with host");
+			e.printStackTrace();
+			//kill the thread which caused the error.
+			killThread();
+		} catch (ClassCastException e){
+			//May be called due to a player quitting
+			//On quit, -1 is sent to other player intentionally to cause an error
+			//If the other thread is waiting for an integer, it can quit gracefully
+			//Otherwise a ClassCastException will cause the other player to quit out.
+			
+			//set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			//report error in console
+			System.err.println("Recieved object does not match expected: String");
+			//kill the thread which caused the error.
 			e.printStackTrace();
 			killThread();
 		}
@@ -160,15 +209,30 @@ public abstract class NetworkThread extends Thread {
 			System.out.println(recieved);
 			return recieved;
 		}  catch (ClassNotFoundException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
-			System.err.println("Recieved object does not match expected: String");
+			//report error in console
+			System.err.println("Could not find class Int.");
 			e.printStackTrace();
+			//kill the thread which caused the error.
 			killThread();
 		} catch (IOException e) {
+			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			//report error in console
 			System.err.println("IOException communicating with host");
+			e.printStackTrace();
+			//kill the thread which caused the error.
+			killThread();
+		} catch (ClassCastException e){
+			//set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			//report error in console
+			System.err.println("Recieved object does not match expected: Int");
+			//kill the thread which caused the error.
 			e.printStackTrace();
 			killThread();
 		}

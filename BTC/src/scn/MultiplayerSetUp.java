@@ -250,7 +250,7 @@ public class MultiplayerSetUp extends Scene {
 			graphics.print("Connection closed", window.width()/2-60, window.height()/2-60);
 			break;
 		case CLASS_CAST_EXCEPTION:
-			graphics.print("Synchronisation failed", window.width()/2-60, window.height()/2-60);
+			graphics.print("Game quit or Synchronisation failed", window.width()/2-60, window.height()/2-60);
 			break;
 		}
 	}

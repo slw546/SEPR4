@@ -257,6 +257,7 @@ public class MultiplayerGame extends Game {
         			moveSplitLineTo += 1;
         		break;
         	case input.KEY_ESCAPE:
+        		//main.closeScene() called in super.keyReleased.
         		networkThread.escapeThread();
         		break;
         }
