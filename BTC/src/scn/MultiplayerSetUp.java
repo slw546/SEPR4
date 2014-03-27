@@ -212,10 +212,7 @@ public class MultiplayerSetUp extends Scene {
 	public void draw() {
 		//draw the textbox
 		textBox.draw();
-		//draw the buttons
-		for (lib.ButtonText b : buttons) {
-			b.draw();
-		}
+
 		switch (state){
 		case CONNECTION_ESTABLISHED:
 			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);
@@ -226,6 +223,11 @@ public class MultiplayerSetUp extends Scene {
 			break;
 		default:
 			break;
+		}
+		
+		//draw the buttons
+		for (lib.ButtonText b : buttons) {
+			b.draw();
 		}
 	}
 	
