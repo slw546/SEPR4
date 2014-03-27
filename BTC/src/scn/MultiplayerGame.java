@@ -232,6 +232,9 @@ public class MultiplayerGame extends Game {
         		if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
         			moveSplitLineTo += 1;
         		break;
+        	case input.KEY_ESCAPE:
+        		networkThread.escapeThread();
+        		break;
         }
 	}
 	

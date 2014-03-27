@@ -90,6 +90,14 @@ public class ClientThread extends NetworkThread {
 			
 			//Blocking IO - wait on being told to expect N aircraft
 			int expected = recieveInt();
+			
+			//if we are sent -1, host has exited.
+			if (expected == -1){
+				lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+				lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+				killThread();
+			}
+			
 			//send ACK
 			sendObject(ack);
 			
@@ -176,9 +184,28 @@ public class ClientThread extends NetworkThread {
 		System.out.println("Thread killed due to error");
 		//if the game is running, escape to lobby
 		if (playing){
-			game.keyReleased(input.KEY_ESCAPE);
+			lobby.setStartOrdered(false);
+			main.keyReleased(input.KEY_ESCAPE);
+			sendObject(-1);
 		}
 		//end while loops to exit the thread
+		this.playing = false;
+		this.listening = false;
+	}
+	
+	@Override
+	public void escapeThread(){
+		System.out.println("Exiting thread voluntarily");
+		//prevent game scene from restarting on return to lobby
+		lobby.setStartOrdered(false);
+		//set error messages, connection state
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
+		
+		//send an object to either break the listening thread, or signal game closed.
+		sendObject(-1);
+		
+		//set flags to exit while loops
 		this.playing = false;
 		this.listening = false;
 	}

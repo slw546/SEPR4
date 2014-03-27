@@ -66,12 +66,11 @@ public class HostThread extends NetworkThread {
 		System.out.println("Test object send 1");
 		testCommunication();
 		System.out.println("test object send finished");
-		int somethingToDo = 0;
+		
 		while (hosting){
 			//If lobby has started the game, send game to client and leave this loop.
 			
 			//Something to do, prevents loop from closing..
-			//somethingToDo++;
 			System.out.print("");
 			
 			//See if the lobby has clicked start game
@@ -181,13 +180,35 @@ public class HostThread extends NetworkThread {
 
 	}
 	
+	/**
+	 * Method for INVOLUNTARY thread death
+	 */
 	@Override
 	public void killThread(){
 		//if game is running, escape to lobby
 		if (playing) {
+			lobby.setStartOrdered(false);
 			game.keyReleased(input.KEY_ESCAPE);
 		}
 		//end while loops to exit thread
+		this.playing = false;
+		this.hosting = false;
+	}
+	
+	/**
+	 * Method for VOLUNTARY thread exit
+	 */
+	public void escapeThread(){
+		//prevent game scene from restarting on return to lobby
+		lobby.setStartOrdered(false);
+		//set error messages, connection state
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
+		
+		//send an object to either break the listening thread, or signal game closed.
+		sendObject(-1);
+		
+		//set flags to exit while loops
 		this.playing = false;
 		this.hosting = false;
 	}

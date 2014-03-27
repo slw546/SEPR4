@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.lwjgl.Sys;
 
+import scn.Scene;
 import lib.jog.*;
 
 /**
@@ -237,6 +238,10 @@ public class Main implements input.EventHandler {
 	@Override
 	public void keyReleased(int key) {
 		currentScene.keyReleased(key);
+	}
+	
+	public Scene getCurrentScene(){
+		return this.currentScene;
 	}
 
 }

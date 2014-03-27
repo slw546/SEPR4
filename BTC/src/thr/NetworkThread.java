@@ -49,7 +49,15 @@ public abstract class NetworkThread extends Thread {
 	}
 	
 	//Error handling
+	/**
+	 * Involuntary thread death handler
+	 */
 	abstract public void killThread();
+	
+	/**
+	 * Voluntary thread death handler
+	 */
+	abstract public void escapeThread();
 	
 	//SEND
 	/**
@@ -96,6 +104,12 @@ public abstract class NetworkThread extends Thread {
 		} catch (IOException e) {
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			System.err.println("IOException communicating with host");
+			e.printStackTrace();
+			killThread();
+		} catch (ClassCastException e){
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
 			System.err.println("IOException communicating with host");
 			e.printStackTrace();
 			killThread();

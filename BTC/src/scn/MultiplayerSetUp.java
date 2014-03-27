@@ -48,7 +48,9 @@ public class MultiplayerSetUp extends Scene {
 		SOCKET_IO_UNAVAILABLE, //unable to get IO streams of socket during set up - connection not established
 		CLASS_NOT_FOUND, //unknown class sent via object stream
 		IO_ERROR_ON_SEND, //unable to send something - connection lost
-		IO_ERROR_ON_RECIEVE //failed to recieve something - connection lost
+		IO_ERROR_ON_RECIEVE, //failed to recieve something - connection lost
+		CLOSED_BY_YOU, //player closed the game scene with the escape key
+		CLASS_CAST_EXCEPTION //synchronisation failed, or someone exited voluntarily.
 	}
 	
 	//current state, variable to hold an error from network thread
@@ -70,14 +72,18 @@ public class MultiplayerSetUp extends Scene {
 	private boolean host_active = false;
 	private boolean client_active = false;
 	private boolean startOrdered = false;
-	
-	private boolean connection_established = false;
 
 	protected MultiplayerSetUp(Main main) {
 		super(main);
 		//Textbox to write flavour text and instructions to.
 		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);	
 		state = networkStates.NO_CONNECTION;
+	}
+	
+	protected MultiplayerSetUp(Main main, networkStates state, errorCauses cause){
+		super(main);
+		this.state = state;
+		this.error = cause;
 	}
 
 	@Override
@@ -239,6 +245,12 @@ public class MultiplayerSetUp extends Scene {
 			break;
 		case IO_ERROR_ON_RECIEVE:
 			graphics.print("Error: IO recieve failed. Connection lost. ", window.width()/2-60, window.height()/2-60);
+			break;
+		case CLOSED_BY_YOU:
+			graphics.print("Connection closed", window.width()/2-60, window.height()/2-60);
+			break;
+		case CLASS_CAST_EXCEPTION:
+			graphics.print("Synchronisation failed", window.width()/2-60, window.height()/2-60);
 			break;
 		}
 	}

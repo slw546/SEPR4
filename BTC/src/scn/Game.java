@@ -750,7 +750,7 @@ public class Game extends Scene {
                 break;*/
             case input.KEY_ESCAPE:
             	// The escape key returns the user to the main menu
-                main.closeScene();
+            	main.closeScene();
                 break;
             /*case input.KEY_F5:
                 Aircraft a1 = createAircraft();
@@ -1011,8 +1011,5 @@ public class Game extends Scene {
     public void setFlightGenerationTimeElapsed(double flightGenerationTimeElapsed) {
 		this.flightGenerationTimeElapsed = flightGenerationTimeElapsed;
 	}
-	
-    public void errorEscape(){
-    	main.closeScene();
-    }
+
 }
