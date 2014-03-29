@@ -81,61 +81,48 @@ public class ClientThread extends NetworkThread {
 			}
 		}
 		
-		
 		while (listening && playing) {
-			// listen to synchronisation from host
-			// send required synchronisations back, e.g. aircraft enters opposing player's airspace.
-			// update local airspace
-			String ack = "ACK";
-			
-			//wait for order from host
+			//get the order from host
 			String order = recieveString();
-			if (order.equals("aircraft")){
-				//acknowledge the order
-				sendObject(ack);
-				//Blocking IO - wait on being told to expect N aircraft
-				int expected = recieveInt();
+			//act upon the order
+			switch (order){
+			
+			case "aircraft":
+				//sync from host
+				recieveAircraftBuffer();
+				//sync to host
+				syncAircraftBuffer();
+				break;
 				
-				//if we are sent -1, host has exited.
-				if (expected == -1){
-					lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-					lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
-					killThread();
-				}
-				
-				//send ACK
-				sendObject(ack);
-				
-				//read in the expected number of aircraft
-				for (int i = 0; i < expected; i++){
-					//read the aircraft into the aircraftInAirspace array
-					//adds aircraft directly into the airspace
-					game.aircraftInAirspace().add(recieveAircraft());
-				}
-				
-			} else if (order.equals("score")){
-				//acknowledge the order
-				sendObject(ack);
-				//read in opponent's score
-				int oppScore = recieveInt();
-				
-				if (oppScore == -1){
-					//Other player is quitting, and their quit signal has been picked up here.
-					//therefore, quit the game
-					lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-					lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
-					killThread();
-				}
-				
-				//update game scene with new opponent score.
-				game.setOpponentScore(oppScore);
-				//send local score to opponent.
-				sendObject(game.getTotalScore());
+			case "score":
+				syncScore();
+				break;
 			}
-
 		}
+		
 		// alert client that thread is exiting
 		System.out.println("ClientThread exiting");
+	}
+	
+	@Override
+	protected void syncScore(){
+		//send the ack
+		sendObject(ack);
+		//get their score
+		int oppScore = recieveInt();
+		//send our score
+		sendObject(game.getTotalScore());
+		
+		if (oppScore == -1){
+			//Other player is quitting, and their quit signal has been picked up here.
+			//therefore, quit the game
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			killThread();
+		} else {
+			//update game scene with new opponent score.
+			game.setOpponentScore(oppScore);
+		}
 	}
 	
 	/**

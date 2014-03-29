@@ -83,67 +83,51 @@ public class HostThread extends NetworkThread {
 		System.out.println("left hosting loop");
 		
 		while(hosting && playing){
-			// listen to synchronisation from client
-			// send changes to client e.g. aircraft changing airspace
-			// update the local airspace
+			//client is waiting for orders from host
 			
-			//Order - client is waiting for an order from the host.
-			//client matches recieved order in if-else statement to carry out appropriate action
-			String order;
+			//sync aircraft
+			//send the order
+			sendObject("aircraft");
+			//sync to client
+			syncAircraftBuffer();
+			//sync from client
+			recieveAircraftBuffer();
 			
-			//aircraft to send - sync aircraft.
-			if (!aircraftBuffer.isEmpty()){
-				order = "aircraft";
-				//deliver order to client
-				sendObject(order);
-				//wait for client's ack.
-				String ack = recieveString();
-				if (ack.equals("ACK")){
-					//threads synced, send aircraft
-					syncAircraftBuffer();
-				}
-			} else {
-				//sync scores
-				order = "score";
-				//deliver order to client
-				sendObject(order);
-				//wait for client's ack
-				String ack = recieveString();
-				if (ack.equals("ACK")){
-					//threads synced, send score
-					sendObject(game.getTotalScore());//send local score
-					int oppScore = recieveInt(); //recieve opponent's score
-					
-					if (oppScore == -1){
-						//opponent is quitting and their quit signal has been found here.
-						//therefore, quit the game.
-						lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-						lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
-						killThread();
-					}
-					
-					//update game scene with new opponent score.
-					game.setOpponentScore(oppScore);
-				}
-			}
+			//sync score
+			//function sends the order
+			syncScore();
 		}
+		
+		
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
 	}
 	
-	private void syncAircraftBuffer(){
-		//tell client how many aircraft to expect
-		sendObject(aircraftBuffer.size());
-		//Blocking IO to sync threads.
-		//Wait for an ack from client
-		String ack = recieveString();
-		if (ack.equals("ACK")){
-			//send the aircraft
-			for (int i = 0; i < aircraftBuffer.size(); i++){
-				//send aircraft, remove it from buffer
-				sendObject(aircraftBuffer.get(i));
-				aircraftBuffer.remove(i);
-			}
+	@Override
+	protected void syncScore(){
+		int oppScore = -1;
+		//send order
+		String order = "score";
+		sendObject(order);
+		//wait for ack
+		String recv = recieveString();
+		if (recv.equals(ack)){
+			//send our score
+			sendObject(game.getTotalScore());
+			//get their score
+			oppScore = recieveInt();
+		}
+		
+		if (oppScore == -1){
+			//opponent is quitting and their quit signal has been found here.
+			//or we failed recieveInt()
+			//therefore, quit the game.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			killThread();
+		} else {
+			//update opponent's score
+			game.setOpponentScore(oppScore);
 		}
 	}
 	
@@ -217,7 +201,6 @@ public class HostThread extends NetworkThread {
 		//if game is running, escape to lobby
 		if (playing) {
 			lobby.setStartOrdered(false);
-			game.keyReleased(input.KEY_ESCAPE);
 		}
 		//end while loops to exit thread
 		this.playing = false;

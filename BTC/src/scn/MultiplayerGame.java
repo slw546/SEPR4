@@ -20,10 +20,12 @@ public class MultiplayerGame extends Game {
 	};
 	
 	/** The current x co-ordinate of the line to split the game screen of the two players **/
-	private int splitLine = SPLIT_LINE_POSITIONS[8];
+	private int splitLine = SPLIT_LINE_POSITIONS[6];
 	
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
-	private int moveSplitLineTo = 8;
+	private int moveSplitLineTo = 6;
+	
+	private long lastMoveTime = System.currentTimeMillis();
 	
 	/** Enumerator for the two players, constructed with the colour of their controlled waypoints **/
 	public enum Player {
@@ -81,6 +83,26 @@ public class MultiplayerGame extends Game {
 		//Sidesteps the flight generator present in Game, which this class is inheriting from.
 		if (gameType.equals(Type.CLIENT)){
 			this.setFlightGenerationTimeElapsed(0);
+		}
+		
+		//Move line if it's been 5 seconds since the last move
+		if (System.currentTimeMillis() > lastMoveTime + 5000){
+			lastMoveTime = System.currentTimeMillis();
+			if (totalScore > opponentScore){
+				switch (gameType){
+				case HOST:
+					//move line right
+					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
+						moveSplitLineTo += 1;
+					}
+					break;
+				case CLIENT:
+					if (moveSplitLineTo > 0){
+						moveSplitLineTo -= 1;
+					}
+					break;
+				}
+			}
 		}
 		
 		// Increment or decrement the splitLine towards moveSplitLineTo every update, giving a smooth transition of the split line
@@ -226,26 +248,60 @@ public class MultiplayerGame extends Game {
      */
 	@Override
     protected void generateFlight() {
-        Aircraft a = createAircraft();
-        if (!Main.testing) ordersBox.addOrder(
-        		"<<< " + a.name() + " incoming from "+ a.originName()
-        		+ " heading towards " + a.destinationName() + ".");
-        
-        // Check which player has control of aircraft
-        if(a.position().x() < splitLine){
-        	// If the aircraft is left of the line, it belongs to the left player
-        	a.setOwner(0);
-        }
-        else{
-        	// If the aircraft is right of the line, it belongs to the right player
-        	a.setOwner(1);
-        }
-        
-        //add the aircraft to the thread's buffer to be sent.
-        networkThread.addToBuffer(a);
-        //add the aircraft to the list of the aircraft in the airspace
-        aircraftInAirspace.add(a);
+		Aircraft a = createAircraft();
+		addFlight(a);
+
+		//add the aircraft to the thread's buffer to be sent.
+		networkThread.addToBuffer(a);
+       
     }
+	
+	/**
+	 * Adds a flight to the airspace and reports it in the order box
+	 * @param a the aircraft to be added
+	 */
+	public void addFlight(Aircraft a){
+		if (!Main.testing) ordersBox.addOrder(
+				"<<< " + a.name() + " incoming from "+ a.originName()
+				+ " heading towards " + a.destinationName() + ".");
+
+		// Check which player has control of aircraft
+		if(a.position().x() < splitLine){
+			// If the aircraft is left of the line, it belongs to the left player
+			a.setOwner(0);
+		}
+		else{
+			// If the aircraft is right of the line, it belongs to the right player
+			a.setOwner(1);
+		}
+
+		//add the aircraft to the list of the aircraft in the airspace
+		aircraftInAirspace.add(a);    
+	}
+	
+	/**
+	 * Checks the aircraftInAirspace to see if a flight already exists
+	 * @param a the aircraft to check the airspace for
+	 * @return the index of the flight if it exists in the airspace, else -2
+	 * -2 used since -1 is in use as an error code due to a player quitting.
+	 */
+	public int existsInAirspace(Aircraft a){
+		//check for general equality
+		if (aircraftInAirspace.contains(a)){
+			return aircraftInAirspace.indexOf(a);
+		}
+		//check for equality using aircraft's unique names
+		String name = a.name();
+		for (int i = 0; i < aircraftInAirspace.size(); i++){
+			if (aircraftInAirspace.get(i).name().equals(name)){
+				System.out.println("existing flight");
+				return i;
+			}
+		}
+		//no match
+		System.out.println("new flight");
+		return -2;
+	}
 	
 	
 	//Input handler
@@ -265,11 +321,21 @@ public class MultiplayerGame extends Game {
         		//main.closeScene() called in super.keyReleased.
         		networkThread.escapeThread();
         		break;
+        	case input.KEY_UP:
+        		if (selectedAircraft != null){
+        			//Aircraft was ordered to ascend, add it to buffer to be sent
+        			networkThread.addToBuffer(selectedAircraft);
+        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        		}
+        		break;
+        	case input.KEY_DOWN:
+        		if (selectedAircraft != null){
+        			//Aircraft was ordered to descend, add it to buffer to be sent
+        			networkThread.addToBuffer(selectedAircraft);
+        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        		}
+        		break;
         }
-	}
-
-	public void setOpponentScore(int opponentScore) {
-		this.opponentScore = opponentScore;
 	}
 	
     /**
@@ -343,5 +409,10 @@ public class MultiplayerGame extends Game {
         // Trigger altimeter actions - not in use?
         altimeter.mousePressed(key, x, y);
     }
+    
+    //Setters
+    public void setOpponentScore(int opponentScore) {
+		this.opponentScore = opponentScore;
+	}
 	
 }

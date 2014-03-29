@@ -22,6 +22,9 @@ public abstract class NetworkThread extends Thread {
 	
 	//Buffer of aircraft to be sent
 	protected ArrayList<Aircraft> aircraftBuffer;
+	public boolean locked = false;
+	
+	protected String ack = "ACK";
 	
 	// INPUT
 	// A buffered input stream to read text incoming from the client socket
@@ -74,7 +77,7 @@ public abstract class NetworkThread extends Thread {
 	 * @param object the object to be sent
 	 */
 	protected void sendObject(Object object){
-		System.out.println("Sending object");
+		//System.out.println("Sending object");
 		try {
 			objOutputWriter.writeObject(object);
 		} catch (IOException e){
@@ -89,12 +92,84 @@ public abstract class NetworkThread extends Thread {
 		}
 	}
 	
-	//RECIEVE
+	/**
+	 * Synchronise the aircraft buffer to a receiver
+	 * Receive command: recieveAircraftBuffer()
+	 * Sends first the number of aircraft to expect
+	 * Followed by the aircraft objects
+	 * Waits for ACKs.
+	 * See also: sendObject for sends
+	 * 			 recieveString for ACK
+	 */
+	protected void syncAircraftBuffer(){
+		//Sync threads
+		//send order
+		//wait for ack
+		//System.out.println("Start sync");
+		String recv = recieveString();
+		int buffSize = aircraftBuffer.size();
+		
+		if (recv.equals(ack)){
+			//tell reciever how many aircraft to expect
+			sendObject(buffSize);
+			//send aircraft
+			for (int i = 0; i < buffSize; i++){
+				sendObject(aircraftBuffer.get(i));
+				//remove sent aircraft from buffer
+				aircraftBuffer.remove(i);
+			}
+		}
+		//System.out.println("End Sync");
+	}
 	
+	abstract protected void syncScore();
+	
+	//RECIEVE
+
 	/*
 	 * ALL RECIEVES ON THE OBJECT INPUT STREAM ARE BLOCKING
 	 * OBJECT MUST BE READ IN THE ORDER THEY ARE SENT TO AVOID CLASS CAST EXCEPTIONS
 	 */
+	
+	/**
+	 * Receive the aircraft buffer from a syncAircraftBuffer() function
+	 * ACKs the order
+	 * listens for the number of aircraft to expect
+	 * followed by that many aircraft
+	 * see also: syncAircraftBuffer
+	 */
+	protected void recieveAircraftBuffer(){
+		//System.out.println("Start recieve");
+		//ack the order
+		sendObject(ack);
+		//get how many aircraft to expect
+		int expected = recieveInt();
+		
+		//if we recieve -1 sender has exited.
+		if (expected == -1){
+			//quit out
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			killThread();
+		}
+		
+		//get the aircraft
+		for (int i = 0; i < expected; i++){
+			Aircraft a = recieveAircraft();
+			//check if the flight is already in the airspace
+			int index = game.existsInAirspace(a);
+			if (index != -2){
+				//if it is, remove it
+				game.aircraftInAirspace().remove(index);
+				//replace it with the updated flight
+				game.aircraftInAirspace().add(a);
+			} else {
+				//otherwise add it as a new flight
+				game.addFlight(a);	
+			}
+		}
+		//System.out.println("end recieve");
+	}
 	
 	/**
 	 * Read an aircraft in from the objectInputStream
@@ -108,7 +183,7 @@ public abstract class NetworkThread extends Thread {
 			Aircraft recieved;
 			//read an aircraft from the stream
 			recieved = (Aircraft) objInputStream.readObject();
-			System.out.println(recieved);
+			//System.out.println("recieved Aircraft\n" + recieved);
 			return recieved;
 		} catch (ClassNotFoundException e) {
 			//set flags for lobby to report the error.
@@ -157,7 +232,7 @@ public abstract class NetworkThread extends Thread {
 		try {
 			String recieved;
 			recieved = (String) objInputStream.readObject();
-			System.out.println(recieved);
+			//System.out.println("Recieved String\n"+recieved);
 			return recieved;
 		}  catch (ClassNotFoundException e) {
 			//set flags for lobby to report the error.
@@ -189,8 +264,8 @@ public abstract class NetworkThread extends Thread {
 			//report error in console
 			System.err.println("Recieved object does not match expected: String");
 			//kill the thread which caused the error.
-			e.printStackTrace();
 			killThread();
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -206,7 +281,7 @@ public abstract class NetworkThread extends Thread {
 		try {
 			int recieved;
 			recieved = (int) objInputStream.readObject();
-			System.out.println(recieved);
+			//System.out.println("Recieved Int\n"+ recieved);
 			return recieved;
 		}  catch (ClassNotFoundException e) {
 			//set flags for lobby to report the error.
@@ -237,5 +312,9 @@ public abstract class NetworkThread extends Thread {
 			killThread();
 		}
 		return 0;
+	}
+	
+	public int getBufferSize(){
+		return this.aircraftBuffer.size();
 	}
 }
