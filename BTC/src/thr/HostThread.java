@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -149,6 +150,10 @@ public class HostThread extends NetworkThread {
 	@Override
 	public void setUp() throws IOException {
 		System.out.println("Set up start");
+		//get the local address and tell the lobby it
+		//this is the address of the host pc on the LAN
+		InetAddress addr = InetAddress.getLocalHost();
+		lobby.setAddress(addr.getHostAddress());
 		//Init the ServerSocket and await a connection
 		ServerSocket socket = new ServerSocket(portNumber);
 		//accept an incoming connection request.
@@ -216,6 +221,14 @@ public class HostThread extends NetworkThread {
 		if (playing) {
 			lobby.setStartOrdered(false);
 		}
+		//close socket
+		try {
+			clientSocket.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 		//end while loops to exit thread
 		this.playing = false;
 		this.hosting = false;
@@ -233,7 +246,14 @@ public class HostThread extends NetworkThread {
 		
 		//send an object to either break the listening thread, or signal game closed.
 		sendObject(-1);
-		
+		//close socket
+		try {
+			clientSocket.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 		//set flags to exit while loops
 		this.playing = false;
 		this.hosting = false;

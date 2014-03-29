@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -79,6 +80,19 @@ public class ClientThread extends NetworkThread {
 				this.playing = true;
 				break;
 			}
+		}
+		
+		//Entering play loop
+		//set to time out after 5 seconds.
+		//if an attempt to read does not get data within 5 seconds,
+		//a socket error will be thrown.
+		//not done earlier, as we don't care if it takes more than 5 seconds
+		//for the host to start the game.
+		try {
+			socket.setSoTimeout(5000);
+		} catch (SocketException e1) {
+			System.err.println("Failed to set socket timeout");
+			e1.printStackTrace();
 		}
 		
 		while (listening && playing) {
@@ -157,11 +171,6 @@ public class ClientThread extends NetworkThread {
 		System.out.println("Set up finished");
 		listening = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
-		
-		//set to time out after 5 seconds.
-		//if an attempt to read does not get data within 5 seconds,
-		//a socket error will be thrown.
-		socket.setSoTimeout(5000);
 	}
 	
 	/**
@@ -203,6 +212,13 @@ public class ClientThread extends NetworkThread {
 			lobby.setStartOrdered(false);
 			main.keyReleased(input.KEY_ESCAPE);
 		}
+		//close socket
+		try {
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 		//end while loops to exit the thread
 		this.playing = false;
 		this.listening = false;
@@ -216,7 +232,13 @@ public class ClientThread extends NetworkThread {
 		//set error messages, connection state
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
-		
+		//close socket
+		try {
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 		//set flags to exit while loops
 		this.playing = false;
 		this.listening = false;

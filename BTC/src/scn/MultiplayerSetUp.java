@@ -1,6 +1,7 @@
 package scn;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -37,6 +38,9 @@ public class MultiplayerSetUp extends Scene {
 	private HostThread host;
 	private ClientThread client;
 	
+	private String address = "localhost";
+	private int port = 4444;
+
 	//enum for state of connection
 	public enum networkStates {
 			NO_CONNECTION, 
@@ -116,6 +120,12 @@ public class MultiplayerSetUp extends Scene {
 		if (key == input.KEY_ESCAPE) {
 			main.closeScene();
 		}
+		//if a host or client is running, kill them as well
+		if (host != null){
+			host.escapeThread();
+		} else if (client != null){
+			client.escapeThread();
+		}
 	}
 
 	@Override
@@ -180,7 +190,7 @@ public class MultiplayerSetUp extends Scene {
 		buttons[1].setAvailability(false);
 		buttons[2].setAvailability(true);
 		//Create and start a host thread
-		host = new HostThread(4445, this, main);
+		host = new HostThread(port, this, main);
 		//create a game scene to be used when the game starts
 		game = new MultiplayerGame(main, MultiplayerGame.Type.HOST, host);
 		
@@ -195,7 +205,7 @@ public class MultiplayerSetUp extends Scene {
 		
 
 		//create and start a client thread
-		client = new ClientThread("localhost", 4445, this, main);
+		client = new ClientThread(address, port, this, main);
 		//create a game scene to be used when the game starts
 		game = new MultiplayerGame(main, MultiplayerGame.Type.CLIENT, client);
 		client.setGameScene(game);
@@ -231,6 +241,10 @@ public class MultiplayerSetUp extends Scene {
 			break;
 		case CONNECTION_ESTABLISHED:
 			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);
+			if (host_active){
+				graphics.print("Hosting at: " + address + " Port: " + port, 
+						window.width()/2-90, window.height()/2-50);
+			}
 			break;
 		case CONNECTION_LOST:
 			graphics.print("Connection lost", window.width()/2-60, window.height()/2-90);
@@ -284,6 +298,14 @@ public class MultiplayerSetUp extends Scene {
 	}
 	
 	//Getters and Setters
+	
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	
 	public void setNetworkState(networkStates state){
 		this.state = state;
