@@ -96,7 +96,13 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the left side
 					// Player 1 looses points
-					// New flight plan generated for new aircraft
+
+					// Generating a new route for the aircraft
+					Waypoint origin = tempAircraft.getRoute()[0];
+					Waypoint[] waypoints = tempAircraft.getRoute();
+					int numberOfWaypoints = tempAircraft.getRoute().length;
+					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
+					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
@@ -109,7 +115,13 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the right side
 					// Player 0 looses points
-					// New flight plan generated for new aircraft
+					
+					// Generating a new route for the aircraft
+					Waypoint origin = tempAircraft.getRoute()[0];
+					Waypoint[] waypoints = tempAircraft.getRoute();
+					int numberOfWaypoints = tempAircraft.getRoute().length;
+					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
+					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
@@ -204,16 +216,6 @@ public class MultiplayerGame extends Game {
         			points[points.length - 1].position().x() - 16,
         			points[points.length - 1].position().y() - 5);
         }
-	}
-	
-	
-	//Aircraft functions
-	/**
-	 * When an aircraft crosses over the split line manually a new flight plan needs to be generated
-	 * This function generates a new flightplan for the aircraft
-	 */
-	private void alterFlightPlan(Aircraft inputAircraft){
-		inputAircraft.regenerateRoute();
 	}
 	
     /**

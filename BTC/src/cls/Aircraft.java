@@ -1128,12 +1128,4 @@ public class Aircraft implements Serializable {
 		return position.z();
 	}
 	
-	/**
-	 * Generates a new route for the aircraft
-	 */
-	public void regenerateRoute(){
-		
-	}
-	
-	
 }
