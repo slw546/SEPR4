@@ -101,6 +101,15 @@ public class HostThread extends NetworkThread {
 		
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
+		
+		//close the sockets on the way out.
+		try {
+			clientSocket.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

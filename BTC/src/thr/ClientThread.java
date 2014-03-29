@@ -102,6 +102,14 @@ public class ClientThread extends NetworkThread {
 		
 		// alert client that thread is exiting
 		System.out.println("ClientThread exiting");
+		
+		//close the socket on the way out.
+		try {
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close socket");
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
