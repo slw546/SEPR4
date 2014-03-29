@@ -1,13 +1,10 @@
 package scn;
 
-import java.io.Serializable;
-
 import thr.NetworkThread;
 import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
-import cls.Aircraft.AltitudeState;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;

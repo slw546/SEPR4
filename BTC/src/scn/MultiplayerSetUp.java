@@ -1,14 +1,7 @@
 package scn;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import thr.ClientThread;
 import thr.HostThread;
-import lib.ButtonText;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
@@ -52,6 +45,7 @@ public class MultiplayerSetUp extends Scene {
 	//enum for errors thrown by network thread
 	public enum errorCauses {
 		UNKNOWN_HOST, //host address incorrect - connection not established
+		NO_HOST_RUNNING, //the client tried to connect before a host had been started.
 		SOCKET_IO_UNAVAILABLE, //unable to get IO streams of socket during set up - connection not established
 		CLASS_NOT_FOUND, //unknown class sent via object stream
 		IO_ERROR_ON_SEND, //unable to send something - connection lost
@@ -263,28 +257,40 @@ public class MultiplayerSetUp extends Scene {
 	private void printError(){
 		switch(error){
 		case UNKNOWN_HOST:
-			graphics.print("Error: Unknown Host. Check host address and port. ", window.width()/2-60, window.height()/2-60);
+			graphics.print("Error: Unknown Host. Check host address and port. ", 
+					window.width()/2-60, window.height()/2-60);
+			break;
+		case NO_HOST_RUNNING:
+			graphics.print("Error: Host not running or unable to set up IO streams",
+					window.width()/2-60, window.height()/2-60 );
 			break;
 		case SOCKET_IO_UNAVAILABLE:
-			graphics.print("Error setting up IO streams.", window.width()/2-60, window.height()/2-60);
+			graphics.print("Error setting up IO streams.", 
+					window.width()/2-60, window.height()/2-60);
 			break;
 		case CLASS_NOT_FOUND:
-			graphics.print("Error: Unknown class recieved.", window.width()/2-60, window.height()/2-60);
+			graphics.print("Error: Unknown class recieved.",
+					window.width()/2-60, window.height()/2-60);
 			break;
 		case IO_ERROR_ON_SEND:
-			graphics.print("Error: IO send failed. Connection lost.", window.width()/2-60, window.height()/2-60);
+			graphics.print("Error: IO send failed. Connection lost.",
+					window.width()/2-60, window.height()/2-60);
 			break;
 		case IO_ERROR_ON_RECIEVE:
-			graphics.print("Error: IO recieve failed. Connection lost. ", window.width()/2-60, window.height()/2-60);
+			graphics.print("Error: IO recieve failed. Connection lost. ",
+					window.width()/2-60, window.height()/2-60);
 			break;
 		case CLOSED_BY_YOU:
-			graphics.print("Connection closed", window.width()/2-60, window.height()/2-60);
+			graphics.print("Connection closed", window.width()/2-60,
+					window.height()/2-60);
 			break;
 		case CLASS_CAST_EXCEPTION:
-			graphics.print("Game quit or Synchronisation failed", window.width()/2-60, window.height()/2-60);
+			graphics.print("Game quit or Synchronisation failed",
+					window.width()/2-60, window.height()/2-60);
 			break;
 		case SOCKET_TIMEOUT:
-			graphics.print("Timed out trying to read socket. Connection lost.", window.width()/2-60, window.height()/2-60);
+			graphics.print("Timed out trying to read socket. Connection lost.",
+					window.width()/2-60, window.height()/2-60);
 			break;
 		}
 	}

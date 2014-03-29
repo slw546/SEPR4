@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
 import scn.MultiplayerGame;

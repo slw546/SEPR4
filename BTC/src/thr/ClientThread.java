@@ -60,8 +60,8 @@ public class ClientThread extends NetworkThread {
 			killThread();
 		} catch (IOException e1) {
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
-			System.err.println("Error setting up IO on socket");
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.NO_HOST_RUNNING);
+			System.err.println("Error setting up IO on socket. Host not running");
 			e1.printStackTrace();
 			killThread();
 		}

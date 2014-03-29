@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import lib.ButtonText;
 import lib.jog.audio;
 import lib.jog.audio.Sound;
 import lib.jog.graphics;

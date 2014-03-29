@@ -2,7 +2,6 @@ package lib.jog;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 
 import static org.lwjgl.opengl.GL11.*;
 

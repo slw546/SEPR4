@@ -9,7 +9,6 @@ import btc.Main;
 import scn.Game;
 import lib.jog.audio;
 import lib.jog.graphics;
-import lib.jog.graphics.Image;
 import lib.jog.input;
 import lib.jog.window;
 
