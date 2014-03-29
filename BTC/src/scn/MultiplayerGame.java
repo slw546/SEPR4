@@ -324,6 +324,7 @@ public class MultiplayerGame extends Game {
         	case input.KEY_UP:
         		if (selectedAircraft != null){
         			//Aircraft was ordered to ascend, add it to buffer to be sent
+        			System.out.println("Flight ordered to ascend");
         			networkThread.addToBuffer(selectedAircraft);
         			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
         		}
@@ -331,6 +332,25 @@ public class MultiplayerGame extends Game {
         	case input.KEY_DOWN:
         		if (selectedAircraft != null){
         			//Aircraft was ordered to descend, add it to buffer to be sent
+        			System.out.println("Flight ordered to descend");
+        			networkThread.addToBuffer(selectedAircraft);
+        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        		}
+        		break;
+        	case input.KEY_T:
+        		//aircraft ordered to take off
+        		//add it to buffer to be sent
+        		if (selectedAircraft != null){
+        			System.out.println("Flight ordered to take off");
+        			networkThread.addToBuffer(selectedAircraft);
+        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        		}
+        		break;
+        	case input.KEY_L:
+        		//aircraft ordered to land
+        		//add it to buffer to be sent
+        		if (selectedAircraft != null){
+        			System.out.println("Flight ordered to descend");
         			networkThread.addToBuffer(selectedAircraft);
         			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
         		}
