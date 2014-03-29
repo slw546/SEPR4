@@ -39,7 +39,10 @@ public class MultiplayerSetUp extends Scene {
 	
 	//enum for state of connection
 	public enum networkStates {
-			NO_CONNECTION, CONNECTION_ESTABLISHED, CONNECTION_LOST
+			NO_CONNECTION, 
+			WAITING_FOR_CONNECTION,
+			CONNECTION_ESTABLISHED, 
+			CONNECTION_LOST
 	}
 	
 	//enum for errors thrown by network thread
@@ -133,6 +136,7 @@ public class MultiplayerSetUp extends Scene {
 			@Override
 			public void action() {
 				createHost();
+				state = networkStates.WAITING_FOR_CONNECTION;
 			}
 		};
 		
@@ -140,6 +144,7 @@ public class MultiplayerSetUp extends Scene {
 			@Override
 			public void action() {
 				createClient();
+				state = networkStates.NO_CONNECTION;
 				}
 		};
 		
@@ -207,6 +212,12 @@ public class MultiplayerSetUp extends Scene {
 		if (startOrdered){
 			main.setScene(game);
 		}
+		
+		if (state == networkStates.CONNECTION_LOST){
+			buttons[0].setAvailability(true);
+			buttons[1].setAvailability(true);
+			buttons[2].setAvailability(false);
+		}
 	}
 
 	@Override
@@ -215,6 +226,9 @@ public class MultiplayerSetUp extends Scene {
 		textBox.draw();
 
 		switch (state){
+		case WAITING_FOR_CONNECTION:
+			graphics.print("Waiting for a player to join", window.width()/2-60, window.height()/2-60);
+			break;
 		case CONNECTION_ESTABLISHED:
 			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);
 			break;
