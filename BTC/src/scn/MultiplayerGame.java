@@ -7,6 +7,7 @@ import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
+import cls.Aircraft.AltitudeState;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
@@ -116,7 +117,7 @@ public class MultiplayerGame extends Game {
 					// The aircraft has been manually flown over to the right side
 					// Player 0 looses points
 					
-					// Generating a new route for the aircraft
+					// Generating a new route
 					Waypoint origin = tempAircraft.getRoute()[0];
 					Waypoint[] waypoints = tempAircraft.getRoute();
 					int numberOfWaypoints = tempAircraft.getRoute().length;
@@ -218,6 +219,8 @@ public class MultiplayerGame extends Game {
         }
 	}
 	
+	
+	//Aircraft functions	
     /**
      * Create a new aircraft object and introduce it to the airspace
      */
@@ -268,5 +271,77 @@ public class MultiplayerGame extends Game {
 	public void setOpponentScore(int opponentScore) {
 		this.opponentScore = opponentScore;
 	}
+	
+    /**
+     * Handle mouse input
+     */
+    @Override
+    public void mousePressed(int key, int x, int y) {
+    	if (key == input.MOUSE_LEFT) {
+        	// If a aircraft is clicked, select it
+            Aircraft newSelected = selectedAircraft;
+            for (Aircraft a : aircraftInAirspace) {
+                /*if (a.isMouseOver(x-16, y-16)
+                		&& aircraftSelectableAtAltitude(a, controlAltitude)) {
+                    newSelected = a;
+                }*/
+                           	
+                if (a.isMouseOver(x-16, y-16)){
+                	// Check for ownership
+                	if ((gameType.equals(Type.HOST) && (a.owner() == 0))){
+                        newSelected = a;
+                	}
+                	else if ((gameType.equals(Type.CLIENT) && (a.owner() == 1))){
+                		newSelected = a;
+                	}
+                }
+            }
+            
+            boolean dontChangeCourse = false;
+            
+            // If the aircraft clicked is not the one already selected, select it
+            // Provided the selected aircraft is not finished, landing or taking off
+            if (newSelected != null
+            		&& newSelected.status() != AirportState.FINISHED
+            		&& newSelected.status() != AirportState.LANDING
+            		&& newSelected.status() != AirportState.TAKEOFF) {
+            	if (newSelected != selectedAircraft) {
+            		deselectAircraft();
+            		selectedAircraft = newSelected;
+            		dontChangeCourse = true;
+            	}
+            }
+            altimeter.show(selectedAircraft);
+            
+            if (selectedAircraft != null) {
+                for (Waypoint w : airspaceWaypoints) {
+                    if ((w.type() == Waypoint.WaypointType.AIRSPACE)
+                    		&& w.isMouseOver(x-16, y-16)
+                    		&& selectedAircraft.flightPathContains(w) > -1) {
+                        selectedWaypoint = w;
+                        selectedPathpoint = selectedAircraft.flightPathContains(w);
+                    }
+                }
+                
+                if (selectedWaypoint == null && !dontChangeCourse) {
+                    // If mouse is over compass
+                    double dx = selectedAircraft.position().x() - input.mouseX();
+                    double dy = selectedAircraft.position().y() - input.mouseY();
+                    int r = Aircraft.COMPASS_RADIUS;
+                    if (dx*dx + dy*dy < r*r) {
+                        compassDragged = true;
+                    }
+                }
+            }
+        }
+        
+        // Deselect aircraft on right click
+        if (key == input.MOUSE_RIGHT) {
+        	deselectAircraft();
+        }
+        
+        // Trigger altimeter actions - not in use?
+        altimeter.mousePressed(key, x, y);
+    }
 	
 }

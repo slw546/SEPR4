@@ -73,10 +73,10 @@ public class Game extends Scene {
     
     /** Tracks if manual heading compass of a manually controller
      * aircraft has been dragged */
-    private boolean compassDragged;
+    protected boolean compassDragged;
     
     /** An altimeter to display aircraft altitidue, heading, etc. */
-    private Altimeter altimeter;
+    protected Altimeter altimeter;
     
     /** The interval in seconds to generate flights after */
     private double flightGenerationInterval = 12;
@@ -848,7 +848,7 @@ public class Game extends Scene {
     /**
      * Causes an aircraft to call methods to handle deselection
      */
-    private void deselectAircraft() {
+    protected void deselectAircraft() {
     	if (selectedAircraft != null && selectedAircraft
     			.isManuallyControlled()) {
     		selectedAircraft.setManuallyControlled(false);
