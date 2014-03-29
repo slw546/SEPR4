@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -194,6 +195,15 @@ public abstract class NetworkThread extends Thread {
 			e.printStackTrace();
 			//kill the thread which caused the error.
 			killThread();
+		} catch (SocketTimeoutException e){
+			//set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_TIMEOUT);
+			//report error in console
+			System.err.println("Timed out communicating with host");
+			//kill the thread which caused the error.
+			e.printStackTrace();
+			killThread();
 		} catch (IOException e) {
 			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
@@ -243,6 +253,15 @@ public abstract class NetworkThread extends Thread {
 			e.printStackTrace();
 			//kill the thread which caused the error.
 			killThread();
+		} catch (SocketTimeoutException e){
+			//set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_TIMEOUT);
+			//report error in console
+			System.err.println("Timed out communicating with host");
+			//kill the thread which caused the error.
+			e.printStackTrace();
+			killThread();
 		} catch (IOException e) {
 			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
@@ -291,6 +310,15 @@ public abstract class NetworkThread extends Thread {
 			System.err.println("Could not find class Int.");
 			e.printStackTrace();
 			//kill the thread which caused the error.
+			killThread();
+		} catch (SocketTimeoutException e){
+			//set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_TIMEOUT);
+			//report error in console
+			System.err.println("Timed out communicating with host");
+			//kill the thread which caused the error.
+			e.printStackTrace();
 			killThread();
 		} catch (IOException e) {
 			//set flags for lobby to report the error.

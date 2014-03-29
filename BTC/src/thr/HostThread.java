@@ -160,6 +160,11 @@ public class HostThread extends NetworkThread {
 		//Raise hosting flag
 		hosting = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
+		
+		//set to time out after 5 seconds.
+		//if an attempt to read does not get data within 5 seconds,
+		//a socket error will be thrown.
+		clientSocket.setSoTimeout(5000);
 	}
 	
 	/**

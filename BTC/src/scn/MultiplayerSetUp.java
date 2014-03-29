@@ -50,7 +50,8 @@ public class MultiplayerSetUp extends Scene {
 		IO_ERROR_ON_SEND, //unable to send something - connection lost
 		IO_ERROR_ON_RECIEVE, //failed to recieve something - connection lost
 		CLOSED_BY_YOU, //player closed the game scene with the escape key
-		CLASS_CAST_EXCEPTION //synchronisation failed, or someone exited voluntarily.
+		CLASS_CAST_EXCEPTION, //synchronisation failed, or someone exited voluntarily.
+		SOCKET_TIMEOUT //an attempt to read the socket failed; nothing was recieved for 5 seconds.
 	}
 	
 	//current state, variable to hold an error from network thread
@@ -253,6 +254,9 @@ public class MultiplayerSetUp extends Scene {
 			break;
 		case CLASS_CAST_EXCEPTION:
 			graphics.print("Game quit or Synchronisation failed", window.width()/2-60, window.height()/2-60);
+			break;
+		case SOCKET_TIMEOUT:
+			graphics.print("Timed out trying to read socket. Connection lost.", window.width()/2-60, window.height()/2-60);
 			break;
 		}
 	}

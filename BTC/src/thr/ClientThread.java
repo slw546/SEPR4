@@ -149,6 +149,11 @@ public class ClientThread extends NetworkThread {
 		System.out.println("Set up finished");
 		listening = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
+		
+		//set to time out after 5 seconds.
+		//if an attempt to read does not get data within 5 seconds,
+		//a socket error will be thrown.
+		socket.setSoTimeout(5000);
 	}
 	
 	/**
