@@ -245,7 +245,7 @@ public class Aircraft implements Serializable {
 		currentlyTurningBy = 0;
 		bearingLeniency = 0.03;
 		manualBearingTarget = Double.NaN;
-		score = 100;
+		score = 0;
 		
 		applyDifficultySettings(true);
 	}
@@ -627,14 +627,20 @@ public class Aircraft implements Serializable {
 					airport.addAircraft(this);
 				}
 			} else if (currentRouteStage == route.length-1) {
+				
 				if (status == AirportState.NORMAL) {
 					currentRouteStage++;
 					currentTarget = destination.position();
+					score += 10;
+					
+					
 				}
 			} else {
 				if (status == AirportState.NORMAL) {
 					currentRouteStage++;
 					currentTarget = route[currentRouteStage].position();
+					score += 10;
+					
 				}
 			}
 		}
@@ -656,6 +662,7 @@ public class Aircraft implements Serializable {
 			// Update bearing
 			if (Math.abs(angleToTarget() - bearing()) > bearingLeniency) {
 				turnTowardsTarget(dt);
+				
 			}
 		}
 	}
@@ -700,6 +707,7 @@ public class Aircraft implements Serializable {
 	 */
 	private void turnTowardsTarget(double dt) {
 		// Get difference in angle
+		
 		double angleDifference = (angleToTarget() % (2 * Math.PI)) - (bearing() % (2 * Math.PI));
 		boolean crossesPositiveNegativeDivide = angleDifference < -Math.PI * 7 / 8;
 		// Correct difference

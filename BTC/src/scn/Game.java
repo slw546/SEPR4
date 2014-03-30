@@ -336,7 +336,9 @@ public class Game extends Scene {
     	
     	for (Aircraft aircraft : aircraftInAirspace) {
     		aircraft.update(dt);
-    		if (aircraft.status() == AirportState.FINISHED) {
+    		totalScore += aircraft.score();
+    		aircraft.clearScore();
+    		/*if (aircraft.status() == AirportState.FINISHED) {
     			if(aircraft.score() > 50) {
     				switch ((new Random()).nextInt(3)) {
     				case 0:
@@ -357,10 +359,10 @@ public class Game extends Scene {
     				ordersBox.addOrder(">>> You deserve nothing.");
     				
     				// Update cumulative score
-    				totalScore += aircraft.score();
-    				aircraft.clearScore();
+    				
+    				//aircraft.clearScore();
     			}               
-    		}
+    		}*/
     	}
 
     	checkCollisions(dt);
@@ -835,7 +837,9 @@ public class Game extends Scene {
         for (Aircraft aircraft : aircraftInAirspace) {
             int collisionState = aircraft.updateCollisions(dt, aircraftList());
             if (collisionState >= 0) {
-                gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+               // gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+            	totalScore -= 100; 
+            	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
                 return;
             }
         }
