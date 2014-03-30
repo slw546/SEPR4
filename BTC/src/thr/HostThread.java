@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
 import scn.MultiplayerGame;
@@ -83,19 +84,21 @@ public class HostThread extends NetworkThread {
 		System.out.println("left hosting loop");
 		
 		while(hosting && playing){
-			//client is waiting for orders from host
-			
 			//sync aircraft
-			//send the order
-			sendObject("aircraft");
 			//sync to client
 			syncAircraftBuffer();
 			//sync from client
 			recieveAircraftBuffer();
 			
 			//sync score
-			//function sends the order
 			syncScore();
+			
+			try {
+				sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -115,7 +118,6 @@ public class HostThread extends NetworkThread {
 	@Override
 	protected void syncScore(){
 		int oppScore = -1;
-		//send order
 		String order = "score";
 		sendObject(order);
 		//wait for ack
@@ -205,9 +207,11 @@ public class HostThread extends NetworkThread {
 		System.out.println("test object send 2: network io");
 		//Send the aircraft to the client
 		sendObject(test);
+		System.out.println("Sent " + test);
 		//Send some text to the client
 		String test2 = "Hello Client";
 		sendObject(test2);
+		System.out.println("Sent: " + test2);
 		System.out.println("Both IO finished");
 	}
 	
@@ -216,9 +220,11 @@ public class HostThread extends NetworkThread {
 	 */
 	@Override
 	public void killThread(){
+		System.out.println("Killing Thread");
 		//if game is running, escape to lobby
 		if (playing) {
 			lobby.setStartOrdered(false);
+			main.keyReleased(input.KEY_ESCAPE);
 		}
 		//close socket
 		try {

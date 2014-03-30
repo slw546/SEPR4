@@ -5,6 +5,7 @@ import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
+import cls.Aircraft.AltitudeState;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
@@ -134,7 +135,7 @@ public class MultiplayerGame extends Game {
 				// If left side aircraft pases to right side
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the right side
-					// Player 0 looses points
+					// Player 0 loses points
 					
 					// Generating a new route
 					Waypoint origin = tempAircraft.getRoute()[0];
@@ -283,15 +284,11 @@ public class MultiplayerGame extends Game {
 	 * -2 used since -1 is in use as an error code due to a player quitting.
 	 */
 	public int existsInAirspace(Aircraft a){
-		//check for general equality
-		if (aircraftInAirspace.contains(a)){
-			return aircraftInAirspace.indexOf(a);
-		}
 		//check for equality using aircraft's unique names
 		String name = a.name();
 		for (int i = 0; i < aircraftInAirspace.size(); i++){
 			if (aircraftInAirspace.get(i).name().equals(name)){
-				System.out.println("existing flight");
+				System.out.println("found: "+ a.name() + ", existing flight");
 				return i;
 			}
 		}
@@ -322,17 +319,20 @@ public class MultiplayerGame extends Game {
         		if (selectedAircraft != null){
         			//Aircraft was ordered to ascend, add it to buffer to be sent
         			System.out.println("Flight ordered to ascend");
+        			selectedAircraft.setAltitudeState(Aircraft.AltitudeState.CLIMBING);
         			networkThread.addToBuffer(selectedAircraft);
-        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        			System.out.println("Sent Altitude state: " + selectedAircraft.altitudeState());
+        			//System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
         		}
         		break;
         	case input.KEY_DOWN:
         		if (selectedAircraft != null){
         			//Aircraft was ordered to descend, add it to buffer to be sent
         			System.out.println("Flight ordered to descend");
+        			selectedAircraft.setAltitudeState(Aircraft.AltitudeState.FALLING);
         			networkThread.addToBuffer(selectedAircraft);
         			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
-        		}
+        		}//
         		break;
         	case input.KEY_T:
         		//aircraft ordered to take off
@@ -340,16 +340,16 @@ public class MultiplayerGame extends Game {
         		if (selectedAircraft != null){
         			System.out.println("Flight ordered to take off");
         			networkThread.addToBuffer(selectedAircraft);
-        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        			//System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
         		}
         		break;
         	case input.KEY_L:
         		//aircraft ordered to land
         		//add it to buffer to be sent
         		if (selectedAircraft != null){
-        			System.out.println("Flight ordered to descend");
+        			System.out.println("Flight ordered to land");
         			networkThread.addToBuffer(selectedAircraft);
-        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        			//System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
         		}
         		break;
         }
@@ -420,11 +420,59 @@ public class MultiplayerGame extends Game {
         
         // Deselect aircraft on right click
         if (key == input.MOUSE_RIGHT) {
-        	deselectAircraft();
+        	deselectAircraft();	
         }
         
         // Trigger altimeter actions - not in use?
         altimeter.mousePressed(key, x, y);
+    }
+    
+    @Override
+    public void mouseReleased(int key, int x, int y){
+    	if (key == input.MOUSE_LEFT && selectedAircraft != null
+    			&& selectedWaypoint != null) {
+    		for (Waypoint w : airspaceWaypoints) {
+    			// Only allow route edit if waypoint isn't an
+    			// entry or exit point, and when aircraft is in its
+    			// 'normal' state
+    			if (selectedAircraft.status() == AirportState.NORMAL) {
+    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && w.isMouseOver(x-16, y-16)) {
+    					selectedAircraft.alterPath(selectedPathpoint, w);
+    					ordersBox.addOrder(">>> " + selectedAircraft.name()
+    							+ " please alter your course");
+    					ordersBox.addOrder("<<< Roger that. Altering course now.");
+    					selectedPathpoint = -1;
+    					selectedWaypoint = null;
+    					System.out.println("Flight ordered to alter course");
+    					networkThread.addToBuffer(selectedAircraft);
+    					System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+    				} else {
+    					selectedWaypoint = null;
+    				}
+    			}
+    		}
+    	}
+    	
+    	// Change altitude when altitude buttons pressed
+        AltitudeState altitudeState = AltitudeState.LEVEL;
+        if (selectedAircraft != null) {
+            altitudeState = selectedAircraft.altitudeState();
+        }
+        
+        //act on mouse press
+        altimeter.mouseReleased(key, x, y);
+        
+        if (selectedAircraft != null) {
+            if ((altitudeState != selectedAircraft.altitudeState())
+            		&& (selectedAircraft.status() == AirportState.NORMAL)) {
+                ordersBox.addOrder(">>> " + selectedAircraft.name() + ", please adjust your altitude");
+                ordersBox.addOrder("<<< Roger that. Altering altitude now.");
+                System.out.println("altitude changed via altimeter");
+				networkThread.addToBuffer(selectedAircraft);
+				System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+            }
+        }
+  
     }
     
     //Setters

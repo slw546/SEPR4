@@ -105,10 +105,17 @@ public abstract class NetworkThread extends Thread {
 	protected void syncAircraftBuffer(){
 		//Sync threads
 		//send order
-		//wait for ack
-		//System.out.println("Start sync");
+		String order = "aircraft";
+		sendObject(order);
+		//get ack
 		String recv = recieveString();
+		if (!recv.equals(ack)){
+			System.err.println("Expected: ACK, got: " + recv);
+			return;
+		}
+		//get buffSize early in case a flight is added during the send
 		int buffSize = aircraftBuffer.size();
+		//synced
 		
 		if (recv.equals(ack)){
 			//tell reciever how many aircraft to expect
@@ -119,6 +126,9 @@ public abstract class NetworkThread extends Thread {
 				//remove sent aircraft from buffer
 				aircraftBuffer.remove(i);
 			}
+		}
+		if (buffSize != 0){
+			System.out.format("Sent %d flights \n", buffSize);
 		}
 		//System.out.println("End Sync");
 	}
@@ -141,10 +151,23 @@ public abstract class NetworkThread extends Thread {
 	 */
 	protected void recieveAircraftBuffer(){
 		//System.out.println("Start recieve");
+		//get order
+		String order = recieveString();
+		
+		if (!order.equals("aircraft")){
+			System.out.println("Expecting order: aircraft, got: " + order);
+			return;
+		}
+		
 		//ack the order
 		sendObject(ack);
 		//get how many aircraft to expect
 		int expected = recieveInt();
+		
+		if (expected > 0){
+			System.out.format("Expecting %d flights \n", expected);
+		}
+		
 		
 		//if we recieve -1 sender has exited.
 		if (expected == -1){
@@ -159,15 +182,41 @@ public abstract class NetworkThread extends Thread {
 			Aircraft a = recieveAircraft();
 			//check if the flight is already in the airspace
 			int index = game.existsInAirspace(a);
-			if (index != -2){
-				//if it is, remove it
+			System.out.format("Flight index: %d \n", index);
+			
+			//index of -2 indicates no matching flight
+			//-1 is used to error out when a player presses escape
+			//hence -2 is used to avoid confusion / errors
+			if (index == -2){
+				game.addFlight(a);
+				//skip to next loop iteration
+				continue;
+			} else {
+				//aircraft already in airspace
+				System.out.println("Before:");
+				System.out.println(game.aircraftInAirspace().toString());
+				//remove from airspace
 				game.aircraftInAirspace().remove(index);
+			}
+			//add new flight
+			System.out.println("New flight's altitudestate: " + a.altitudeState());
+			game.aircraftInAirspace().add(a);
+			System.out.println("After");
+			System.out.println(game.aircraftInAirspace().toString());
+			
+			/*if (index != -2){
+				System.out.println("Before");
+				System.out.println(game.aircraftInAirspace().toString());
+				//if it is, remove it
+				//game.aircraftInAirspace().remove(index);
 				//replace it with the updated flight
 				game.aircraftInAirspace().add(a);
+				System.out.println("After");
+				System.out.println(game.aircraftInAirspace().toString());
 			} else {
 				//otherwise add it as a new flight
 				game.addFlight(a);	
-			}
+			}*/
 		}
 		//System.out.println("end recieve");
 	}

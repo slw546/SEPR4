@@ -691,14 +691,6 @@ public class Game extends Scene {
     			}
     		}
     	}
-
-    	/*if (key == input.MOUSE_WHEEL_UP && controlAltitude < 30000) {
-        	controlAltitude += 2000;
-        }
-        
-        if (key == input.MOUSE_WHEEL_DOWN && controlAltitude > 28000) {
-        	controlAltitude -= 2000;
-        }*/
         
         // Change altitude when altitude buttons pressed
         AltitudeState altitudeState = AltitudeState.LEVEL;
@@ -764,6 +756,8 @@ public class Game extends Scene {
             			&& (selectedAircraft.status() == AirportState.NORMAL)
             			&& (selectedAircraft.position().z() < 30000)) {
             		selectedAircraft.setAltitudeState(AltitudeState.CLIMBING);
+            		ordersBox.addOrder(">>> " + selectedAircraft.name() + ", please adjust your altitude");
+                    ordersBox.addOrder("<<< Roger that. Altering altitude now.");
             	}
             	break;
             case input.KEY_DOWN:
@@ -774,6 +768,8 @@ public class Game extends Scene {
             			&& (selectedAircraft.status() == AirportState.NORMAL)
             			&& (selectedAircraft.position().z() > 28000)) {
             		selectedAircraft.setAltitudeState(AltitudeState.FALLING);
+            		ordersBox.addOrder(">>> " + selectedAircraft.name() + ", please adjust your altitude");
+                    ordersBox.addOrder("<<< Roger that. Altering altitude now.");
             	}
             	break;
             case input.KEY_T:
@@ -818,12 +814,12 @@ public class Game extends Scene {
             			} else {
             				ordersBox.addOrder(">>> " + selectedAircraft.name()
                             		+ " Please remain in the stack. The runway is currently busy.");
-                			ordersBox.addOrder("<<< Roger that. Will continue going round in circles.");
+                			ordersBox.addOrder("<<< Roger that. Will continue circling.");
             			}
             		} else {
             			ordersBox.addOrder(">>> " + selectedAircraft.name()
                         		+ " Please remain in the stack. The airport is currently full.");
-            			ordersBox.addOrder("<<< Roger that. Will continue going round in circles.");
+            			ordersBox.addOrder("<<< Roger that. Will continue circling.");
             		}
             	}
             	break;
@@ -932,15 +928,15 @@ public class Game extends Scene {
         // Use the percentage capacity to determine the probability
         // that a flight will be heading to the airport
         if (ratio == 0) {
-        	p = 0.9;
+        	p = 0.3;
         } else if (ratio <= 0.25) {
-        	p = 0.75;
-        } else if (ratio <= 0.5) {
-        	p = 0.5;
-        } else if (ratio <= 0.75) {
         	p = 0.25;
+        } else if (ratio <= 0.5) {
+        	p = 0.16;
+        } else if (ratio <= 0.75) {
+        	p = 0.08;
         } else if (ratio <= 1) {
-        	p = 0.1;
+        	p = 0.03;
         }
         
         // However, if 

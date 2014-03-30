@@ -192,6 +192,16 @@ public class MultiplayerSetUp extends Scene {
 		host_active = true;
 	}
 	
+	public void startGame(){
+		if (startOrdered){
+			main.setScene(game);
+			//prevent another instance of the game opening
+			//if the lobby update loop runs again before the scene switch
+			startOrdered = false;
+		}
+	}
+	
+	
 	private void createClient(){
 		//hide buttons
 		buttons[0].setAvailability(false);
@@ -213,15 +223,13 @@ public class MultiplayerSetUp extends Scene {
 		//update the textbox
 		textBox.update(dt);
 		
-		if (startOrdered){
-			main.setScene(game);
-		}
-		
 		if (state == networkStates.CONNECTION_LOST){
 			buttons[0].setAvailability(true);
 			buttons[1].setAvailability(true);
 			buttons[2].setAvailability(false);
 		}
+		
+		startGame();
 	}
 
 	@Override
@@ -232,6 +240,8 @@ public class MultiplayerSetUp extends Scene {
 		switch (state){
 		case WAITING_FOR_CONNECTION:
 			graphics.print("Waiting for a player to join", window.width()/2-60, window.height()/2-60);
+			graphics.print("Hosting at: " + address + " Port: " + port, 
+					window.width()/2-90, window.height()/2-50);
 			break;
 		case CONNECTION_ESTABLISHED:
 			graphics.print("Connection established", window.width()/2-60, window.height()/2-60);

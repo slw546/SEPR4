@@ -96,7 +96,21 @@ public class ClientThread extends NetworkThread {
 		}
 		
 		while (listening && playing) {
-			//get the order from host
+			//Sync aircraft
+			//sync from host
+			recieveAircraftBuffer();
+			//sync to host
+			syncAircraftBuffer();
+			//sync score
+			syncScore();
+			
+			try {
+				sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			/*//get the order from host
 			String order = recieveString();
 			//act upon the order
 			switch (order){
@@ -111,7 +125,7 @@ public class ClientThread extends NetworkThread {
 			case "score":
 				syncScore();
 				break;
-			}
+			}*/
 		}
 		
 		// alert client that thread is exiting
@@ -128,6 +142,12 @@ public class ClientThread extends NetworkThread {
 	
 	@Override
 	protected void syncScore(){
+		String order = recieveString();
+		
+		if (!order.equals("score")){
+			System.err.println("Expected order: score, got: " + order);
+			return;
+		}
 		//send the ack
 		sendObject(ack);
 		//get their score
@@ -206,7 +226,7 @@ public class ClientThread extends NetworkThread {
 	
 	@Override
 	public void killThread(){
-		System.out.println("Thread killed due to error");
+		System.out.println("Killing thread");
 		//if the game is running, escape to lobby
 		if (playing){
 			lobby.setStartOrdered(false);
