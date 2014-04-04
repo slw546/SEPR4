@@ -337,6 +337,7 @@ public abstract class graphics {
 		
 	}
 	
+	private static boolean isInitialised = false;
 	private static Font currentFont;
 	private static Color currentColour;
 	private static boolean viewPortEnabled;
@@ -352,6 +353,11 @@ public abstract class graphics {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		viewPortEnabled = false;
+		isInitialised = true;
+	}
+	
+	static public boolean isInitialised() {
+		return isInitialised;
 	}
 
 	/**

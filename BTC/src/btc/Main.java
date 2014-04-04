@@ -103,7 +103,8 @@ public class Main implements input.EventHandler {
 
 		if (!testing) {
 			window.setIcon(ICONS);
-			window.initialise(TITLE, (int)(width), (int)(height));
+			window.initialise(TITLE, (int)(width), (int)(height), 60, window.WindowMode.BORDERLESS_FULLSCREEN);
+			System.out.println("Window Dimensions: " + window.width() + " by " + window.height() + ".");
 			graphics.initialise();
 			graphics.Font font = graphics.newBitmapFont("gfx" + File.separator
 					+ "font.png", ("ABCDEFGHIJKLMNOPQRSTUVWXYZ " +
