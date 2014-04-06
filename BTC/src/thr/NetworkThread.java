@@ -48,7 +48,30 @@ public abstract class NetworkThread extends Thread {
 	//Test
 	abstract public void testCommunication();
 	
+	/**
+	 * Add an aircraft to the thread's aircraft buffer for sync.
+	 * @param aircraft the aircraft to be added
+	 */
 	public void addToBuffer(Aircraft aircraft){
+		//if buffer empty, add new aircraft and return
+		if (aircraftBuffer.size() == 0){
+			aircraftBuffer.add(aircraft);
+			return;
+		}
+		
+		//otherwise check for a matching aircraft
+		//and update it so we don't send duplicates.
+		for (int i = 0; i < aircraftBuffer.size(); i++){
+			if (aircraftBuffer.get(i).name() == aircraft.name()){
+				//found a match
+				//replace the matching aircraft with the new changes
+				aircraftBuffer.remove(i);
+				aircraftBuffer.add(aircraft);
+				//done
+				return;
+			}
+		}
+		//no match, so add the new aircraft.
 		aircraftBuffer.add(aircraft);
 	}
 	

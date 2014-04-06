@@ -75,12 +75,22 @@ public class MultiplayerGame extends Game {
 	//Update and draw
 	@Override
 	public void update(double dt) {
-		super.update(dt);
 		
 		//If we are the client, never allow a flight to be generated.
 		//Sidesteps the flight generator present in Game, which this class is inheriting from.
 		if (gameType.equals(Type.CLIENT)){
 			this.setFlightGenerationTimeElapsed(0);
+		}
+		
+		super.update(dt);
+		
+		//if holding down the left or right key and has an aircraft selected
+		if (selectedAircraft != null &&
+				(input.isKeyDown(input.KEY_LEFT) || input.isKeyDown(input.KEY_RIGHT))){
+			//selected flight's heading has been manually altered
+			//send to buffer for sync
+			networkThread.addToBuffer(selectedAircraft);
+			
 		}
 		
 		//Move line if it's been 5 seconds since the last move
@@ -428,6 +438,8 @@ public class MultiplayerGame extends Game {
     }
     
     @Override
+    //Overridden to allow aircraft to be sync at sensible places in the code
+    //rather than only before or after a super.mouseReleased()
     public void mouseReleased(int key, int x, int y){
     	if (key == input.MOUSE_LEFT && selectedAircraft != null
     			&& selectedWaypoint != null) {
@@ -443,7 +455,7 @@ public class MultiplayerGame extends Game {
     					ordersBox.addOrder("<<< Roger that. Altering course now.");
     					selectedPathpoint = -1;
     					selectedWaypoint = null;
-    					System.out.println("Flight ordered to alter course");
+    					System.out.println("Flight route was altered");
     					networkThread.addToBuffer(selectedAircraft);
     					System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
     				} else {
@@ -462,6 +474,7 @@ public class MultiplayerGame extends Game {
         //act on mouse press
         altimeter.mouseReleased(key, x, y);
         
+        //If altimeter action changed altitude state
         if (selectedAircraft != null) {
             if ((altitudeState != selectedAircraft.altitudeState())
             		&& (selectedAircraft.status() == AirportState.NORMAL)) {
@@ -472,6 +485,27 @@ public class MultiplayerGame extends Game {
 				System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
             }
         }
+        
+        // Change bearing when compass clicked
+        // But only when the aircraft is in the 'normal'
+        // or 'waiting' states
+        if (selectedAircraft != null
+        		&& (selectedAircraft.status() == AirportState.NORMAL)
+        		&& (selectedAircraft.status() == AirportState.WAITING)) {
+        	if (compassDragged) {
+        		if (selectedAircraft.manualBearing() != Double.NaN) {
+        			double dx = input.mouseX() - selectedAircraft.position().x();
+        			double dy = input.mouseY() - selectedAircraft.position().y();
+        			double newHeading = Math.atan2(dy, dx);
+        			selectedAircraft.setBearing(newHeading);
+        			selectedAircraft.setManuallyControlled(true);
+        			System.out.println("Flight heading altered via compass");
+        			networkThread.addToBuffer(selectedAircraft);
+        			System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+        		}
+        	}
+        }
+        compassDragged = false;
   
     }
     

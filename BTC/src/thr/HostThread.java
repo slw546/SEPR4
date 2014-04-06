@@ -93,6 +93,8 @@ public class HostThread extends NetworkThread {
 			//sync score
 			syncScore();
 			
+			//sleep for 1/10th of a second
+			//to reduce network load
 			try {
 				sleep(100);
 			} catch (InterruptedException e) {

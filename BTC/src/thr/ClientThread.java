@@ -104,28 +104,14 @@ public class ClientThread extends NetworkThread {
 			//sync score
 			syncScore();
 			
+			//sleep for 1/10th of a second
+			//to reduce network load
 			try {
 				sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			/*//get the order from host
-			String order = recieveString();
-			//act upon the order
-			switch (order){
-			
-			case "aircraft":
-				//sync from host
-				recieveAircraftBuffer();
-				//sync to host
-				syncAircraftBuffer();
-				break;
-				
-			case "score":
-				syncScore();
-				break;
-			}*/
 		}
 		
 		// alert client that thread is exiting
