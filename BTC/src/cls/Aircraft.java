@@ -1126,10 +1126,11 @@ public class Aircraft implements Serializable {
 	 * @return the textual representation of the aircraft
 	 */
 	public String toString() {
-		return ("Name: " + flightName + " Altitude: " + altitudeState);
-		/*return ("Name: " + flightName + " | "
+		//return ("Name: " + flightName + " Altitude: " + altitudeState);
+		return ("Name: " + flightName + " | "
+				+ "Altitude: " + altitudeState + " | "
 				+ "XPos: " + position.x() + " | "
-				+ "YPos: " + position.y());*/
+				+ "YPos: " + position.y());
 	}
 
 	public double getAltitude() {

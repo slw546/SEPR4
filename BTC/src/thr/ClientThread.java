@@ -118,6 +118,7 @@ public class ClientThread extends NetworkThread {
 		System.out.println("ClientThread exiting");
 		
 		//close the socket on the way out.
+		//allows for a new connection to be started in the lobby without exiting the program
 		try {
 			socket.close();
 		} catch (IOException e) {
@@ -211,6 +212,10 @@ public class ClientThread extends NetworkThread {
 	}
 	
 	@Override
+	/**
+	 * Kill the thread and exit the game to the lobby.
+	 * If called during an error catch, lobby will display cause of exit.
+	 */
 	public void killThread(){
 		System.out.println("Killing thread");
 		//if the game is running, escape to lobby
@@ -219,6 +224,7 @@ public class ClientThread extends NetworkThread {
 			main.keyReleased(input.KEY_ESCAPE);
 		}
 		//close socket
+		//allows for a new connection to be started in the lobby without exiting the program
 		try {
 			socket.close();
 		} catch (IOException e) {
@@ -231,6 +237,9 @@ public class ClientThread extends NetworkThread {
 	}
 	
 	@Override
+	/**
+	 * Exit the thread due to the escape key being pressed
+	 */
 	public void escapeThread(){
 		System.out.println("Exiting thread voluntarily");
 		//prevent game scene from restarting on return to lobby
@@ -250,6 +259,8 @@ public class ClientThread extends NetworkThread {
 		this.listening = false;
 		
 		//send an object to either break the listening thread, or signal game closed.
+		//We can afford to do this since the connection will still be up.
+		//Unlike in killThread, where it may have been lost due to an error.
 		sendObject(-1);
 	}
 	

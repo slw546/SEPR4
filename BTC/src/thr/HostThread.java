@@ -108,6 +108,7 @@ public class HostThread extends NetworkThread {
 		System.out.println("HostThread exiting");
 		
 		//close the sockets on the way out.
+		//allows for a new connection to be started in the lobby without exiting the program
 		try {
 			clientSocket.close();
 			socket.close();
@@ -219,6 +220,7 @@ public class HostThread extends NetworkThread {
 	
 	/**
 	 * Method for INVOLUNTARY thread death
+	 * e.g. due to connection loss
 	 */
 	@Override
 	public void killThread(){
@@ -228,7 +230,8 @@ public class HostThread extends NetworkThread {
 			lobby.setStartOrdered(false);
 			main.keyReleased(input.KEY_ESCAPE);
 		}
-		//close socket
+		//close the sockets
+		//allows for a new connection to be started in the lobby without exiting the program
 		try {
 			clientSocket.close();
 			socket.close();
@@ -243,6 +246,7 @@ public class HostThread extends NetworkThread {
 	
 	/**
 	 * Method for VOLUNTARY thread exit
+	 * E.g. due to escape key being pressed.
 	 */
 	public void escapeThread(){
 		//prevent game scene from restarting on return to lobby
@@ -251,19 +255,16 @@ public class HostThread extends NetworkThread {
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
 		
-		//send an object to either break the listening thread, or signal game closed.
-		sendObject(-1);
-		//close socket
-		try {
-			clientSocket.close();
-			socket.close();
-		} catch (IOException e) {
-			System.err.println("failed to close sockets");
-			e.printStackTrace();
-		}
 		//set flags to exit while loops
 		this.playing = false;
 		this.hosting = false;
+		
+		//send an object to either break the listening thread, or signal game closed.
+		//send an object to either break the listening thread, or signal game closed.
+		//We can afford to do this since the connection will still be up.
+		//Unlike in killThread, where it may have been lost due to an error.
+		sendObject(-1);
+
 	}
 	
 	

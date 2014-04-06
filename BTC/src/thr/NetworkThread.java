@@ -17,31 +17,54 @@ import cls.Aircraft;
 public abstract class NetworkThread extends Thread {
 	
 	//SCENES
+	/**
+	 * The scenes associated with this networkThread instance
+	 * used as handles to call functions in the scene.
+	 */
 	protected MultiplayerSetUp lobby;
 	protected MultiplayerGame game;
 	protected Main main;
 	
 	//Buffer of aircraft to be sent
+	/**
+	 * The buffer of aircraft with changes requiring synchronisation to the other player
+	 */
 	protected ArrayList<Aircraft> aircraftBuffer;
-	public boolean locked = false;
 	
+	// an ACK used to syncronise the thread execution with the other player's networkThread
 	protected String ack = "ACK";
 	
 	// INPUT
-	// A buffered input stream to read text incoming from the client socket
+	/** 
+	 * An input stream to read text incoming from the client socket
+	 * Not used, since text is not buffered which means this cannot be used to synchronise the threads
+	 */
 	protected BufferedReader textInputStream;
-	// An input stream to read objects incoming from the client socket.
+	
+	
+	/** 
+	 * An input stream to read objects incoming from the client socket.
+	 * Objects in this stream are buffered in order until read
+	 * Objects read from this stream must be type cast with a cast matching their object
+	 * e.g. new Aircraft a = (Aircraft) objInputStream.readObject();
+	 */
 	protected ObjectInputStream objInputStream;
 
 	//OUTPUT
-	// A print writer to send text through the client socket.
+	/**
+	 * A print writer to send text through the client socket.
+	 * Text is not buffered by reciever. Unused.
+	 */
 	protected PrintWriter textOutputWriter;
-	// An output stream to send objects through the client socket.
+
+	/**
+	 * An output stream to send objects through the client socket.
+	 * Objects are buffered by the reciever until read.
+	 */
 	protected ObjectOutputStream objOutputWriter; 
 	
 	//Constructor
-	public NetworkThread(){
-	}
+	public NetworkThread(){}
 	
 	//Set up
 	abstract public void setUp() throws UnknownHostException, IOException;
@@ -61,6 +84,11 @@ public abstract class NetworkThread extends Thread {
 		
 		//otherwise check for a matching aircraft
 		//and update it so we don't send duplicates.
+		
+		//check for equality using aircraft's unique names
+		//cant use ArrayList.contains(object o) since new flights will have different attributes
+		//e.g. different x,y pos, altitude, etc.
+		//Hence contains(o) will not consider them equal.
 		for (int i = 0; i < aircraftBuffer.size(); i++){
 			if (aircraftBuffer.get(i).name() == aircraft.name()){
 				//found a match
@@ -140,22 +168,37 @@ public abstract class NetworkThread extends Thread {
 		int buffSize = aircraftBuffer.size();
 		//synced
 		
+		/*if (buffSize != 0){
+			System.out.format("Sent %d flights \n", buffSize);
+			System.out.print(aircraftBuffer.toString() + "\n");
+		}
+		*/
 		if (recv.equals(ack)){
 			//tell reciever how many aircraft to expect
 			sendObject(buffSize);
 			//send aircraft
 			for (int i = 0; i < buffSize; i++){
-				sendObject(aircraftBuffer.get(i));
+				Aircraft temp = aircraftBuffer.get(i);
 				//remove sent aircraft from buffer
 				aircraftBuffer.remove(i);
+				sendObject(temp);
+				System.out.println("Sent: " + temp.toString());
 			}
 		}
-		if (buffSize != 0){
+		/*if (buffSize != 0){
 			System.out.format("Sent %d flights \n", buffSize);
-		}
+			System.out.print(aircraftBuffer.toString());
+		}*/
 		//System.out.println("End Sync");
 	}
 	
+	/**
+	 * score sync isn't as involved as the aircraft sync
+	 * It's just sending an int and listening for one in reply.
+	 * However the Host and Client must do this in opposite orders.
+	 * Therefore this method is left for definition in the Host and Client thread
+	 * rather than providing two simple but opposite definitions here.
+	 */
 	abstract protected void syncScore();
 	
 	//RECIEVE
@@ -201,47 +244,39 @@ public abstract class NetworkThread extends Thread {
 		}
 		
 		//get the aircraft
+		game.lockAircraftInAirspace();
 		for (int i = 0; i < expected; i++){
 			Aircraft a = recieveAircraft();
+			System.out.println("Recv: " + a.toString());
+
 			//check if the flight is already in the airspace
 			int index = game.existsInAirspace(a);
-			System.out.format("Flight index: %d \n", index);
+			//System.out.format("Flight index: %d \n", index);
 			
 			//index of -2 indicates no matching flight
 			//-1 is used to error out when a player presses escape
 			//hence -2 is used to avoid confusion / errors
 			if (index == -2){
 				game.addFlight(a);
+				//System.out.println("New flight: " + a.toString());
 				//skip to next loop iteration
 				continue;
 			} else {
 				//aircraft already in airspace
-				System.out.println("Before:");
-				System.out.println(game.aircraftInAirspace().toString());
+/*				System.out.println("Before:");
+				System.out.println(game.aircraftInAirspace().toString());*/
 				//remove from airspace
+				//System.out.println("Existing flight: " + game.aircraftInAirspace().get(index).toString());
 				game.aircraftInAirspace().remove(index);
+				//System.out.print(" changed to: " + a.toString() + "\n");
 			}
 			//add new flight
-			System.out.println("New flight's altitudestate: " + a.altitudeState());
+			//System.out.println("New flight's altitudestate: " + a.altitudeState());
 			game.aircraftInAirspace().add(a);
-			System.out.println("After");
-			System.out.println(game.aircraftInAirspace().toString());
-			
-			/*if (index != -2){
-				System.out.println("Before");
-				System.out.println(game.aircraftInAirspace().toString());
-				//if it is, remove it
-				//game.aircraftInAirspace().remove(index);
-				//replace it with the updated flight
-				game.aircraftInAirspace().add(a);
-				System.out.println("After");
-				System.out.println(game.aircraftInAirspace().toString());
-			} else {
-				//otherwise add it as a new flight
-				game.addFlight(a);	
-			}*/
+/*			System.out.println("After");
+			System.out.println(game.aircraftInAirspace().toString());*/
 		}
-		//System.out.println("end recieve");
+		game.unlockAircraftInAirspace();
 	}
 	
 	/**
@@ -414,6 +449,9 @@ public abstract class NetworkThread extends Thread {
 		return 0;
 	}
 	
+	/**
+	 * @return the size of the aircraftBuffer i.e. the number of aircraft awaiting sync.
+	 */
 	public int getBufferSize(){
 		return this.aircraftBuffer.size();
 	}

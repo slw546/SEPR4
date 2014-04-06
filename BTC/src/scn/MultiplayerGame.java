@@ -23,6 +23,7 @@ public class MultiplayerGame extends Game {
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
 	private int moveSplitLineTo = 6;
 	
+	/** The time the dividing line was last moved **/
 	private long lastMoveTime = System.currentTimeMillis();
 	
 	/** Enumerator for the two players, constructed with the colour of their controlled waypoints **/
@@ -43,15 +44,43 @@ public class MultiplayerGame extends Game {
 		}
 	}
 	
+	/**
+	 * Enum for the networkThread working with the instance of MultiplayerGame
+	 */
 	public enum Type {
 		CLIENT, HOST
-	}
+	} 
 	
+	/**
+	 * The last time a manually controlled aircraft was added to the buffer for sync
+	 * Used to reduce spamming of the buffer (since manual control is in the main update loop
+	 * it would otherwise be added to the buffer every update)
+	 */
+	private long lastManualControlSync = 0l;
+	
+	/**
+	 * The gameType, ie. whether we are the HOST or CLIENT.
+	 * Determined by the TYPE of networkThread associated with this instance
+	 * of MultiplayerGame
+	 */
 	private Type gameType;
 	
+	/**
+	 * A handle to the associated networkThread
+	 * used to call functions e.g. adding aircraft to the buffer for sync
+	 */
 	private NetworkThread networkThread;
 	
+	/**
+	 * The opponent's score
+	 */
 	private int opponentScore = 0;
+	
+	/**
+	 * Whether or not the AircraftInAirspace array is locked
+	 * Locked during the update loop, and when the networkThread is making changes
+	 */
+	private boolean locked = false;
 	
 	//Constructor
 	public MultiplayerGame(Main main, Type type, NetworkThread thread) {
@@ -82,15 +111,32 @@ public class MultiplayerGame extends Game {
 			this.setFlightGenerationTimeElapsed(0);
 		}
 		
+		lockAircraftInAirspace();
 		super.update(dt);
+		unlockAircraftInAirspace();
+		
 		
 		//if holding down the left or right key and has an aircraft selected
 		if (selectedAircraft != null &&
 				(input.isKeyDown(input.KEY_LEFT) || input.isKeyDown(input.KEY_RIGHT))){
 			//selected flight's heading has been manually altered
 			//send to buffer for sync
-			networkThread.addToBuffer(selectedAircraft);
+			long sysTime = System.currentTimeMillis();
 			
+			//only add the flight if it's been 0.5 secs since it was last synced
+			//enforces several syncs in between the last send and this
+			//prevents one side spamming the other player's thread with sends
+			if (lastManualControlSync + 500 < sysTime){
+				//unset manual control
+				//prevents other player getting an unselectable aircraft
+				selectedAircraft.setManuallyControlled(false);
+				//add aircraft to list for sync
+				networkThread.addToBuffer(selectedAircraft);
+				//update last manual sync time
+				lastManualControlSync = sysTime;
+				//reset manual control for local player
+				selectedAircraft.setManuallyControlled(true);
+			}
 		}
 		
 		//Move line if it's been 5 seconds since the last move
@@ -284,7 +330,7 @@ public class MultiplayerGame extends Game {
 		}
 
 		//add the aircraft to the list of the aircraft in the airspace
-		aircraftInAirspace.add(a);    
+		aircraftInAirspace.add(a); 
 	}
 	
 	/**
@@ -295,6 +341,9 @@ public class MultiplayerGame extends Game {
 	 */
 	public int existsInAirspace(Aircraft a){
 		//check for equality using aircraft's unique names
+		//cant use ArrayList.contains(object o) since new flights will have different attributes
+		//e.g. differeny x,y pos, altitude, etc.
+		//Hence contains(o) will not consider them equal.
 		String name = a.name();
 		for (int i = 0; i < aircraftInAirspace.size(); i++){
 			if (aircraftInAirspace.get(i).name().equals(name)){
@@ -507,6 +556,31 @@ public class MultiplayerGame extends Game {
         }
         compassDragged = false;
   
+    }
+    
+    /**
+     * Locks the Aircraft in Airspace array for changes
+     */
+    public synchronized void lockAircraftInAirspace(){
+    	//System.out.println("Locking airspace");
+    	while (locked){
+    		try {
+    			wait();
+    		} catch (InterruptedException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	
+    	locked = true;
+    }
+    
+    /**
+     * Unlocks the aircraft in airspace array
+     */
+    public synchronized void unlockAircraftInAirspace(){
+    	//System.out.println("unlocking airspace");
+    	locked = false;
+    	notifyAll();
     }
     
     //Setters
