@@ -101,7 +101,8 @@ public class Game extends Scene {
     
     /** The background to draw in the airspace. */
     private Image background;
-
+    
+    private graphics.Quad backgroundQuad;
 
     /** List of names to be assigned to flight entry points */
     public static final String[] FLIGHT_ENTRY_POINT_NAMES = new String[] {
@@ -322,6 +323,9 @@ public class Game extends Scene {
         			landingWaypoints,
           			parkingWaypoints,
           			takeoffWaypoints);
+        backgroundQuad = graphics.newQuad(0, 0, background.width(), background.height(),
+        		background.width() * (Main.width() / Main.TARGET_WIDTH),
+        		background.height() * (Main.width() / Main.TARGET_WIDTH));
     }
    
     /**
@@ -438,9 +442,7 @@ public class Game extends Scene {
         graphics.rectangle(false, 16, 16, window.width() - 32, window.height() - 144);
         graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
         graphics.setColour(255, 255, 255, 60);
-        graphics.drawq(background, graphics.newQuad(0, 0, background.width(), background.height(),
-        		background.width() * (Main.width() / Main.TARGET_WIDTH),
-        		background.height() * (Main.width() / Main.TARGET_WIDTH)),
+        graphics.drawq(background, backgroundQuad,
         		0, 0);
         
         for (Airport airport : airports) {
