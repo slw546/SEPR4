@@ -95,35 +95,34 @@ public class Credits extends Scene {
 		graphics.push();
 		graphics.translate(0, scrollPosition);
 		currentHeight += gap;
-		graphics.printCentred("Bare Traffic Controller", 0, currentHeight, 3, window.width());
+		graphics.printCentred("Bear Traffic Controller", 0, currentHeight, 3, window.width());
 		currentHeight += gap * 2;
 
 		graphics.printCentred("Programming", 0, currentHeight, 2, window.width());
 		graphics.printCentred("___________", 0, currentHeight + 8, 2, window.width());
 		graphics.printCentred("__________", 4, currentHeight + 8, 2, window.width());
 		currentHeight += gap;
-		graphics.printCentred("Mark 'Washing' Woosey", 0, currentHeight, 2, window.width()/2);
-		graphics.printCentred("Richard 'Rich-Tea' Kirby", window.width()/2, currentHeight, 2, window.width()/2);
-		currentHeight += gap;
-		graphics.printCentred("Richard 'Wandering Overlord' Aickin", 0, currentHeight, 2, window.width());
-		//graphics.printCentred("Stephen Webb", 2*window.width()/3, currentHeight, 2, window.width()/3);
+		graphics.printCentred("Josh Adams", 0, currentHeight, 2, window.width()/3);
+		graphics.printCentred("Huw Taylor", window.width()/3, currentHeight, 2, window.width()/3);
+		graphics.printCentred("Stephen Webb", 2*window.width()/3, currentHeight, 2, window.width()/3);
 		currentHeight += gap * 2;
 
-		
+		graphics.printCentred("Website", 0, currentHeight, 2, window.width());
+		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("______", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("Gareth Handley", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
 
 		graphics.printCentred("Testing", 0, currentHeight, 2, window.width());
 		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
 		graphics.printCentred("______", 4, currentHeight + 8, 2, window.width());
 		currentHeight += gap;
-		graphics.printCentred("Jaron 'Read Access' Ali", 0, currentHeight, 2, window.width()/3);
-		graphics.printCentred("Emily 'Emily Hall' Hall", window.width()/2, currentHeight, 2, window.width()/2);
+		graphics.printCentred("Sanjit Samaddar", 0, currentHeight, 2, window.width()/2);
+		graphics.printCentred("Alex Stewart", window.width()/2, currentHeight, 2, window.width()/2);
 		currentHeight += gap * 2;
 		
-		graphics.printCentred("Shot Web", 0, currentHeight, 2, window.width());
-		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
-		graphics.printCentred("______", 4, currentHeight + 8, 2, window.width());
-		currentHeight += gap;
-		graphics.printCentred("Jon 'Slurp' Howell", 0, currentHeight, 2, window.width());
+		graphics.printCentred("Based of the modifications made by Team GOA", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
 		
 		graphics.printCentred("Music", 0, currentHeight, 2, window.width());
