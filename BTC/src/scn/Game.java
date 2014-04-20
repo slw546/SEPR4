@@ -943,7 +943,6 @@ public class Game extends Scene {
         }
         
         // However, if 
-        
     	// Destination is an airport with probability p
     	if (Math.random() < p) {
     		do {

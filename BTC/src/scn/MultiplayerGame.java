@@ -13,12 +13,15 @@ import btc.Main;
 
 public class MultiplayerGame extends Game {
 	
+	/**
+	 * 17 x positions for the line to be at. 
+	 */
 	private static final int[] SPLIT_LINE_POSITIONS = new int[] {
 		320, 350, 380, 420, 460, 500, 540, 580, 640, 700, 740, 780, 820, 860, 900, 930, 960
 	};
 	
 	/** The current x co-ordinate of the line to split the game screen of the two players **/
-	private int splitLine = SPLIT_LINE_POSITIONS[6];
+	private int splitLine = SPLIT_LINE_POSITIONS[9];
 	
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
 	private int moveSplitLineTo = 6;
@@ -180,6 +183,8 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
+					//remove manual control
+					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
@@ -199,6 +204,8 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
+					//remove manual control
+					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
@@ -490,6 +497,8 @@ public class MultiplayerGame extends Game {
     //Overridden to allow aircraft to be sync at sensible places in the code
     //rather than only before or after a super.mouseReleased()
     public void mouseReleased(int key, int x, int y){
+    	
+    	//SYNC flight path change
     	if (key == input.MOUSE_LEFT && selectedAircraft != null
     			&& selectedWaypoint != null) {
     		for (Waypoint w : airspaceWaypoints) {
@@ -523,6 +532,7 @@ public class MultiplayerGame extends Game {
         //act on mouse press
         altimeter.mouseReleased(key, x, y);
         
+        //SYNC altimeter altitude change
         //If altimeter action changed altitude state
         if (selectedAircraft != null) {
             if ((altitudeState != selectedAircraft.altitudeState())
@@ -535,6 +545,7 @@ public class MultiplayerGame extends Game {
             }
         }
         
+        //SYNC compass direction change
         // Change bearing when compass clicked
         // But only when the aircraft is in the 'normal'
         // or 'waiting' states
