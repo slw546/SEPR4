@@ -250,9 +250,9 @@ public class MultiplayerSetUp extends Scene {
 		textInput.draw();
 		switch (state){
 		case WAITING_FOR_CONNECTION:
-			graphics.print("Waiting for a player to join", window.width()/2-60, window.height()/2-30);
-			graphics.print("Hosting at: " + address + " Port: " + port, 
-					window.width()/2-90, window.height()/2-10);
+			graphics.printCentred("Waiting for a player to join", 0, window.height()/2-30, 1, window.width());
+			graphics.printCentred("Hosting at: " + address + ".", 
+					0, window.height()/2-10, 1, window.width());
 			break;
 		case ATTEMPTING_CONNECTION:
 			graphics.print("Connecting..", window.width()/2-60, window.height()/2-30);
