@@ -67,6 +67,7 @@ public class MultiplayerSetUp extends Scene {
 	private lib.TextBox textBox;
 	
 	//Textfield for text input
+	private lib.TextInput textInput;
 
 	//list of buttons
 	private lib.ButtonText[] buttons;
@@ -79,7 +80,14 @@ public class MultiplayerSetUp extends Scene {
 	protected MultiplayerSetUp(Main main) {
 		super(main);
 		//Textbox to write flavour text and instructions to.
-		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);	
+		textBox = new lib.TextBox(128, 96, window.width() - 256, window.height() - 96, 32);
+		lib.TextInput.Accept ip = new lib.TextInput.Accept() {
+			@Override
+			public boolean acceptString(String string) {
+				return string.matches("\\d+\\.\\d+\\.\\d+\\.\\d+") || string.equals("localhost");
+			}
+		};
+		textInput = new lib.TextInput(CLIENT_BUTTON_X - 140, CLIENT_BUTTON_Y - 4, 132, 24, ip, "127.0.0.1");
 		state = networkStates.NO_CONNECTION;
 	}
 	
@@ -102,12 +110,12 @@ public class MultiplayerSetUp extends Scene {
 				b.act();
 			}
 		}
+		textInput.mouseReleased(key, x, y);
 	}
 
 	@Override
 	public void keyPressed(int key) {
-		// TODO Auto-generated method stub
-		
+		textInput.keyPressed(key);
 	}
 
 	@Override
@@ -141,7 +149,6 @@ public class MultiplayerSetUp extends Scene {
 			@Override
 			public void action() {
 				createHost();
-				state = networkStates.WAITING_FOR_CONNECTION;
 			}
 		};
 		
@@ -149,8 +156,7 @@ public class MultiplayerSetUp extends Scene {
 			@Override
 			public void action() {
 				createClient();
-				state = networkStates.NO_CONNECTION;
-				}
+			}
 		};
 		
 		lib.ButtonText.Action startGame = new lib.ButtonText.Action(){
@@ -191,6 +197,8 @@ public class MultiplayerSetUp extends Scene {
 		
 		host.start();
 		host_active = true;
+		state = networkStates.WAITING_FOR_CONNECTION;
+		textInput.active = false;
 	}
 	
 	public void startGame(){
@@ -204,10 +212,11 @@ public class MultiplayerSetUp extends Scene {
 	
 	
 	private void createClient(){
+		if (!textInput.isValid()) return;
+		setAddress(textInput.getText());
 		//hide buttons
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
-		
 
 		//create and start a client thread
 		client = new ClientThread(address, port, this, main);
@@ -217,13 +226,14 @@ public class MultiplayerSetUp extends Scene {
 		
 		client.start();
 		client_active = true;
+		state = networkStates.NO_CONNECTION;
 	}
 
 	@Override
 	public void update(double dt) {
 		//update the textbox
 		textBox.update(dt);
-		
+		textInput.update(dt);
 		if (state == networkStates.CONNECTION_LOST){
 			buttons[0].setAvailability(true);
 			buttons[1].setAvailability(true);
@@ -237,7 +247,7 @@ public class MultiplayerSetUp extends Scene {
 	public void draw() {
 		//draw the textbox
 		textBox.draw();
-
+		textInput.draw();
 		switch (state){
 		case WAITING_FOR_CONNECTION:
 			graphics.print("Waiting for a player to join", window.width()/2-60, window.height()/2-30);
