@@ -1005,7 +1005,8 @@ public class Aircraft implements Serializable {
 		for (int i = 0; i < aircraftList.size(); i++) {
 			Aircraft aircraft = aircraftList.get(i);
 			if ((aircraft != this) && (isWithin(aircraft, RADIUS))) {
-				status = AirportState.FINISHED;
+				crash();
+				aircraft.crash();
 				return i;
 			} else if (aircraft != this && isWithin(aircraft, separationRule)) {
 				aircraftTooNear.add(aircraft);
@@ -1038,6 +1039,10 @@ public class Aircraft implements Serializable {
 		}
 		
 		return -1;
+	}
+	
+	public void crash() {
+		status = AirportState.FINISHED;
 	}
 	
 	/**
