@@ -69,6 +69,10 @@ public class TextInput implements lib.jog.input.EventHandler {
 	public void mouseReleased(int key, int mx, int my) {
 		if (!active) return;
 		selected = (mx >= x && mx <= x + width && my >= y && my <= y + height);
+		if (selected) {
+			int newLocation = (mx - (x + 4)) / charWidth; 
+			cursorLocation = Math.max(0, Math.min(text.length(), newLocation));
+		}
 	}
 
 	@Override
@@ -89,7 +93,7 @@ public class TextInput implements lib.jog.input.EventHandler {
 		    Transferable t = c.getContents(this);
 	    	try {
 				String clipboard = (String) t.getTransferData(DataFlavor.stringFlavor);
-				System.out.println(clipboard);
+				addString(clipboard);
 			} catch (UnsupportedFlavorException | IOException e) {}
 		} else if (key == lib.jog.input.KEY_BACKSPACE) {
 			backspace();
