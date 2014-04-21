@@ -35,6 +35,8 @@ public class Main implements input.EventHandler {
 	private static double width;
 	private static double height;
 	
+	private static double[] screenShake = new double[2];
+	
 	final private String[] ICONS = {
 		"gfx" + File.separator + "icon16.png", // 16
 		"gfx" + File.separator + "icon32.png", // 32
@@ -126,6 +128,12 @@ public class Main implements input.EventHandler {
 			input.update(this);
 		}
 		
+		if (screenShake[1] > 0) {
+			screenShake[1] -= dt;
+			screenShake[1] = Math.max(0, screenShake[1]);
+			screenShake[0] *= 0.99;
+		}
+		
 		updateFPS();
 		
 		if (!testing) {
@@ -150,10 +158,17 @@ public class Main implements input.EventHandler {
 	 * Clears the graphical viewport and calls the draw function of the current scene.
 	 */
 	private void draw() {
+		lib.jog.graphics.push();
+		if (screenShake[1] > 0 && screenShake[0] > 0) {
+			double x = Math.random() * screenShake[0];
+			double y = Math.random() * screenShake[0] / 2;
+			lib.jog.graphics.translate(x, y);
+		}
 		if (!testing) {
 			graphics.clear();
 			currentScene.draw();
 		}
+		lib.jog.graphics.pop();
 	}
 	
 	/**
@@ -168,6 +183,25 @@ public class Main implements input.EventHandler {
 		}
 		
 		System.exit(0);
+	}
+
+	/** 
+	 * Updates the fps
+	 */
+	private void updateFPS()
+	{
+		long time = ((Sys.getTime()* 1000) / Sys.getTimerResolution()); //set lastFPS to current Time
+		
+		if (time - lastfps > 1000) {
+			if (!testing) {
+				window.setTitle("Bare Traffic Controller - FPS: " + fps);
+			}
+			
+			fps = 0; //reset the FPS counter
+			lastfps += 1000; //add one second
+		}
+		
+		fps++;
 	}
 	
 	/**
@@ -190,23 +224,9 @@ public class Main implements input.EventHandler {
 		currentScene = sceneStack.peek();
 	}
 	
-	/** 
-	 * Updates the fps
-	 */
-	public void updateFPS()
-	{
-		long time = ((Sys.getTime()* 1000) / Sys.getTimerResolution()); //set lastFPS to current Time
-		
-		if (time - lastfps > 1000) {
-			if (!testing) {
-				window.setTitle("Bare Traffic Controller - FPS: " + fps);
-			}
-			
-			fps = 0; //reset the FPS counter
-			lastfps += 1000; //add one second
-		}
-		
-		fps++;
+	public void screenShake(int strength, double duration) {
+		screenShake[0] = strength;
+		screenShake[1] = duration;
 	}
 	
 	public static double width() {

@@ -839,6 +839,7 @@ public class Game extends Scene {
                // gameOver(aircraft, aircraftList().get(collisionState), totalScore);
             	totalScore -= 100; 
             	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
+            	main.screenShake(24, 0.6);
                 return;
             }
         }
