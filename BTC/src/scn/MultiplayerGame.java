@@ -116,11 +116,18 @@ public class MultiplayerGame extends Game {
 	 * @param waypoint the waypoint to decide upon
 	 * @return the player the waypoint is controlled by
 	 */
-	private Player controlledBy(Waypoint waypoint) {
+	private Player controlledByPlayer(Waypoint waypoint) {
 		if (waypoint.position().x() < splitLine)
 			return Player.LEFT;
 		else
 			return Player.RIGHT;
+	}
+	
+	private Type controlledByType(Waypoint waypoint) {
+		if (waypoint.position().x() < splitLine)
+			return Type.HOST;
+		else
+			return Type.CLIENT;
 	}
 	
 	//Update and draw
@@ -264,7 +271,7 @@ public class MultiplayerGame extends Game {
 	@Override
 	protected void drawMap() {
 		for (Waypoint waypoint : airspaceWaypoints) {
-            waypoint.draw(controlledBy(waypoint).getColour());
+            waypoint.draw(controlledByPlayer(waypoint).getColour());
         }
         
         graphics.setColour(255, 255, 255, 108);
@@ -498,6 +505,7 @@ public class MultiplayerGame extends Game {
             if (selectedAircraft != null) {
                 for (Waypoint w : airspaceWaypoints) {
                     if ((w.type() == Waypoint.WaypointType.AIRSPACE)
+                    		&& controlledByType(w) == gameType
                     		&& w.isMouseOver(x-16, y-16)
                     		&& selectedAircraft.flightPathContains(w) > -1) {
                         selectedWaypoint = w;
@@ -542,7 +550,7 @@ public class MultiplayerGame extends Game {
     			// entry or exit point, and when aircraft is in its
     			// 'normal' state
     			if (selectedAircraft.status() == AirportState.NORMAL) {
-    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && w.isMouseOver(x-16, y-16)) {
+    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && controlledByType(w) == gameType && w.isMouseOver(x-16, y-16)) {
     					selectedAircraft.alterPath(selectedPathpoint, w);
     					ordersBox.addOrder(">>> " + selectedAircraft.name()
     							+ " please alter your course");

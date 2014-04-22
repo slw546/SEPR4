@@ -535,7 +535,7 @@ public class Aircraft implements Serializable {
 	public int flightPathContains(Waypoint waypoint) {
 		int index = -1;
 		for (int i = 0; i < route.length; i++) {
-			if (route[i] == waypoint) index = i;
+			if (route[i].position().equals(waypoint.position())) index = i;
 		}
 		return index;
 	}
