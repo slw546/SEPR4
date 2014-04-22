@@ -79,6 +79,9 @@ public class MultiplayerGame extends Game {
 	 */
 	private int opponentScore = 0;
 	
+	public lib.ButtonText landButton;
+	public lib.ButtonText takeOffButton;
+	
 	/**
 	 * Whether or not the AircraftInAirspace array is locked
 	 * Locked during the update loop, and when the networkThread is making changes
@@ -90,6 +93,22 @@ public class MultiplayerGame extends Game {
 		super(main, 0);
 		gameType = type;
 		networkThread = thread;
+		lib.ButtonText.Action landAction = new lib.ButtonText.Action() {
+			@Override
+			public void action() {
+				// _selectedAircraft.manuallyControl();
+				landAircraft();
+			}
+		};
+		landButton = new lib.ButtonText("Land", landAction, gameType == Type.CLIENT ? 1062 : 118, 32, 100, 25, 34, -6);
+		lib.ButtonText.Action takeOffAction = new lib.ButtonText.Action() {
+			@Override
+			public void action() {
+				// _selectedAircraft.manuallyControl();
+				takeOffAircraft();
+			}
+		};
+		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, gameType == Type.CLIENT ? 1062 : 118, 32, 128, 25, 18, -6);
 	}
 	
 	/** 
@@ -264,6 +283,20 @@ public class MultiplayerGame extends Game {
         		graphics.setColour(0, 128, 0);
         		selectedAircraft.drawFlightPath();
         		graphics.setColour(0, 128, 0);
+        	}
+        	if (selectedAircraft.status() == AirportState.WAITING) {
+        		graphics.setColour(0, 0, 0);
+        		graphics.rectangle(true, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.setColour(0, 128, 0);
+        		graphics.rectangle(false, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		landButton.draw();
+        	}
+        	if (selectedAircraft.status() == AirportState.PARKED) {
+        		graphics.setColour(0, 0, 0);
+        		graphics.rectangle(true, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.setColour(0, 128, 0);
+        		graphics.rectangle(false, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		takeOffButton.draw();
         	}
         }
        
@@ -497,7 +530,10 @@ public class MultiplayerGame extends Game {
     //Overridden to allow aircraft to be sync at sensible places in the code
     //rather than only before or after a super.mouseReleased()
     public void mouseReleased(int key, int x, int y){
-    	
+    	if (selectedAircraft != null) {
+    		if (landButton.isMouseOver(x, y)) landButton.act();
+    		if (takeOffButton.isMouseOver(x, y)) takeOffButton.act();
+    	}
     	//SYNC flight path change
     	if (key == input.MOUSE_LEFT && selectedAircraft != null
     			&& selectedWaypoint != null) {

@@ -774,57 +774,65 @@ public class Game extends Scene {
             	}
             	break;
             case input.KEY_T:
-            	if ((selectedAircraft != null)
-            			&& (selectedAircraft.status() == AirportState.PARKED)) {
-            		// Find the parking bay the aircraft was in, and clear it
-            		Airport curAirport = selectedAircraft.airport();
-            		for (int i = 0; i < curAirport.parkingPoints().length; i++) {
-            			if (selectedAircraft.isAt(curAirport.parkingPoints()[i]
-            					.position())) {
-            				curAirport.clearBay(i);
-            			}
-            		}
-
-            		if (!selectedAircraft.airport().runwayStatus(1)) {
-            			selectedAircraft.setStatus(AirportState.TAKEOFF);
-            			selectedAircraft.resetScore();
-            			
-            			ordersBox.addOrder(">>> " + selectedAircraft.name()
-            					+ " You are cleared to takeoff. Please proceed to the runway.");
-            			ordersBox.addOrder("<<< Roger that.");
-            		} else {
-        				ordersBox.addOrder(">>> " + selectedAircraft.name()
-                        		+ " Please remain in your bay. The runway is currently busy.");
-            			ordersBox.addOrder("<<< Roger that.");
-            		}
-            	}
+            	takeOffAircraft();
             	break;
             case input.KEY_L:
-            	if ((selectedAircraft != null)
-            			&& (selectedAircraft.status() == AirportState.WAITING)) {
-            		if (selectedAircraft.airport().capacity() > 0) {
-            			if (!selectedAircraft.airport().runwayStatus(0)) {
-            				selectedAircraft.setStatus(AirportState.LANDING);
-            				selectedAircraft.setTurnSpeed(Math.PI);
-            				selectedAircraft.airport().activateRunway(0);
-            				selectedAircraft.airport().decrementCapacity();
-            				
-            				ordersBox.addOrder(">>> " + selectedAircraft.name()
-            						+ " You are cleared to land. Please proceed.");
-                			ordersBox.addOrder("<<< Roger that.");
-            			} else {
-            				ordersBox.addOrder(">>> " + selectedAircraft.name()
-                            		+ " Please remain in the stack. The runway is currently busy.");
-                			ordersBox.addOrder("<<< Roger that. Will continue circling.");
-            			}
-            		} else {
-            			ordersBox.addOrder(">>> " + selectedAircraft.name()
-                        		+ " Please remain in the stack. The airport is currently full.");
-            			ordersBox.addOrder("<<< Roger that. Will continue circling.");
-            		}
-            	}
+            	landAircraft();
             	break;
         }
+    }
+    
+    public void landAircraft() {
+    	if ((selectedAircraft != null)
+    			&& (selectedAircraft.status() == AirportState.WAITING)) {
+    		if (selectedAircraft.airport().capacity() > 0) {
+    			if (!selectedAircraft.airport().runwayStatus(0)) {
+    				selectedAircraft.setStatus(AirportState.LANDING);
+    				selectedAircraft.setTurnSpeed(Math.PI);
+    				selectedAircraft.airport().activateRunway(0);
+    				selectedAircraft.airport().decrementCapacity();
+    				
+    				ordersBox.addOrder(">>> " + selectedAircraft.name()
+    						+ " You are cleared to land. Please proceed.");
+        			ordersBox.addOrder("<<< Roger that.");
+    			} else {
+    				ordersBox.addOrder(">>> " + selectedAircraft.name()
+                    		+ " Please remain in the stack. The runway is currently busy.");
+        			ordersBox.addOrder("<<< Roger that. Will continue circling.");
+    			}
+    		} else {
+    			ordersBox.addOrder(">>> " + selectedAircraft.name()
+                		+ " Please remain in the stack. The airport is currently full.");
+    			ordersBox.addOrder("<<< Roger that. Will continue circling.");
+    		}
+    	}
+    }
+    
+    public void takeOffAircraft() {
+    	if ((selectedAircraft != null)
+    			&& (selectedAircraft.status() == AirportState.PARKED)) {
+    		// Find the parking bay the aircraft was in, and clear it
+    		Airport curAirport = selectedAircraft.airport();
+    		for (int i = 0; i < curAirport.parkingPoints().length; i++) {
+    			if (selectedAircraft.isAt(curAirport.parkingPoints()[i]
+    					.position())) {
+    				curAirport.clearBay(i);
+    			}
+    		}
+
+    		if (!selectedAircraft.airport().runwayStatus(1)) {
+    			selectedAircraft.setStatus(AirportState.TAKEOFF);
+    			selectedAircraft.resetScore();
+    			
+    			ordersBox.addOrder(">>> " + selectedAircraft.name()
+    					+ " You are cleared to takeoff. Please proceed to the runway.");
+    			ordersBox.addOrder("<<< Roger that.");
+    		} else {
+				ordersBox.addOrder(">>> " + selectedAircraft.name()
+                		+ " Please remain in your bay. The runway is currently busy.");
+    			ordersBox.addOrder("<<< Roger that.");
+    		}
+    	}
     }
     
 	/**
