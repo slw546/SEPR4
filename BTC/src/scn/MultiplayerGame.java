@@ -50,7 +50,7 @@ public class MultiplayerGame extends Game {
 	/**
 	 * Enum for the networkThread working with the instance of MultiplayerGame
 	 */
-	public enum Type {
+	public enum MultiplayerRole {
 		CLIENT, HOST
 	} 
 	
@@ -66,7 +66,7 @@ public class MultiplayerGame extends Game {
 	 * Determined by the TYPE of networkThread associated with this instance
 	 * of MultiplayerGame
 	 */
-	private Type gameType;
+	private MultiplayerRole gameType;
 	
 	/**
 	 * A handle to the associated networkThread
@@ -89,7 +89,7 @@ public class MultiplayerGame extends Game {
 	private boolean locked = false;
 	
 	//Constructor
-	public MultiplayerGame(Main main, Type type, NetworkThread thread) {
+	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread) {
 		super(main, 0);
 		gameType = type;
 		networkThread = thread;
@@ -100,7 +100,7 @@ public class MultiplayerGame extends Game {
 				landAircraft();
 			}
 		};
-		landButton = new lib.ButtonText("Land", landAction, gameType == Type.CLIENT ? 1062 : 118, 32, 100, 25, 34, -6);
+		landButton = new lib.ButtonText("Land", landAction, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 32, 100, 25, 34, -6);
 		lib.ButtonText.Action takeOffAction = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
@@ -108,7 +108,7 @@ public class MultiplayerGame extends Game {
 				takeOffAircraft();
 			}
 		};
-		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, gameType == Type.CLIENT ? 1062 : 118, 32, 128, 25, 18, -6);
+		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 32, 128, 25, 18, -6);
 	}
 	
 	/** 
@@ -123,11 +123,11 @@ public class MultiplayerGame extends Game {
 			return Player.RIGHT;
 	}
 	
-	private Type controlledByType(Waypoint waypoint) {
+	private MultiplayerRole controlledByType(Waypoint waypoint) {
 		if (waypoint.position().x() < splitLine)
-			return Type.HOST;
+			return MultiplayerRole.HOST;
 		else
-			return Type.CLIENT;
+			return MultiplayerRole.CLIENT;
 	}
 	
 	//Update and draw
@@ -136,7 +136,7 @@ public class MultiplayerGame extends Game {
 		
 		//If we are the client, never allow a flight to be generated.
 		//Sidesteps the flight generator present in Game, which this class is inheriting from.
-		if (gameType.equals(Type.CLIENT)){
+		if (gameType.equals(MultiplayerRole.CLIENT)){
 			this.setFlightGenerationTimeElapsed(0);
 		}
 		
@@ -293,16 +293,16 @@ public class MultiplayerGame extends Game {
         	}
         	if (selectedAircraft.status() == AirportState.WAITING) {
         		graphics.setColour(0, 0, 0);
-        		graphics.rectangle(true, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(true, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
         		graphics.setColour(0, 128, 0);
-        		graphics.rectangle(false, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(false, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
         		landButton.draw();
         	}
         	if (selectedAircraft.status() == AirportState.PARKED) {
         		graphics.setColour(0, 0, 0);
-        		graphics.rectangle(true, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(true, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
         		graphics.setColour(0, 128, 0);
-        		graphics.rectangle(false, gameType == Type.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(false, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
         		takeOffButton.draw();
         	}
         }
@@ -477,10 +477,10 @@ public class MultiplayerGame extends Game {
                            	
                 if (a.isMouseOver(x-16, y-16)){
                 	// Check for ownership
-                	if ((gameType.equals(Type.HOST) && (a.owner() == 0))){
+                	if ((gameType.equals(MultiplayerRole.HOST) && (a.owner() == 0))){
                         newSelected = a;
                 	}
-                	else if ((gameType.equals(Type.CLIENT) && (a.owner() == 1))){
+                	else if ((gameType.equals(MultiplayerRole.CLIENT) && (a.owner() == 1))){
                 		newSelected = a;
                 	}
                 }

@@ -193,7 +193,7 @@ public class MultiplayerSetUp extends Scene {
 		//Create and start a host thread
 		host = new HostThread(port, this, main);
 		//create a game scene to be used when the game starts
-		game = new MultiplayerGame(main, MultiplayerGame.Type.HOST, host);
+		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.HOST, host);
 		
 		host.start();
 		host_active = true;
@@ -221,7 +221,7 @@ public class MultiplayerSetUp extends Scene {
 		//create and start a client thread
 		client = new ClientThread(address, port, this, main);
 		//create a game scene to be used when the game starts
-		game = new MultiplayerGame(main, MultiplayerGame.Type.CLIENT, client);
+		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.CLIENT, client);
 		client.setGameScene(game);
 		
 		client.start();
