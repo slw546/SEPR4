@@ -15,6 +15,8 @@ public class Credits extends Scene {
 	 * Default speed to scroll the credits
 	 */
 	private final static int SCROLL_SPEED = 64;
+	
+	private final static int SCROLL_LENGTH = 2560;
 
 	private float speed;
 
@@ -81,7 +83,7 @@ public class Credits extends Scene {
 		boolean hurried = input.isKeyDown(input.KEY_SPACE) || input.isMouseDown(input.MOUSE_LEFT);
 		speed = hurried ? 4f : 1f;
 		scrollPosition += SCROLL_SPEED * dt * speed;
-		if (scrollPosition > 1100) scrollPosition = -window.height();
+		if (scrollPosition > SCROLL_LENGTH) scrollPosition = -window.height();
 	}
 
 	@Override
@@ -113,6 +115,13 @@ public class Credits extends Scene {
 		currentHeight += gap;
 		graphics.printCentred("Gareth Handley", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
+		
+		graphics.printCentred("Networking", 0, currentHeight, 2, window.width());
+		graphics.printCentred("__________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("_________", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("Stephen Webb", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
 
 		graphics.printCentred("Testing", 0, currentHeight, 2, window.width());
 		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
@@ -120,9 +129,6 @@ public class Credits extends Scene {
 		currentHeight += gap;
 		graphics.printCentred("Sanjit Samaddar", 0, currentHeight, 2, window.width()/2);
 		graphics.printCentred("Alex Stewart", window.width()/2, currentHeight, 2, window.width()/2);
-		currentHeight += gap * 2;
-		
-		graphics.printCentred("With modifications by Team GOA", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
 		
 		graphics.printCentred("Music", 0, currentHeight, 2, window.width());
@@ -146,6 +152,22 @@ public class Credits extends Scene {
 		graphics.printCentred("JOG", 2*window.width()/3, currentHeight, 2, window.width()/3);
 		currentHeight += gap * 2;
 
+		currentHeight += gap * 4;
+		
+		graphics.printCentred("Special thanks to SEPR Team GOA", 0, currentHeight, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("for their modifications in stage 3.", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
+		
+		currentHeight += gap * 4;
+		
+		graphics.printCentred("Very few bears were harmed in", 0, currentHeight, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("the making of this game.", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
+		
+		currentHeight += gap * 4;
+		graphics.printCentred("Bear Traffic Controller", 0, currentHeight, 2, window.width());
 		graphics.pop();
 	}
 
