@@ -202,7 +202,7 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the left side
 					// Player 1 looses points
-
+					opponentScore -= 20; 
 					// Generating a new route for the aircraft
 					Waypoint origin = tempAircraft.getRoute()[0];
 					Waypoint[] waypoints = tempAircraft.getRoute();
@@ -215,6 +215,7 @@ public class MultiplayerGame extends Game {
 				else{
 					// The aircraft has automatically flown over to the left side
 					// Player 0 gets points
+					totalScore += 10; 
 				}
 				aircraftList().get(i).setOwner(1);
 			}
@@ -223,7 +224,7 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the right side
 					// Player 0 loses points
-					
+					totalScore -= 20;
 					// Generating a new route
 					Waypoint origin = tempAircraft.getRoute()[0];
 					Waypoint[] waypoints = tempAircraft.getRoute();
@@ -235,7 +236,8 @@ public class MultiplayerGame extends Game {
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
-					// Player 0 gets points
+					// Player 1 gets points
+					opponentScore += 10;
 				}
 				aircraftList().get(i).setOwner(0);
 			}

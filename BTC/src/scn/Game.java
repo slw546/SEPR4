@@ -843,15 +843,20 @@ public class Game extends Scene {
     private void checkCollisions(double dt) {
         for (Aircraft aircraft : aircraftInAirspace) {
             int collisionState = aircraft.updateCollisions(dt, aircraftList());
-            if (collisionState >= 0) {
-               // gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+            if (collisionState == 2) {
+               gameOver(aircraft, aircraftList().get(collisionState), totalScore);
             	totalScore -= 100; 
             	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
             	main.screenShake(24, 0.6);
                 return;
             }
+            else if (collisionState == 1) {
+             	totalScore -= 2; 
+             	ordersBox.addOrder("<<< Seperation Violation. Control your planes!");
+                 return;
+             }
         }
-    }
+    } 
     
     /**
      * Causes an aircraft to call methods to handle deselection

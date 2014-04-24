@@ -1007,7 +1007,7 @@ public class Aircraft implements Serializable {
 			if ((aircraft != this) && (isWithin(aircraft, RADIUS))) {
 				crash();
 				aircraft.crash();
-				return i;
+				return 2;
 			} else if (aircraft != this && isWithin(aircraft, separationRule)) {
 				aircraftTooNear.add(aircraft);
 				if (collisionWarningSoundFlag == false){
@@ -1016,10 +1016,11 @@ public class Aircraft implements Serializable {
 					if (WARNING_SOUND != null) {
 						WARNING_SOUND.play();
 					}
+					return 1;
 					
 					// Following decrements score in case of separation violation
 					// But don't apply if aircraft are in stack
-					if (status != AirportState.WAITING) {
+					/*if (status != AirportState.WAITING) {
 						if (score > 50) {		
 							score -= 10;			// Greatest penalty for 'best' aircraft.
 						}
@@ -1029,7 +1030,7 @@ public class Aircraft implements Serializable {
 						else if (score >  0) {
 							score -= 1;			// Decrease again, score must be +ve.
 						}
-					}
+					}*/
 				}
 			}
 		}
@@ -1038,7 +1039,7 @@ public class Aircraft implements Serializable {
 			collisionWarningSoundFlag = false;
 		}
 		
-		return -1;
+		return 0;
 	}
 	
 	public void crash() {
