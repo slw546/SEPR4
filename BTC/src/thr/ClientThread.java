@@ -161,6 +161,7 @@ public class ClientThread extends NetworkThread {
 	 */
 	@Override
 	public void setUp() throws UnknownHostException, IOException{
+		
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.ATTEMPTING_CONNECTION);
 		//Set up connection to the host
 		Socket socket = new Socket(hostAddress, portNumber);
@@ -179,6 +180,7 @@ public class ClientThread extends NetworkThread {
 		System.out.println("Set up finished");
 		listening = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
+	
 	}
 	
 	/**
