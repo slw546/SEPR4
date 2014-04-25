@@ -842,21 +842,16 @@ public class Game extends Scene {
      */
     private void checkCollisions(double dt) {
         for (Aircraft aircraft : aircraftInAirspace) {
-            int collisionState = aircraft.updateCollisions(dt, aircraftList());
-            if (collisionState == 2) {
-            	crash(aircraft, collisionState);
+            int collisionPlane = aircraft.updateCollisions(dt, aircraftList());
+            if (collisionPlane != -1) {
+            	crash(aircraft, collisionPlane);
                 return;
             }
-            else if (collisionState == 1) {
-             	totalScore -= 2; 
-             	ordersBox.addOrder("<<< Seperation Violation. Control your planes!");
-                 return;
-             }
         }
     } 
     
-    protected void crash(Aircraft aircraft, int collisionState) {
-    	gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+    protected void crash(Aircraft aircraft, int collisionPlane) {
+    	gameOver(aircraft, aircraftList().get(collisionPlane), totalScore);
     	totalScore -= 100; 
     	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
     	main.screenShake(24, 0.6);
