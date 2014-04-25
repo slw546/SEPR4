@@ -136,7 +136,6 @@ public class GameOver extends Scene {
 	@Override
 	public void mouseReleased(int key, int x, int y) {
 		main.closeScene();
-		main.closeScene();
 	}
 
 	@Override
@@ -154,7 +153,6 @@ public class GameOver extends Scene {
 	@Override
 	public void keyReleased(int key) {
 		if (key == keyPressed) {
-			main.closeScene();
 			main.closeScene();
 		}
 	}

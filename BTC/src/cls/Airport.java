@@ -1,12 +1,11 @@
 package cls;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
 import btc.Main;
-
 import scn.Game;
-
 import cls.Aircraft.AirportState;
 import cls.Aircraft.AltitudeState;
 
@@ -16,7 +15,13 @@ import cls.Aircraft.AltitudeState;
  * Represents an airport. Stores aircraft, launches aircraft.
  * </p>
  */
-public class Airport {
+public class Airport implements Serializable {
+
+	/**
+	 * serialVersionUID used to check consistency between host and reciever
+	 * Required for network communication of objects
+	 */
+	private static final long serialVersionUID = -2909280533122997898L;
 
 	/** The airport's name */
 	private String name;
@@ -540,16 +545,16 @@ public class Airport {
 					// Reset aircraft to new route
 					airc.clearAirport();
 
-					int d = (new Random()).nextInt(Game.locationWaypoints.length);
+					int d = (new Random()).nextInt(Game.flightEntryPoints.length);
 					Waypoint currentPos = new Waypoint(
-							airc.position().x(), airc.position().y(), 1);
+							airc.position().x(), airc.position().y(), Waypoint.WaypointType.ENTRY);
 
 					airc.setOriginName(name);
 					
-					airc.setDestinationName(Game.LOCATION_NAMES[d]);
+					airc.setDestinationName(Game.FLIGHT_EXIT_POINT_NAMES[d]);
 					airc.setRoute(airc.findGreedyRoute(currentPos,
-							Game.locationWaypoints[d], Game.airspaceWaypoints));
-					airc.setDestination(Game.locationWaypoints[d]);
+							Game.flightExitPoints[d], Game.airspaceWaypoints));
+					airc.setDestination(Game.flightExitPoints[d]);
 					airc.setCurrentTarget(airc.getRoute()[0].position());
 					airc.setManuallyControlled(false);
 					airc.clearCurrentRouteStage();

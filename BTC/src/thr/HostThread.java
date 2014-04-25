@@ -6,10 +6,18 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class HostThread extends Thread {
+import lib.jog.input;
+import btc.Main;
+import cls.Aircraft;
+import cls.AircraftBuffer;
+import scn.MultiplayerGame;
+import scn.MultiplayerSetUp;
+
+public class HostThread extends NetworkThread {
 	/**
 	 * Thread which hosts the multiplayer service on a TCP socket.
 	 * Communication with client is not delegated to separate threads
@@ -28,79 +36,246 @@ public class HostThread extends Thread {
 	private Socket clientSocket = null;
 	
 	// The port to open the socket on.
-	private int portNumber = 4444;
+	private int portNumber = 4445;
 	// Flag to raise when we are hosting the service.
 	private boolean hosting = false;
 	//flag to raise when we are playing the game.
 	private boolean playing = false;
-
-	// INPUT
-	// A buffered input stream to read text incoming from the client socket
-	private BufferedReader textInputStream;
-	// An input stream to read objects incoming from the client socket.
-	private ObjectInputStream objInputStream;
 	
-	//OUTPUT
-	
-	// A print writer to send text through the client socket.
-	private PrintWriter textOutputWriter;
-	// An output stream to send objects through the client socket.
-	private ObjectOutputStream objOutputWriter; 
-	
-	public HostThread(int portNumber) throws IOException {
-		
+	//Constructor
+	public HostThread(int portNumber, MultiplayerSetUp lobby, Main main) {
 		this.portNumber = portNumber;
-
-		// Try to initialise the ServerSocket
-		// If socket initialised, wait for a client to arrive at it.
-		try (ServerSocket socket = new ServerSocket(portNumber)) {
-			this.socket = socket;
-
-			// Wait for, and try to accept, communication through the socket
-			// If client accepted, try to set up IO streams.
-			try (Socket clientSocket = socket.accept()) {
-				this.clientSocket = clientSocket;
-				System.out.println("Accepted communication through socket");
-				
-				try {
-					// set up input streams
-					textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
-					objInputStream = new ObjectInputStream(clientSocket.getInputStream());	
-				} catch (IOException e){
-					e.printStackTrace();
-					System.err.println("Could not set up input streams");
-				}
-				try {
-					// set up output streams
-				textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
-				objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.err.println("Could not set up output streams");
-				}
-				
-				hosting = true;
-				
-		} catch (IOException e){
-			e.printStackTrace();
-			System.err.println("Could not host on port " + portNumber);
-			System.err.println("Ensure no other service is using this port");
-		}
-
-		}
-
+		this.lobby = lobby;
+		this.main = main;
+		//init aircraftBuffer
+		aircraftBuffer = new AircraftBuffer();
 	}
 	
+	@Override
 	public void run(){
+		try {
+			setUp();
+		} catch (IOException e) {
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_IO_UNAVAILABLE);
+			System.err.println("Error setting up connection or IO with client");
+			e.printStackTrace();
+			killThread();
+		}
+		
+		//Sending a test object
+		testCommunication();
+		System.out.println("test object send finished");
+		
 		while (hosting){
-			//carry out pregame hosting, e.g. lobby
+			//If lobby has started the game, send game to client and leave this loop.
+			
+			//Something to do, prevents loop from closing..
+			System.out.print("");
+			
+			//See if the lobby has clicked start game
+			if (playing){
+				System.out.println("inside if playing");
+				startGame();
+				//exit loop and move to the next loop.
+				break;
+			}
 		}
+		System.out.println("left hosting loop");
+		
 		while(hosting && playing){
-			// listen to synchronisation from client
-			// send changes to client e.g. aircraft changing airspace
-			// update the local airspace
+			//sync aircraft
+			//sync to client
+			syncAircraftBuffer();
+			//sync from client
+			recieveAircraftBuffer();
+			
+			//sync score
+			syncScore();
+			
+			//sleep for 1/10th of a second
+			//to reduce network load
+			try {
+				sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		
 		// alert host that thread is exiting
 		System.out.println("HostThread exiting");
+		
+		//close the sockets on the way out.
+		//allows for a new connection to be started in the lobby without exiting the program
+		try {
+			clientSocket.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
 	}
+	
+	@Override
+	protected void syncScore(){
+		int oppScore = -1;
+		String order = "score";
+		sendObject(order);
+		//wait for ack
+		String recv = recieveString();
+		if (recv.equals(ack)){
+			//send our score
+			sendObject(game.getTotalScore());
+			//get their score
+			oppScore = recieveInt();
+			System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
+		}
+		
+		if (oppScore == -1){
+			//opponent is quitting and their quit signal has been found here.
+			//or we failed recieveInt()
+			//therefore, quit the game.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			killThread();
+		} else {
+			//update opponent's score
+			game.setOpponentScore(oppScore);
+		}
+	}
+	
+	/**
+	 * Sets up the ServerSocket, accepts a client connection,
+	 * and sets up the IO streams for that connection.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@Override
+	public void setUp() throws IOException {
+		System.out.println("Set up start");
+		//get the local address and tell the lobby it
+		//this is the address of the host pc on the LAN
+		InetAddress addr = InetAddress.getLocalHost();
+		lobby.setAddress(addr.getHostAddress());
+		//Init the ServerSocket and await a connection
+		ServerSocket socket = new ServerSocket(portNumber);
+		//accept an incoming connection request.
+		//Blocking: Will wait here until a client connects.
+		//May be given a timeout via clientSocket.setSOTimeout(time) before trying to accept
+		Socket clientSocket = socket.accept();
+		this.socket = socket;
+		this.clientSocket = clientSocket;
+		//set up IO
+		//Outputs
+		textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
+		textOutputWriter.flush();
+		objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
+		objOutputWriter.flush();
+		//Inputs
+		textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
+		objInputStream = new ObjectInputStream(clientSocket.getInputStream());
+		//Raise hosting flag
+		hosting = true;
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
+		
+		//set to time out after 5 seconds.
+		//if an attempt to read does not get data within 5 seconds,
+		//a socket error will be thrown.
+		clientSocket.setSoTimeout(5000);
+	}
+	
+	/**
+	 * Tell the client to start the game, after the host game has begun.
+	 * @throws IOException
+	 */
+	public void startGame(){
+		//Alert client that game has started.
+		String start = "start";
+		System.out.println(start);
+		//send a string which tells client to start the game
+		sendObject(start);
+		lobby.setStartOrdered(true);
+	}
+	
+	/**
+	 * Test communications by sending some objects to the client
+	 */
+	@Override
+	public void testCommunication(){
+		//generate an aircraft for comm test
+		Aircraft test = new Aircraft();
+		System.out.println("Generated an aircraft to send");
+
+		System.out.println("test object send 2: network io");
+		//Send the aircraft to the client
+		sendObject(test);
+		System.out.println("Sent " + test);
+		//Send some text to the client
+		String test2 = "Hello Client";
+		sendObject(test2);
+		System.out.println("Sent: " + test2);
+		System.out.println("Both IO finished");
+	}
+	
+	/**
+	 * Method for INVOLUNTARY thread death
+	 * e.g. due to connection loss
+	 */
+	@Override
+	public void killThread(){
+		System.out.println("Killing Thread");
+		//if game is running, escape to lobby
+		if (playing) {
+			lobby.setStartOrdered(false);
+			main.keyReleased(input.KEY_ESCAPE);
+		}
+		//close the sockets
+		//allows for a new connection to be started in the lobby without exiting the program
+		try {
+			clientSocket.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("failed to close sockets");
+			e.printStackTrace();
+		}
+		//end while loops to exit thread
+		this.playing = false;
+		this.hosting = false;
+	}
+	
+	/**
+	 * Method for VOLUNTARY thread exit
+	 * E.g. due to escape key being pressed.
+	 */
+	public void escapeThread(){
+		//prevent game scene from restarting on return to lobby
+		lobby.setStartOrdered(false);
+		//set error messages, connection state
+		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+		lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLOSED_BY_YOU);
+		
+		//set flags to exit while loops
+		this.playing = false;
+		this.hosting = false;
+		
+		//send an object to either break the listening thread, or signal game closed.
+		//send an object to either break the listening thread, or signal game closed.
+		//We can afford to do this since the connection will still be up.
+		//Unlike in killThread, where it may have been lost due to an error.
+		sendObject(-1);
+
+	}
+	
+	
+	//Getters and Setters
+	public void setGameScene(MultiplayerGame game){
+		this.game = game;
+	}
+	
+	public void setPlaying(boolean playing){
+		this.playing = playing;
+		System.out.println("set playing");
+	}
+	
 }

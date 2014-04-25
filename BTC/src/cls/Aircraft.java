@@ -1,16 +1,14 @@
 package cls;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
 import btc.Main;
-
 import scn.Game;
-
 import lib.jog.audio;
 import lib.jog.graphics;
-import lib.jog.graphics.Image;
 import lib.jog.input;
 import lib.jog.window;
 
@@ -20,7 +18,13 @@ import lib.jog.window;
  * Represents an in-game aircraft. Calculates velocity, route-following, etc.
  * </p>
  */
-public class Aircraft {
+public class Aircraft implements Serializable {
+
+	/**
+	 * serialVersionUID used to check consistency between host and reciever
+	 * Required for network communication of objects
+	 */
+	private static final long serialVersionUID = -3814805202501151884L;
 
 	/** The physical size of the aircraft in pixels. This determines crashes */
 	public final static int RADIUS = 16;
@@ -88,7 +92,7 @@ public class Aircraft {
 	private Airport airport;
 	
 	/** The image to be drawn representing the aircraft */
-	private Image image;
+	//private Image image;
 	
 	/** Whether the aircraft has reached its destination and can be disposed of */
 	private AirportState status;
@@ -104,6 +108,9 @@ public class Aircraft {
 	 * i.e. if the aircraft is climbing or falling */
 	private AltitudeState altitudeState;
 	
+	/** The current owner of the aircraft, 0 is left, 1 is right */
+	private int owner;
+	
 	/** The speed to climb or fall by */
 	private int altitudeChangeSpeed;
 	
@@ -116,6 +123,9 @@ public class Aircraft {
 	public enum AirportState {
 		NORMAL, FINISHED, WAITING, LANDING, TAKEOFF, PARKED
 	};
+
+
+	private static ArrayList<String> usedNames = new ArrayList<String>();
 	
 	/**
 	 * Flags whether the collision warning sound has been played before.
@@ -140,35 +150,40 @@ public class Aircraft {
 	 * @param sceneWaypoints the waypoints on the map
 	 * @param airport the airport the aircraft is travelling to
 	 */
-	public Aircraft(String name, String nameDestination,
+	public Aircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
-			Waypoint originPoint, graphics.Image img,
+			Waypoint originPoint,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport) {
-		generateAircraft(name, nameDestination, nameOrigin,
-				destinationPoint, originPoint, img, speed,
+		generateAircraft(nameDestination, nameOrigin,
+				destinationPoint, originPoint, speed,
 				sceneWaypoints, airport, false);
 	}
 
-	public Aircraft(String name, String nameDestination,
+	public Aircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
 			Waypoint originPoint, graphics.Image img,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
-		generateAircraft(name, nameDestination, nameOrigin,
-				destinationPoint, originPoint, img, speed,
+		generateAircraft(nameDestination, nameOrigin,
+				destinationPoint, originPoint, speed,
 				sceneWaypoints, airport, testing);
 	}
 	
-	private void generateAircraft(String name, String nameDestination,
+	public Aircraft(){
+		flightName = generateName();
+		position = new Vector(100,100,0);
+	}
+		
+	private void generateAircraft(String nameDestination,
 			String nameOrigin, Waypoint destinationPoint,
-			Waypoint originPoint, graphics.Image img,
+			Waypoint originPoint,
 			double speed, Waypoint[] sceneWaypoints,
 			Airport airport, boolean testing) {
-		flightName = name;
+		flightName = generateName();
 		destinationName = nameDestination;
 		originName = nameOrigin;
-		image = img;
+		//image = img;
 		initialSpeed = speed;
 		
 		// Find route
@@ -230,9 +245,23 @@ public class Aircraft {
 		currentlyTurningBy = 0;
 		bearingLeniency = 0.03;
 		manualBearingTarget = Double.NaN;
-		score = 100;
+		score = 0;
 		
 		applyDifficultySettings(true);
+	}
+	
+	private String generateName() {
+		String name = "";
+		boolean nameTaken = true;
+		while (nameTaken) {
+			name = "Flight " + (int)(900 * Math.random() + 100);
+			nameTaken = false;
+			for (String used : usedNames) {
+				if (name == used) nameTaken = true;
+			}
+		}
+		usedNames.add(name);
+		return name;
 	}
 	
 	public void applyDifficultySettings(boolean setVelocity) {
@@ -323,6 +352,14 @@ public class Aircraft {
 	
 	public AltitudeState altitudeState() {
 		return altitudeState;
+	}
+	
+	public int owner(){
+		return owner;
+	}
+	
+	public void setOwner(int newOwner){
+		this.owner = newOwner;
 	}
 	
 	public Vector getCurrentTarget() {
@@ -498,7 +535,7 @@ public class Aircraft {
 	public int flightPathContains(Waypoint waypoint) {
 		int index = -1;
 		for (int i = 0; i < route.length; i++) {
-			if (route[i] == waypoint) index = i;
+			if (route[i].position().equals(waypoint.position())) index = i;
 		}
 		return index;
 	}
@@ -583,21 +620,27 @@ public class Aircraft {
 		// Update target
 		if (isAt(currentTarget) && (status == AirportState.NORMAL)) {	
 			if (currentTarget.equals(destination.position())) {
-				if (destination.type() == 1) {
+				if (destination.type() == Waypoint.WaypointType.EXIT) {
 					status = AirportState.FINISHED;
-				} else if (destination.type() == 2) {
+				} else if (destination.type() == Waypoint.WaypointType.AIRPORT) {
 					altitudeState = AltitudeState.LEVEL;
 					airport.addAircraft(this);
 				}
 			} else if (currentRouteStage == route.length-1) {
+				
 				if (status == AirportState.NORMAL) {
 					currentRouteStage++;
 					currentTarget = destination.position();
+					score += 10;
+					
+					
 				}
 			} else {
 				if (status == AirportState.NORMAL) {
 					currentRouteStage++;
 					currentTarget = route[currentRouteStage].position();
+					score += 10;
+					
 				}
 			}
 		}
@@ -619,6 +662,7 @@ public class Aircraft {
 			// Update bearing
 			if (Math.abs(angleToTarget() - bearing()) > bearingLeniency) {
 				turnTowardsTarget(dt);
+				
 			}
 		}
 	}
@@ -663,6 +707,7 @@ public class Aircraft {
 	 */
 	private void turnTowardsTarget(double dt) {
 		// Get difference in angle
+		
 		double angleDifference = (angleToTarget() % (2 * Math.PI)) - (bearing() % (2 * Math.PI));
 		boolean crossesPositiveNegativeDivide = angleDifference < -Math.PI * 7 / 8;
 		// Correct difference
@@ -682,7 +727,7 @@ public class Aircraft {
 	public void draw(int controlAltitude) {
 		double scale = 2*(Math.max(position.z(), 28000) / 30000);
 		graphics.setColour(128, 128, 128, 255);
-		graphics.draw(image, scale, position.x(), position.y(), bearing(), 8, 8);
+		graphics.draw(Game.aircraftImage, scale, position.x(), position.y(), bearing(), 8, 8);
 		graphics.setColour(128, 128, 128, 255/2.5);
 		graphics.print(String.format("%.0f", position.z()) + "+", position.x()+8, position.y()-8);
 		
@@ -899,7 +944,7 @@ public class Aircraft {
 				if (skip == true
 						|| point.position().equals(currentPos.position())
 						|| point.position().equals(origin.position())
-						|| ((point.type() > 0)
+						|| ((point.type() != Waypoint.WaypointType.AIRSPACE)
 								&& (!point.position().equals(destination.position())))) {
 					skip = false;
 					continue;
@@ -955,13 +1000,14 @@ public class Aircraft {
 	 * @param aircraftList the list of aircraft to update
 	 * @return 0 if no collisions, 1 if separation violation, 2 if crash
 	 */
-	public int updateCollisions(double dt, ArrayList<Aircraft> aircraftList) {
+	public int updateCollisions(double dt, AircraftBuffer aircraftList) {
 		aircraftTooNear.clear();
 		for (int i = 0; i < aircraftList.size(); i++) {
 			Aircraft aircraft = aircraftList.get(i);
 			if ((aircraft != this) && (isWithin(aircraft, RADIUS))) {
-				status = AirportState.FINISHED;
-				return i;
+				crash();
+				aircraft.crash();
+				return 2;
 			} else if (aircraft != this && isWithin(aircraft, separationRule)) {
 				aircraftTooNear.add(aircraft);
 				if (collisionWarningSoundFlag == false){
@@ -970,10 +1016,11 @@ public class Aircraft {
 					if (WARNING_SOUND != null) {
 						WARNING_SOUND.play();
 					}
+					return 1;
 					
 					// Following decrements score in case of separation violation
 					// But don't apply if aircraft are in stack
-					if (status != AirportState.WAITING) {
+					/*if (status != AirportState.WAITING) {
 						if (score > 50) {		
 							score -= 10;			// Greatest penalty for 'best' aircraft.
 						}
@@ -983,7 +1030,7 @@ public class Aircraft {
 						else if (score >  0) {
 							score -= 1;			// Decrease again, score must be +ve.
 						}
-					}
+					}*/
 				}
 			}
 		}
@@ -992,7 +1039,11 @@ public class Aircraft {
 			collisionWarningSoundFlag = false;
 		}
 		
-		return -1;
+		return 0;
+	}
+	
+	public void crash() {
+		status = AirportState.FINISHED;
 	}
 	
 	/**
@@ -1081,7 +1132,9 @@ public class Aircraft {
 	 * @return the textual representation of the aircraft
 	 */
 	public String toString() {
+		//return ("Name: " + flightName + " Altitude: " + altitudeState);
 		return ("Name: " + flightName + " | "
+				+ "Altitude: " + altitudeState + " | "
 				+ "XPos: " + position.x() + " | "
 				+ "YPos: " + position.y());
 	}

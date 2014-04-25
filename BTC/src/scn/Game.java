@@ -2,7 +2,6 @@
 package scn;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Random;
 
 import lib.jog.audio;
@@ -15,6 +14,7 @@ import lib.jog.window;
 import cls.Aircraft;
 import cls.Aircraft.AirportState;
 import cls.Aircraft.AltitudeState;
+import cls.AircraftBuffer;
 import cls.Airport;
 import cls.Altimeter;
 import cls.OrdersBox;
@@ -36,7 +36,7 @@ public class Game extends Scene {
     private final int ALTIMETER_H = 112;
    
     private final int ORDERSBOX_X = ALTIMETER_X + ALTIMETER_W + 8;
-    private final static int ORDERSBOX_Y = window.height() - 120;
+    protected final static int ORDERSBOX_Y = window.height() - 120;
     private final int ORDERSBOX_W = window.width() - (ORDERSBOX_X + 16);
     private final static int ORDERSBOX_H = 112;
    
@@ -48,35 +48,35 @@ public class Game extends Scene {
     public static int difficulty = DIFFICULTY_MEDIUM;
    
     /** Orders box to print orders from ACTO to aircraft to */
-    private OrdersBox ordersBox;
+    protected OrdersBox ordersBox;
    
     /** Time since the scene began */
-    private double timeElapsed;
+    protected double timeElapsed;
    
     /** Score attained by the user as a result of successful flights */
-    private int totalScore;
+    protected int totalScore;
 
     /** The currently selected aircraft */
-    private Aircraft selectedAircraft;
+    protected Aircraft selectedAircraft;
     
     /** The currently selected waypoint */
-    private Waypoint selectedWaypoint;
+    protected Waypoint selectedWaypoint;
     
     /** Selected path point, in an aircraft's route, used for altering the route */
-    private int selectedPathpoint;
+    protected int selectedPathpoint;
     
     /** A list of all aircraft present in the airspace */
-    private ArrayList<Aircraft> aircraftInAirspace;
+    protected AircraftBuffer aircraftInAirspace;
    
     /** The image to be used for aircraft */
-    private Image aircraftImage;
+    public static Image aircraftImage;
     
     /** Tracks if manual heading compass of a manually controller
      * aircraft has been dragged */
-    private boolean compassDragged;
+    protected boolean compassDragged;
     
     /** An altimeter to display aircraft altitidue, heading, etc. */
-    private Altimeter altimeter;
+    protected Altimeter altimeter;
     
     /** The interval in seconds to generate flights after */
     private double flightGenerationInterval = 12;
@@ -84,7 +84,7 @@ public class Game extends Scene {
     /** The time elapsed since the last flight was generated */
     private double flightGenerationTimeElapsed = 10;
     
-    /** Maximum number of aircraft allowed in the airspace at once */
+	/** Maximum number of aircraft allowed in the airspace at once */
     private int maxAircraft = 6;
     
     /** Total number of aircraft to generate */
@@ -101,21 +101,31 @@ public class Game extends Scene {
     
     /** The background to draw in the airspace. */
     private Image background;
-   
-    /** A list of location names for waypoint flavour */
-    public static final String[] LOCATION_NAMES = new String[] {
-    		"Moscow",
-    		"Malino",
-    		"Khorlovo",
-    		"Peski"
+    
+    private graphics.Quad backgroundQuad;
+
+    /** List of names to be assigned to flight entry points */
+    public static final String[] FLIGHT_ENTRY_POINT_NAMES = new String[] {
+    	"Moscow",
+    	"Khorlovo",
     };
-   
-    /** The set of waypoints in the airspace which are origins / destinations */
-    public static Waypoint[] locationWaypoints = new Waypoint[] {
-    	new Waypoint(8, 8, 1), // top left
-    	new Waypoint(8, window.height() - ORDERSBOX_H - 40, 1), // bottom left
-    	new Waypoint(window.width() - 40, 8, 1), // top right
-    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, 1), // bottom right
+    
+    /** List of names to be assigned to flight exit points */
+    public static final String[] FLIGHT_EXIT_POINT_NAMES = new String[] {
+    	"Malino",
+		"Peski",
+    };
+    
+    /** Create the set of waypoints that are flight entry points */
+    public static Waypoint[] flightEntryPoints = new Waypoint[] {
+    	new Waypoint(8, 8, Waypoint.WaypointType.ENTRY), // top left
+    	new Waypoint(window.width() - 40, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.ENTRY), // bottom right
+    };
+    
+    /** Create the set of waypoints that are flight exit points */
+    public static Waypoint[] flightExitPoints = new Waypoint[] {
+    	new Waypoint(8, window.height() - ORDERSBOX_H - 40, Waypoint.WaypointType.EXIT), // bottom left
+    	new Waypoint(window.width() - 40, 8, Waypoint.WaypointType.EXIT), // top right
     };
     
     /** The set of airports in the airspace */
@@ -124,20 +134,21 @@ public class Game extends Scene {
     /** All waypoints in the airspace, <b>including</b> location waypoints. */
     public static Waypoint[] airspaceWaypoints = new Waypoint[] {
     	// Airspace waypoints
-    	new Waypoint(125, 70, 0),
-    	new Waypoint(200, 635, 0),
-    	new Waypoint(250, 400, 0),
-    	new Waypoint(300, 100, 0),
-    	new Waypoint(450, 605, 0),
-    	new Waypoint(515, 300, 0),
-    	new Waypoint(600, 700, 0),
-    	new Waypoint(670, 400, 0),
+    	new Waypoint(278, 75, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(973, 692, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(650, 391, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(494, 53, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(776, 743, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(1137, 69, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(66, 715, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(415, 383, Waypoint.WaypointType.AIRSPACE),
+    	new Waypoint(889, 393, Waypoint.WaypointType.AIRSPACE),
 
-    	// Destination/origin waypoints
-    	locationWaypoints[0],
-    	locationWaypoints[1],
-    	locationWaypoints[2],
-    	locationWaypoints[3],
+    	//Flight entry and exit points
+    	flightEntryPoints[0],
+    	flightEntryPoints[1],
+    	flightExitPoints[0],
+    	flightExitPoints[1],
     };
 
 	/**
@@ -165,12 +176,12 @@ public class Game extends Scene {
     public int totalScore() {
     	return this.totalScore;
     }
-   
-    public ArrayList<Aircraft> aircraftInAirspace() {
+
+	public AircraftBuffer aircraftInAirspace() {
 		return aircraftInAirspace;
 	}
 
-	public void setAircraftInAirspace(ArrayList<Aircraft> aircraftInAirspace) {
+	public void setAircraftInAirspace(AircraftBuffer aircraftInAirspace) {
 		this.aircraftInAirspace = aircraftInAirspace;
 	}
 	
@@ -178,7 +189,7 @@ public class Game extends Scene {
      * Getter for aircraft list
      * @return the arrayList of aircraft in the airspace
      */
-    public ArrayList<Aircraft> aircraftList() {
+    public AircraftBuffer aircraftList() {
         return aircraftInAirspace;
     }
 
@@ -197,7 +208,7 @@ public class Game extends Scene {
         ordersBox = new OrdersBox(ORDERSBOX_X, ORDERSBOX_Y,
         		ORDERSBOX_W, ORDERSBOX_H, 6, Main.testing);
         
-        aircraftInAirspace = new ArrayList<Aircraft>();
+        aircraftInAirspace = new AircraftBuffer();
         
         if (!Main.testing) { 
         	aircraftImage = graphics.newImage("gfx" + File.separator + "plane.png");
@@ -228,60 +239,105 @@ public class Game extends Scene {
         		flightGenerationInterval = flightGenerationInterval / 1.6;
         		break;
         }
-        
-        // Set up airports
+        // Airport Setup
         // Waypoints an aircraft will turn through to reach the runway
-        Waypoint[] entryWaypoints = new Waypoint[] {
-        		new Waypoint(677, 44, 2),
-        		new Waypoint(767, 0, 2),
-        		new Waypoint(873, 0, 2),
-        		new Waypoint(957, 44, 2)
-        };
-        
-        String[] entryWaypointNames = new String[] {
-        		"Chkalovsky West",
-        		"Chkalovsky East"
-        };
-        
+        Waypoint[] entryWaypoints;
+        // Names of above waypoints
+        String[] entryWaypointNames;
         // Waypoints an aircraft will pass through while landing
-        Waypoint[] landingWaypoints = new Waypoint[] {
-        		new Waypoint(817, 104, 2),
-        		new Waypoint(795, 726, 2),
-        		new Waypoint(825, 754, 2),
-        		new Waypoint(842, 652, 2),
-        		new Waypoint(866, 656, 2),
-        		new Waypoint(882, 546, 2),
-        		new Waypoint(950, 496, 2),
-        		new Waypoint(970, 486, 2),
-        		new Waypoint(1010, 486, 2)
-        };
-        
-     // Waypoints an aircraft can park at
-        Waypoint[] parkingWaypoints = new Waypoint[] {
-        		new Waypoint(1092, 358, 2),
-        		new Waypoint(1113, 425, 2),
-        		new Waypoint(1108, 493, 2),
-        		new Waypoint(1085, 567, 2)
-        };
-        
+        Waypoint[] landingWaypoints;        
+        // Waypoints an aircraft can park at
+        Waypoint[] parkingWaypoints;
         // Waypoints an aircraft will pass through while taking off
-        Waypoint[] takeoffWaypoints = new Waypoint[] {
-        		new Waypoint(1010, 486, 2),
-        		new Waypoint(1001, 488, 2),
-        		new Waypoint(991, 671, 2),
-        		new Waypoint(954, 678, 2),
-        		new Waypoint(954, 655, 2),
-        		new Waypoint(976, 46, 2)
-        };
+        Waypoint[] takeoffWaypoints;
         
-        airports = new Airport[] {
-        	new Airport("Chkalovsky Airport", 4,
+        airports = new Airport[2];
+        
+        entryWaypoints = new Waypoint[] {
+        		new Waypoint(821, 143, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(904, 28, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1015, 97, Waypoint.WaypointType.AIRPORT),
+        };
+        entryWaypointNames = new String[] { "Chkalovsky West", "Chkalovsky East" };
+        landingWaypoints = new Waypoint[] {
+        		new Waypoint(979, 223, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1097, 590, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1158, 787, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1188, 778, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1201, 757, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1202, 727, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1184, 664, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1093, 388, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1089, 363, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1146, 340, Waypoint.WaypointType.AIRPORT),
+        };
+        parkingWaypoints = new Waypoint[] {
+        		new Waypoint(1160, 311, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1183, 340, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1194, 374, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1195, 412, Waypoint.WaypointType.AIRPORT),
+        };
+        takeoffWaypoints = new Waypoint[] {
+        		new Waypoint(1145, 342, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1085, 364, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1150, 581, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1144, 597, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1129, 612, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1109, 624, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1074, 633, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(936, 193, Waypoint.WaypointType.AIRPORT),
+        };
+        airports[0] = new Airport("Chkalovsky Airport", 4,
         			entryWaypointNames,
         			entryWaypoints,
         			landingWaypoints,
         			parkingWaypoints,
-        			takeoffWaypoints)	
+        			takeoffWaypoints);
+        
+        entryWaypoints = new Waypoint[] {
+        		new Waypoint(385, 653, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(337, 781, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(184, 689, Waypoint.WaypointType.AIRPORT),
         };
+        entryWaypointNames = new String[] { "Syrrilicovich West", "Syrrilicovich East" };
+        landingWaypoints = new Waypoint[] {
+        		new Waypoint(259, 584, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(137, 210, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(73, 20, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(49, 26, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(36, 43, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(31, 65, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(58, 151, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(144, 419, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(152, 444, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(94, 462, Waypoint.WaypointType.AIRPORT)
+        };
+        parkingWaypoints = new Waypoint[] {
+        		new Waypoint(78, 497, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(53, 464, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(39, 424, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(44, 393, Waypoint.WaypointType.AIRPORT),
+        };
+        takeoffWaypoints = new Waypoint[] {
+        		new Waypoint(94, 462, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(147, 442, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(84, 228, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(95, 207, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(104, 194, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(125, 183, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(161, 174, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(300, 613, Waypoint.WaypointType.AIRPORT),
+        };
+        
+        airports[1] = new Airport("Syrrilicovich Airport", 4,
+        			entryWaypointNames,
+        			entryWaypoints,
+        			landingWaypoints,
+          			parkingWaypoints,
+          			takeoffWaypoints);
+        backgroundQuad = graphics.newQuad(0, 0, background.width(), background.height(),
+        		background.width() * (Main.width() / Main.TARGET_WIDTH),
+        		background.height() * (Main.width() / Main.TARGET_WIDTH));
     }
    
     /**
@@ -296,20 +352,21 @@ public class Game extends Scene {
     	
     	for (Aircraft aircraft : aircraftInAirspace) {
     		aircraft.update(dt);
-    		if (aircraft.status() == AirportState.FINISHED) {
+    		totalScore += aircraft.score();
+    		aircraft.clearScore();
+    		/*if (aircraft.status() == AirportState.FINISHED) {
     			if(aircraft.score() > 50) {
     				switch ((new Random()).nextInt(3)) {
     				case 0:
-    					ordersBox.addOrder(">>> Mental planing bruv");
+    					ordersBox.addOrder(">>> Success to us!");
     					break;
     				case 1:
-    					ordersBox.addOrder(">>> Bare jokes man");
+    					ordersBox.addOrder(">>> Good job comrade.");
     					break;
     				case 2:
-    					ordersBox.addOrder(">>> Such plane");
+    					ordersBox.addOrder(">>> Many thanks.");
     					break;
     				}
-    				
     				// Update cumulative score
     				totalScore += aircraft.score();
     				aircraft.clearScore();
@@ -318,10 +375,10 @@ public class Game extends Scene {
     				ordersBox.addOrder(">>> You deserve nothing.");
     				
     				// Update cumulative score
-    				totalScore += aircraft.score();
-    				aircraft.clearScore();
+    				
+    				//aircraft.clearScore();
     			}               
-    		}
+    		}*/
     	}
 
     	checkCollisions(dt);
@@ -397,32 +454,15 @@ public class Game extends Scene {
         graphics.rectangle(false, 16, 16, window.width() - 32, window.height() - 144);
         graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
         graphics.setColour(255, 255, 255, 60);
-        graphics.drawq(background, graphics.newQuad(0, 0, background.width(), background.height(),
-        		background.width() * (Main.width() / Main.TARGET_WIDTH),
-        		background.height() * (Main.width() / Main.TARGET_WIDTH)),
-        		0, 0);
+        graphics.drawq(background, backgroundQuad, 0, 0);
         
         for (Airport airport : airports) {
-        	Waypoint[] entryPoints = airport.entryPoints();
-        	//Waypoint[] landingPoints = airport.landingPoints();
-        	Waypoint[] parkingPoints = airport.parkingPoints();
-        	//Waypoint[] takeoffPoints = airport.takeoffPoints();
-        	
-        	for (int j = 0; j < entryPoints.length; j++) {
-        		entryPoints[j].draw();
+        	for (Waypoint w : airport.entryPoints()) {
+        		w.draw();
         	}
-
-        	/*for (int k = 0; k < landingPoints.length; k++) {
-        		landingPoints[k].draw();
-        	}*/
-        	
-        	for (int m = 0; m < parkingPoints.length; m++) {
-        		parkingPoints[m].draw();
+        	for (Waypoint w : airport.parkingPoints()) {
+        		w.draw();
         	}
-        	
-        	/*for (int n = 0; n < takeoffPoints.length; n++) {
-        		takeoffPoints[n].draw();
-        	}*/
         }
         
         drawMap();       
@@ -445,7 +485,7 @@ public class Game extends Scene {
      * Draw waypoints, and route of a selected aircraft between waypoints
      * print waypoint names next to waypoints
      */
-    private void drawMap() {
+    protected void drawMap() {
         for (Waypoint waypoint : airspaceWaypoints) {
             waypoint.draw();
         }
@@ -473,18 +513,18 @@ public class Game extends Scene {
         graphics.setViewport();
         graphics.setColour(0, 128, 0);
         
-        graphics.print(LOCATION_NAMES[0],
-        		locationWaypoints[0].position().x() + 25,
-        		locationWaypoints[0].position().y() + 10);
-        graphics.print(LOCATION_NAMES[1],
-        		locationWaypoints[1].position().x() + 25,
-        		locationWaypoints[1].position().y() + 10);
-        graphics.print(LOCATION_NAMES[2],
-        		locationWaypoints[2].position().x() - 70,
-        		locationWaypoints[2].position().y() + 10);
-        graphics.print(LOCATION_NAMES[3],
-        		locationWaypoints[3].position().x() - 50,
-        		locationWaypoints[3].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[0],
+        		flightEntryPoints[0].position().x() + 25,
+        		flightEntryPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[0],
+        		flightExitPoints[0].position().x() + 25,
+        		flightExitPoints[0].position().y() + 10);
+        graphics.print(FLIGHT_ENTRY_POINT_NAMES[1],
+        		flightEntryPoints[1].position().x() - 70,
+        		flightEntryPoints[1].position().y() + 10);
+        graphics.print(FLIGHT_EXIT_POINT_NAMES[1],
+        		flightExitPoints[1].position().x() - 50,
+        		flightExitPoints[1].position().y() + 10);
         
         for (Airport airport : airports) {
         	String[] names = airport.entryPointNames();
@@ -543,7 +583,7 @@ public class Game extends Scene {
      * Draw a readout of the time the game has been played for,
      * aircraft in the sky, etc.
      */
-    private void drawScore() {
+    protected void drawScore() {
         int hours = (int)(timeElapsed / (60 * 60));
         int minutes = (int)(timeElapsed / 60);
         minutes %= 60;
@@ -553,7 +593,6 @@ public class Game extends Scene {
         graphics.print(timePlayed, window.width() - (timePlayed.length() * 8 + 32), 0);
         graphics.print(String.valueOf(aircraftInAirspace.size())
         		+ " aircraft in the airspace.", 32, 0);
-        //graphics.print("Control Altitude: " + String.valueOf(controlAltitude) + "+", 544, 0);
        
         // GOA CODE FOLLOWS
         
@@ -602,7 +641,7 @@ public class Game extends Scene {
             
             if (selectedAircraft != null) {
                 for (Waypoint w : airspaceWaypoints) {
-                    if ((w.type() == 0)
+                    if ((w.type() == Waypoint.WaypointType.AIRSPACE)
                     		&& w.isMouseOver(x-16, y-16)
                     		&& selectedAircraft.flightPathContains(w) > -1) {
                         selectedWaypoint = w;
@@ -640,7 +679,7 @@ public class Game extends Scene {
     			// entry or exit point, and when aircraft is in its
     			// 'normal' state
     			if (selectedAircraft.status() == AirportState.NORMAL) {
-    				if ((w.type() == 0) && w.isMouseOver(x-16, y-16)) {
+    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && w.isMouseOver(x-16, y-16)) {
     					selectedAircraft.alterPath(selectedPathpoint, w);
     					ordersBox.addOrder(">>> " + selectedAircraft.name()
     							+ " please alter your course");
@@ -653,14 +692,6 @@ public class Game extends Scene {
     			}
     		}
     	}
-
-    	/*if (key == input.MOUSE_WHEEL_UP && controlAltitude < 30000) {
-        	controlAltitude += 2000;
-        }
-        
-        if (key == input.MOUSE_WHEEL_DOWN && controlAltitude > 28000) {
-        	controlAltitude -= 2000;
-        }*/
         
         // Change altitude when altitude buttons pressed
         AltitudeState altitudeState = AltitudeState.LEVEL;
@@ -711,7 +742,7 @@ public class Game extends Scene {
                 break;*/
             case input.KEY_ESCAPE:
             	// The escape key returns the user to the main menu
-                main.closeScene();
+            	main.closeScene();
                 break;
             /*case input.KEY_F5:
                 Aircraft a1 = createAircraft();
@@ -726,6 +757,8 @@ public class Game extends Scene {
             			&& (selectedAircraft.status() == AirportState.NORMAL)
             			&& (selectedAircraft.position().z() < 30000)) {
             		selectedAircraft.setAltitudeState(AltitudeState.CLIMBING);
+            		ordersBox.addOrder(">>> " + selectedAircraft.name() + ", please adjust your altitude");
+                    ordersBox.addOrder("<<< Roger that. Altering altitude now.");
             	}
             	break;
             case input.KEY_DOWN:
@@ -736,60 +769,70 @@ public class Game extends Scene {
             			&& (selectedAircraft.status() == AirportState.NORMAL)
             			&& (selectedAircraft.position().z() > 28000)) {
             		selectedAircraft.setAltitudeState(AltitudeState.FALLING);
+            		ordersBox.addOrder(">>> " + selectedAircraft.name() + ", please adjust your altitude");
+                    ordersBox.addOrder("<<< Roger that. Altering altitude now.");
             	}
             	break;
             case input.KEY_T:
-            	if ((selectedAircraft != null)
-            			&& (selectedAircraft.status() == AirportState.PARKED)) {
-            		// Find the parking bay the aircraft was in, and clear it
-            		Airport curAirport = selectedAircraft.airport();
-            		for (int i = 0; i < curAirport.parkingPoints().length; i++) {
-            			if (selectedAircraft.isAt(curAirport.parkingPoints()[i]
-            					.position())) {
-            				curAirport.clearBay(i);
-            			}
-            		}
-
-            		if (!selectedAircraft.airport().runwayStatus(1)) {
-            			selectedAircraft.setStatus(AirportState.TAKEOFF);
-            			selectedAircraft.resetScore();
-            			
-            			ordersBox.addOrder(">>> " + selectedAircraft.name()
-            					+ " You are cleared to takeoff. Please proceed to the runway.");
-            			ordersBox.addOrder("<<< Roger that.");
-            		} else {
-        				ordersBox.addOrder(">>> " + selectedAircraft.name()
-                        		+ " Please remain in your bay. The runway is currently busy.");
-            			ordersBox.addOrder("<<< Roger that.");
-            		}
-            	}
+            	takeOffAircraft();
             	break;
             case input.KEY_L:
-            	if ((selectedAircraft != null)
-            			&& (selectedAircraft.status() == AirportState.WAITING)) {
-            		if (selectedAircraft.airport().capacity() > 0) {
-            			if (!selectedAircraft.airport().runwayStatus(0)) {
-            				selectedAircraft.setStatus(AirportState.LANDING);
-            				selectedAircraft.setTurnSpeed(Math.PI);
-            				selectedAircraft.airport().activateRunway(0);
-            				selectedAircraft.airport().decrementCapacity();
-            				
-            				ordersBox.addOrder(">>> " + selectedAircraft.name()
-            						+ " You are cleared to land. Please proceed.");
-                			ordersBox.addOrder("<<< Roger that.");
-            			} else {
-            				ordersBox.addOrder(">>> " + selectedAircraft.name()
-                            		+ " Please remain in the stack. The runway is currently busy.");
-                			ordersBox.addOrder("<<< Roger that. Will continue going round in circles.");
-            			}
-            		} else {
-            			ordersBox.addOrder(">>> " + selectedAircraft.name()
-                        		+ " Please remain in the stack. The airport is currently full.");
-            			ordersBox.addOrder("<<< Roger that. Will continue going round in circles.");
-            		}
-            	}
+            	landAircraft();
             	break;
         }
+    }
+    
+    public void landAircraft() {
+    	if ((selectedAircraft != null)
+    			&& (selectedAircraft.status() == AirportState.WAITING)) {
+    		if (selectedAircraft.airport().capacity() > 0) {
+    			if (!selectedAircraft.airport().runwayStatus(0)) {
+    				selectedAircraft.setStatus(AirportState.LANDING);
+    				selectedAircraft.setTurnSpeed(Math.PI);
+    				selectedAircraft.airport().activateRunway(0);
+    				selectedAircraft.airport().decrementCapacity();
+    				
+    				ordersBox.addOrder(">>> " + selectedAircraft.name()
+    						+ " You are cleared to land. Please proceed.");
+        			ordersBox.addOrder("<<< Roger that.");
+    			} else {
+    				ordersBox.addOrder(">>> " + selectedAircraft.name()
+                    		+ " Please remain in the stack. The runway is currently busy.");
+        			ordersBox.addOrder("<<< Roger that. Will continue circling.");
+    			}
+    		} else {
+    			ordersBox.addOrder(">>> " + selectedAircraft.name()
+                		+ " Please remain in the stack. The airport is currently full.");
+    			ordersBox.addOrder("<<< Roger that. Will continue circling.");
+    		}
+    	}
+    }
+    
+    public void takeOffAircraft() {
+    	if ((selectedAircraft != null)
+    			&& (selectedAircraft.status() == AirportState.PARKED)) {
+    		// Find the parking bay the aircraft was in, and clear it
+    		Airport curAirport = selectedAircraft.airport();
+    		for (int i = 0; i < curAirport.parkingPoints().length; i++) {
+    			if (selectedAircraft.isAt(curAirport.parkingPoints()[i]
+    					.position())) {
+    				curAirport.clearBay(i);
+    			}
+    		}
+
+    		if (!selectedAircraft.airport().runwayStatus(1)) {
+    			selectedAircraft.setStatus(AirportState.TAKEOFF);
+    			selectedAircraft.resetScore();
+    			
+    			ordersBox.addOrder(">>> " + selectedAircraft.name()
+    					+ " You are cleared to takeoff. Please proceed to the runway.");
+    			ordersBox.addOrder("<<< Roger that.");
+    		} else {
+				ordersBox.addOrder(">>> " + selectedAircraft.name()
+                		+ " Please remain in your bay. The runway is currently busy.");
+    			ordersBox.addOrder("<<< Roger that.");
+    		}
+    	}
     }
     
 	/**
@@ -800,17 +843,29 @@ public class Game extends Scene {
     private void checkCollisions(double dt) {
         for (Aircraft aircraft : aircraftInAirspace) {
             int collisionState = aircraft.updateCollisions(dt, aircraftList());
-            if (collisionState >= 0) {
-                gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+            if (collisionState == 2) {
+            	crash(aircraft, collisionState);
                 return;
             }
+            else if (collisionState == 1) {
+             	totalScore -= 2; 
+             	ordersBox.addOrder("<<< Seperation Violation. Control your planes!");
+                 return;
+             }
         }
+    } 
+    
+    protected void crash(Aircraft aircraft, int collisionState) {
+    	gameOver(aircraft, aircraftList().get(collisionState), totalScore);
+    	totalScore -= 100; 
+    	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
+    	main.screenShake(24, 0.6);
     }
     
     /**
      * Causes an aircraft to call methods to handle deselection
      */
-    private void deselectAircraft() {
+    protected void deselectAircraft() {
     	if (selectedAircraft != null && selectedAircraft
     			.isManuallyControlled()) {
     		selectedAircraft.setManuallyControlled(false);
@@ -861,7 +916,7 @@ public class Game extends Scene {
     /**
      * Create a new aircraft object and introduce it to the airspace
      */
-    private void generateFlight() {
+    protected void generateFlight() {
         Aircraft a = createAircraft();
         if (!Main.testing) ordersBox.addOrder(
         		"<<< " + a.name() + " incoming from "+ a.originName()
@@ -874,23 +929,12 @@ public class Game extends Scene {
      * including randomisation of entry, exit, altitude, etc.
      * @return the created aircraft object
      */
-    private Aircraft createAircraft() {
+    protected Aircraft createAircraft() {
     	int d, o;
     	String originName;
     	Waypoint originPoint;
     	String destinationName;
     	Waypoint destinationPoint;
-    	
-        // Name
-        String name = "";
-        boolean nameTaken = true;
-        while (nameTaken) {
-            name = "Flight " + (int)(900 * Math.random() + 100);
-            nameTaken = false;
-            for (Aircraft a : aircraftInAirspace) {
-                if (a.name() == name) nameTaken = true;
-            }
-        }
         
         // Reduce probability that an aircraft will be heading to an airport
         // based on how full the airport is
@@ -905,52 +949,50 @@ public class Game extends Scene {
         // Use the percentage capacity to determine the probability
         // that a flight will be heading to the airport
         if (ratio == 0) {
-        	p = 0.9;
+        	p = 0.3;
         } else if (ratio <= 0.25) {
-        	p = 0.75;
-        } else if (ratio <= 0.5) {
-        	p = 0.5;
-        } else if (ratio <= 0.75) {
         	p = 0.25;
+        } else if (ratio <= 0.5) {
+        	p = 0.16;
+        } else if (ratio <= 0.75) {
+        	p = 0.08;
         } else if (ratio <= 1) {
-        	p = 0.1;
+        	p = 0.03;
         }
         
         // However, if 
-        
     	// Destination is an airport with probability p
     	if (Math.random() < p) {
     		do {
     			// Random used to determine the origin point
-    			o = (new Random()).nextInt(locationWaypoints.length);
+    			o = (new Random()).nextInt(flightEntryPoints.length);
 
     			// Random used to determine the destination point
-    			d = (new Random()).nextInt(locationWaypoints.length);
+    			d = (new Random()).nextInt(flightExitPoints.length);
     		} while (d == o);
 
-    		originName = LOCATION_NAMES[o];
-    		originPoint = locationWaypoints[o];
-    		destinationName = LOCATION_NAMES[d];
-    		destinationPoint = locationWaypoints[d];
+    		originName = FLIGHT_ENTRY_POINT_NAMES[o];
+    		originPoint = flightEntryPoints[o];
+    		destinationName = FLIGHT_EXIT_POINT_NAMES[d];
+    		destinationPoint = flightExitPoints[d];
     		
-    		return new Aircraft(name, destinationName, originName,
-            		destinationPoint, originPoint, aircraftImage,
+    		return new Aircraft(destinationName, originName,
+            		destinationPoint, originPoint,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		null);
     	} else {
     		// Random used to determine the origin point
-			o = (new Random()).nextInt(locationWaypoints.length);
-			
+			o = (new Random()).nextInt(flightEntryPoints.length);
 			// Random used to determine the destination airport
 			d = (new Random()).nextInt(airports.length);
 			
-			originName = LOCATION_NAMES[o];
-    		originPoint = locationWaypoints[o];			
+			originName = FLIGHT_ENTRY_POINT_NAMES[o];
+    		originPoint = flightEntryPoints[o];				
     		destinationPoint = airports[d].getPosition(originPoint.position());
     		destinationName = airports[d].name();
     		
-    		return new Aircraft(name, destinationName, originName,
-            		destinationPoint, originPoint, aircraftImage,
+    		return new Aircraft(destinationName, originName,
+            		destinationPoint, originPoint,
             		32 + (int)(10 * Math.random()), airspaceWaypoints,
             		airports[d]);
     	}
@@ -980,5 +1022,13 @@ public class Game extends Scene {
     		music.stop();
     	}
     }
-	
+    
+    public void setFlightGenerationTimeElapsed(double flightGenerationTimeElapsed) {
+		this.flightGenerationTimeElapsed = flightGenerationTimeElapsed;
+	}
+    
+    public int getTotalScore() {
+ 		return totalScore;
+ 	}
+
 }

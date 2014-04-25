@@ -20,9 +20,6 @@ import cls.Vector;
  */
 public class AircraftTest {
 	
-	/** The name to give to the first testing aircraft */
-	private String testAircraftName;
-	
 	/** The origin to give to testing aircraft */
 	private String testAircraftOrigin;
 	
@@ -38,7 +35,6 @@ public class AircraftTest {
 	 */
 	@Before
 	public void beforeTests() {
-		this.testAircraftName = "TestAircraft1";
 		this.testAircraftOrigin = "Dublin";
 		this.testAircraftDest = "Berlin";
 	}
@@ -52,14 +48,15 @@ public class AircraftTest {
 	 * </p>
 	 */
 	private Aircraft generateTestAircraft() {
-		Waypoint[] waypointList = new Waypoint[] {new Waypoint(0, 0, 1),
-				new Waypoint(100, 100, 1), new Waypoint(25, 75, 0),
-				new Waypoint(75, 25, 0), new Waypoint(50, 50, 0)};
+		Waypoint[] waypointList = new Waypoint[] {
+				new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
+				new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
+				new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
+				new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
+				new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)};
 		
-		Aircraft testAircraft = new Aircraft(this.testAircraftName,
-				this.testAircraftDest, this.testAircraftOrigin,
-				new Waypoint(100, 100, 1), new Waypoint(0, 0, 1),
-				null, 10.0, waypointList, null);
+		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
+				waypointList[1], waypointList[0], 10.0, waypointList, null);
 		
 		return testAircraft;
 	}
@@ -83,20 +80,6 @@ public class AircraftTest {
 				((0 == resultPosition.y()) && (128 >= resultPosition.x())
 						&& (-128 <= resultPosition.x()) && ((28000 == resultPosition.z())
 								|| (30000 == resultPosition.z()))));
-	}
-	
-	/**
-	 * Tests the Aircraft.name() method
-	 * 
-	 * <p>
-	 * Checks that the name is returned correctly.
-	 * </p>
-	 */
-	@Test
-	public void testGetName() {
-		Aircraft testAircraft = generateTestAircraft();
-		String name = testAircraft.name();
-		assertTrue("Name = test aircraft name", name.equals(this.testAircraftName));
 	}
 	
 	/**

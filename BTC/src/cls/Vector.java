@@ -1,13 +1,20 @@
 package cls;
 
+import java.io.Serializable;
+
 import btc.Main;
 
 /**
  * Simplified 3D vector class with basic operations
  * @author Huw Taylor
  */
-public class Vector {
+public class Vector implements Serializable {
 	
+	/**
+	 * serialVersionUID used to check consistency between host and reciever
+	 * Required for network communication of objects
+	 */
+	private static final long serialVersionUID = -8060185066672703558L;
 	private double x, y, z;
 	
 	/**
