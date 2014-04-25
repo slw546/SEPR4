@@ -119,7 +119,7 @@ public class HostThread extends NetworkThread {
 	
 	@Override
 	protected void syncScore(){
-		int oppScore = -1;
+		int oppScore = Integer.MAX_VALUE;
 		String order = "score";
 		sendObject(order);
 		//wait for ack
@@ -132,7 +132,7 @@ public class HostThread extends NetworkThread {
 			System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
 		}
 		
-		if (oppScore == -1){
+		if (oppScore == Integer.MAX_VALUE){
 			//opponent is quitting and their quit signal has been found here.
 			//or we failed recieveInt()
 			//therefore, quit the game.
@@ -260,10 +260,9 @@ public class HostThread extends NetworkThread {
 		this.hosting = false;
 		
 		//send an object to either break the listening thread, or signal game closed.
-		//send an object to either break the listening thread, or signal game closed.
 		//We can afford to do this since the connection will still be up.
 		//Unlike in killThread, where it may have been lost due to an error.
-		sendObject(-1);
+		sendObject(Integer.MAX_VALUE);
 
 	}
 	
