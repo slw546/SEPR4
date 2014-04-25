@@ -644,5 +644,12 @@ public class MultiplayerGame extends Game {
     public void setOpponentScore(int opponentScore) {
 		this.opponentScore = opponentScore;
 	}
+    
+    @Override
+    protected void crash(Aircraft aircraft, int collisionState) {
+    	totalScore -= 100; 
+    	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
+    	main.screenShake(24, 0.6);
+    }
 	
 }
