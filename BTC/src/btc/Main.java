@@ -29,7 +29,7 @@ public class Main implements input.EventHandler {
 		new Main(false);
 	}
 	
-	final private String TITLE = "Bare Traffic Controller";
+	final private String TITLE = "Bear Traffic Controller: Over the Cloud";
 	final public static double TARGET_WIDTH = 1280;
 	final public static double TARGET_HEIGHT = 960;
 	private static double width;
@@ -194,7 +194,7 @@ public class Main implements input.EventHandler {
 		
 		if (time - lastfps > 1000) {
 			if (!testing) {
-				window.setTitle("Bare Traffic Controller - FPS: " + fps);
+				window.setTitle(TITLE + "- FPS: " + fps);
 			}
 			
 			fps = 0; //reset the FPS counter

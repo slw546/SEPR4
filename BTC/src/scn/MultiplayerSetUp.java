@@ -248,6 +248,8 @@ public class MultiplayerSetUp extends Scene {
 		//draw the textbox
 		textBox.draw();
 		textInput.draw();
+		
+		graphics.setColour(0, 128, 0);
 		switch (state){
 		case WAITING_FOR_CONNECTION:
 			graphics.printCentred("Waiting for a player to join", 0, window.height()/2-30, 1, window.width());

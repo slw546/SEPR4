@@ -141,7 +141,7 @@ public class ClientThread extends NetworkThread {
 		//send our score
 		sendObject(game.getTotalScore());
 		
-		if (oppScore == -1){
+		if (oppScore == Integer.MAX_VALUE){
 			//Other player is quitting, and their quit signal has been picked up here.
 			//therefore, quit the game
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
@@ -150,6 +150,7 @@ public class ClientThread extends NetworkThread {
 		} else {
 			//update game scene with new opponent score.
 			game.setOpponentScore(oppScore);
+			System.out.printf("Sent score: %d,  recieved score: %d", game.totalScore(), oppScore);
 		}
 	}
 	
@@ -160,6 +161,7 @@ public class ClientThread extends NetworkThread {
 	 */
 	@Override
 	public void setUp() throws UnknownHostException, IOException{
+		
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.ATTEMPTING_CONNECTION);
 		//Set up connection to the host
 		Socket socket = new Socket(hostAddress, portNumber);
@@ -178,6 +180,7 @@ public class ClientThread extends NetworkThread {
 		System.out.println("Set up finished");
 		listening = true;
 		lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_ESTABLISHED);
+	
 	}
 	
 	/**
@@ -261,7 +264,7 @@ public class ClientThread extends NetworkThread {
 		//send an object to either break the listening thread, or signal game closed.
 		//We can afford to do this since the connection will still be up.
 		//Unlike in killThread, where it may have been lost due to an error.
-		sendObject(-1);
+		sendObject(Integer.MAX_VALUE);
 	}
 	
 	//Getters and Setters
