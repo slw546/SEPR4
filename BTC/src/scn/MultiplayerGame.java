@@ -24,7 +24,7 @@ public class MultiplayerGame extends Game {
 	private int splitLine = SPLIT_LINE_POSITIONS[9];
 	
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
-	private int moveSplitLineTo = 6;
+	private int moveSplitLineTo = 9;
 	
 	/** The time the dividing line was last moved **/
 	private long lastMoveTime = System.currentTimeMillis();
@@ -152,10 +152,10 @@ public class MultiplayerGame extends Game {
 			//send to buffer for sync
 			long sysTime = System.currentTimeMillis();
 			
-			//only add the flight if it's been 0.5 secs since it was last synced
+			//only add the flight if it's been 0.25 secs since it was last synced
 			//enforces several syncs in between the last send and this
 			//prevents one side spamming the other player's thread with sends
-			if (lastManualControlSync + 500 < sysTime){
+			if (lastManualControlSync + 250 < sysTime){
 				//unset manual control
 				//prevents other player getting an unselectable aircraft
 				selectedAircraft.setManuallyControlled(false);
