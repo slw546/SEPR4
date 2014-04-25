@@ -2,7 +2,6 @@
 package scn;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Random;
 
 import lib.jog.audio;
@@ -15,6 +14,7 @@ import lib.jog.window;
 import cls.Aircraft;
 import cls.Aircraft.AirportState;
 import cls.Aircraft.AltitudeState;
+import cls.AircraftBuffer;
 import cls.Airport;
 import cls.Altimeter;
 import cls.OrdersBox;
@@ -66,7 +66,7 @@ public class Game extends Scene {
     protected int selectedPathpoint;
     
     /** A list of all aircraft present in the airspace */
-    protected ArrayList<Aircraft> aircraftInAirspace;
+    protected AircraftBuffer aircraftInAirspace;
    
     /** The image to be used for aircraft */
     public static Image aircraftImage;
@@ -177,11 +177,11 @@ public class Game extends Scene {
     	return this.totalScore;
     }
 
-	public ArrayList<Aircraft> aircraftInAirspace() {
+	public AircraftBuffer aircraftInAirspace() {
 		return aircraftInAirspace;
 	}
 
-	public void setAircraftInAirspace(ArrayList<Aircraft> aircraftInAirspace) {
+	public void setAircraftInAirspace(AircraftBuffer aircraftInAirspace) {
 		this.aircraftInAirspace = aircraftInAirspace;
 	}
 	
@@ -189,7 +189,7 @@ public class Game extends Scene {
      * Getter for aircraft list
      * @return the arrayList of aircraft in the airspace
      */
-    public ArrayList<Aircraft> aircraftList() {
+    public AircraftBuffer aircraftList() {
         return aircraftInAirspace;
     }
 
@@ -208,7 +208,7 @@ public class Game extends Scene {
         ordersBox = new OrdersBox(ORDERSBOX_X, ORDERSBOX_Y,
         		ORDERSBOX_W, ORDERSBOX_H, 6, Main.testing);
         
-        aircraftInAirspace = new ArrayList<Aircraft>();
+        aircraftInAirspace = new AircraftBuffer();
         
         if (!Main.testing) { 
         	aircraftImage = graphics.newImage("gfx" + File.separator + "plane.png");

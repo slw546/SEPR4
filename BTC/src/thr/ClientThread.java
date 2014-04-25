@@ -9,11 +9,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
+import cls.AircraftBuffer;
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
@@ -43,7 +43,7 @@ public class ClientThread extends NetworkThread {
 		this.lobby = lobby;
 		this.main = main;
 		//init aircraftBuffer
-		aircraftBuffer = new ArrayList<Aircraft>();
+		aircraftBuffer = new AircraftBuffer();
 		System.out.println("Constructed a client");
 	}
 	
@@ -109,7 +109,6 @@ public class ClientThread extends NetworkThread {
 			try {
 				sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

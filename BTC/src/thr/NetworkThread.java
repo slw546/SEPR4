@@ -7,12 +7,12 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 import btc.Main;
 import cls.Aircraft;
+import cls.AircraftBuffer;
 
 public abstract class NetworkThread extends Thread {
 	
@@ -29,7 +29,7 @@ public abstract class NetworkThread extends Thread {
 	/**
 	 * The buffer of aircraft with changes requiring synchronisation to the other player
 	 */
-	protected ArrayList<Aircraft> aircraftBuffer;
+	protected AircraftBuffer aircraftBuffer;
 	
 	// an ACK used to syncronise the thread execution with the other player's networkThread
 	protected String ack = "ACK";
@@ -244,7 +244,6 @@ public abstract class NetworkThread extends Thread {
 		}
 		
 		//get the aircraft
-		game.lockAircraftInAirspace();
 		for (int i = 0; i < expected; i++){
 			Aircraft a = recieveAircraft();
 			System.out.println("Recv: " + a.toString());
@@ -276,7 +275,6 @@ public abstract class NetworkThread extends Thread {
 /*			System.out.println("After");
 			System.out.println(game.aircraftInAirspace().toString());*/
 		}
-		game.unlockAircraftInAirspace();
 	}
 	
 	/**

@@ -1000,7 +1000,7 @@ public class Aircraft implements Serializable {
 	 * @param aircraftList the list of aircraft to update
 	 * @return 0 if no collisions, 1 if separation violation, 2 if crash
 	 */
-	public int updateCollisions(double dt, ArrayList<Aircraft> aircraftList) {
+	public int updateCollisions(double dt, AircraftBuffer aircraftList) {
 		aircraftTooNear.clear();
 		for (int i = 0; i < aircraftList.size(); i++) {
 			Aircraft aircraft = aircraftList.get(i);

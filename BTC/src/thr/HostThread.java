@@ -9,11 +9,11 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import lib.jog.input;
 import btc.Main;
 import cls.Aircraft;
+import cls.AircraftBuffer;
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 
@@ -48,7 +48,7 @@ public class HostThread extends NetworkThread {
 		this.lobby = lobby;
 		this.main = main;
 		//init aircraftBuffer
-		aircraftBuffer = new ArrayList<Aircraft>();
+		aircraftBuffer = new AircraftBuffer();
 	}
 	
 	@Override
@@ -98,7 +98,6 @@ public class HostThread extends NetworkThread {
 			try {
 				sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -130,6 +129,7 @@ public class HostThread extends NetworkThread {
 			sendObject(game.getTotalScore());
 			//get their score
 			oppScore = recieveInt();
+			System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
 		}
 		
 		if (oppScore == -1){
