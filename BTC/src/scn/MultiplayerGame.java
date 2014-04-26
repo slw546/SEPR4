@@ -207,8 +207,6 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
-					//remove manual control
-					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
@@ -229,14 +227,15 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
-					//remove manual control
-					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
 					// Player 1 gets points
 					opponentScore += 10;
 				}
+				// Remove selection of plane and manual control if the plane is selected while crossing the line
+				if (selectedAircraft == tempAircraft)
+					deselectAircraft();
 				aircraftList().get(i).setOwner(0);
 			}
 		}
