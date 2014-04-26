@@ -100,9 +100,9 @@ public class Game extends Scene {
     private Music music;
     
     /** The background to draw in the airspace. */
-    private Image background;
+    protected Image background;
     
-    private graphics.Quad backgroundQuad;
+    protected graphics.Quad backgroundQuad;
 
     /** List of names to be assigned to flight entry points */
     public static final String[] FLIGHT_ENTRY_POINT_NAMES = new String[] {
@@ -543,7 +543,7 @@ public class Game extends Scene {
     /**
      * Draw the info of a selected aircraft in the scene GUI
      */
-    private void drawAircraftInfo() {
+    protected void drawAircraftInfo() {
         graphics.setColour(0, 128, 0);
         graphics.rectangle(false, AIRCRAFT_INFO_X, AIRCRAFT_INFO_Y, AIRCRAFT_INFO_W, AIRCRAFT_INFO_H);
         if (selectedAircraft != null) {

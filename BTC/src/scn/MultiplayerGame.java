@@ -243,6 +243,39 @@ public class MultiplayerGame extends Game {
 	}
 	
 	@Override
+    public void draw() {
+        graphics.setColour(0, 128, 0);
+        graphics.rectangle(false, 16, 16, window.width() - 32, window.height() - 144);
+        graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
+        graphics.setColour(255, 255, 255, 60);
+        graphics.drawq(background, backgroundQuad, 0, 0);
+        
+        for (Airport airport : airports) {
+        	for (Waypoint w : airport.entryPoints()) {
+        		w.draw(controlledByPlayer(w).getColour());
+        	}
+        	for (Waypoint w : airport.parkingPoints()) {
+        		w.draw(controlledByPlayer(w).getColour());
+        	}
+        }
+        
+        drawMap();       
+        graphics.setViewport();
+       
+        if (selectedAircraft != null
+        		&& selectedAircraft.status() != AirportState.PARKED) {
+            selectedAircraft.drawCompass();
+        }
+       
+        ordersBox.draw();
+        altimeter.draw();
+        drawAircraftInfo();
+       
+        graphics.setColour(0, 128, 0);
+        drawScore();
+    }
+	
+	@Override
 	protected void drawScore() {
 		int hours = (int)(timeElapsed / (60 * 60));
         int minutes = (int)(timeElapsed / 60);
