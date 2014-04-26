@@ -944,15 +944,15 @@ public class Game extends Scene {
         // Use the percentage capacity to determine the probability
         // that a flight will be heading to the airport
         if (ratio == 0) {
-        	p = 0.3;
+        	p = 0.7;
         } else if (ratio <= 0.25) {
-        	p = 0.25;
+        	p = 0.6;
         } else if (ratio <= 0.5) {
-        	p = 0.16;
+        	p = 0.5;
         } else if (ratio <= 0.75) {
-        	p = 0.08;
+        	p = 0.4;
         } else if (ratio <= 1) {
-        	p = 0.03;
+        	p = 0.3;
         }
         
         // However, if 
