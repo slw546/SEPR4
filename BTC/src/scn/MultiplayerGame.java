@@ -140,9 +140,7 @@ public class MultiplayerGame extends Game {
 			this.setFlightGenerationTimeElapsed(0);
 		}
 		
-		lockAircraftInAirspace();
 		super.update(dt);
-		unlockAircraftInAirspace();
 		
 		
 		//if holding down the left or right key and has an aircraft selected
@@ -614,31 +612,7 @@ public class MultiplayerGame extends Game {
         compassDragged = false;
   
     }
-    
-    /**
-     * Locks the Aircraft in Airspace array for changes
-     */
-    public synchronized void lockAircraftInAirspace(){
-    	//System.out.println("Locking airspace");
-    	while (locked){
-    		try {
-    			wait();
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    	
-    	locked = true;
-    }
-    
-    /**
-     * Unlocks the aircraft in airspace array
-     */
-    public synchronized void unlockAircraftInAirspace(){
-    	//System.out.println("unlocking airspace");
-    	locked = false;
-    	notifyAll();
-    }
+ 
     
     //Setters
     public void setOpponentScore(int opponentScore) {
