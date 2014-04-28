@@ -86,7 +86,7 @@ public class Airport implements Serializable {
 			Waypoint[] entryPoints, Waypoint[] landingPoints,
 			Waypoint[] parkingPoints, Waypoint[] takeoffPoints) {
 		this.name = name;
-		this.initialCapacity = Math.min(capacity, entryPoints.length);
+		this.initialCapacity = Math.min(capacity, parkingPoints.length);
 		this.capacity = initialCapacity;
 		this.entryPointNames = entryPointNames;
 		this.entryPoints = entryPoints;
@@ -111,7 +111,7 @@ public class Airport implements Serializable {
 		aircraft = new ArrayList<Aircraft>();
 		aircraftLeaving = new ArrayList<Aircraft>();
 
-		parkingBays = new boolean[this.landingPoints.length];
+		parkingBays = new boolean[this.parkingPoints.length];
 
 		// Clear the parking bays
 		for (int i = 0; i < parkingBays.length; i++) {
