@@ -82,12 +82,6 @@ public class MultiplayerGame extends Game {
 	public lib.ButtonText landButton;
 	public lib.ButtonText takeOffButton;
 	
-	/**
-	 * Whether or not the AircraftInAirspace array is locked
-	 * Locked during the update loop, and when the networkThread is making changes
-	 */
-	private boolean locked = false;
-	
 	//Constructor
 	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread) {
 		super(main, 0);
