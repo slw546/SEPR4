@@ -74,7 +74,6 @@ public class MultiplayerSetUp extends Scene {
 	
 	//flags
 	private boolean host_active = false;
-	private boolean client_active = false;
 	private boolean startOrdered = false;
 
 	protected MultiplayerSetUp(Main main) {
@@ -99,8 +98,6 @@ public class MultiplayerSetUp extends Scene {
 
 	@Override
 	public void mousePressed(int key, int x, int y) {
-		// TODO Auto-generated method stub
-	
 	}
 
 	@Override
@@ -225,7 +222,6 @@ public class MultiplayerSetUp extends Scene {
 		client.setGameScene(game);
 		
 		client.start();
-		client_active = true;
 		state = networkStates.NO_CONNECTION;
 	}
 
