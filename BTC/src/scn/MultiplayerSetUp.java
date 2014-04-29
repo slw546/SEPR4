@@ -186,7 +186,6 @@ public class MultiplayerSetUp extends Scene {
 		//Hide buttons
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
-		buttons[2].setAvailability(true);
 		//Create and start a host thread
 		host = new HostThread(port, this, main);
 		//create a game scene to be used when the game starts
@@ -234,6 +233,11 @@ public class MultiplayerSetUp extends Scene {
 			buttons[0].setAvailability(true);
 			buttons[1].setAvailability(true);
 			buttons[2].setAvailability(false);
+		}
+		
+		//make start game button available once connection established, but only for the host.
+		if (state == networkStates.CONNECTION_ESTABLISHED && host_active){
+			buttons[2].setAvailability(true);
 		}
 		
 		startGame();
