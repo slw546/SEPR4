@@ -853,7 +853,7 @@ public class Game extends Scene {
     protected void crash(Aircraft aircraft, int collisionPlane) {
     	gameOver(aircraft, aircraftList().get(collisionPlane), totalScore);
     	totalScore -= 100; 
-    	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
+    	//ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
     	main.screenShake(24, 0.6);
     }
     

@@ -1,11 +1,14 @@
 package scn;
 
+import java.io.File;
+
 import thr.NetworkThread;
 import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
 import cls.Aircraft.AltitudeState;
+import lib.jog.audio;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
@@ -233,8 +236,17 @@ public class MultiplayerGame extends Game {
 				aircraftList().get(i).setOwner(0);
 			}
 		}
+		if (splitLine == 380 || splitLine == 900 ){
+			multiGameOver(totalScore);
+		}
 	}
-	
+	 public void multiGameOver(int score) {
+	    	//if (!Main.testing) {
+	    		//playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
+	    	//}
+	    	main.closeScene();
+	    	main.setScene(new MultiGameOver(main, score));
+	    }
 	@Override
     public void draw() {
         graphics.setColour(0, 128, 0);
