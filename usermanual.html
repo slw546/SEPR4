@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+
+    <title>BTC: OTC - User Manual</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+	<style>
+	body {
+		text-align: center;
+		margin-top: 110px;
+	}
+	</style>
+    
+  </head>
+
+  <body>
+
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				 </button>
+				<a class="navbar-brand" href="#">Bear Traffic Controller: Over the Cloud</a>
+			</div>
+			<div class="collapse navbar-collapse">
+				 <ul class="nav navbar-nav navbar-right">
+					<li><a href="#">Home</a></li>
+					<li class="active"><a href="#">User Manual</a></li>
+					<li><a href="#contact">Download</a></li>
+				 </ul>
+			</div><!--/.nav-collapse -->
+		</div>
+    </div>
+	
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-top:50px">
+		<div class="container">
+			<div class="collapse navbar-collapse">
+				 <ul class="nav navbar-nav">
+					<li><a href="#">Single Player</a></li>
+					<li><a href="#">Multiplayer</a></li>
+				 </ul>
+			</div><!--/.nav-collapse -->
+		</div>
+    </div>
+    
+    <div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>User Manual</h1>
+				<p>If you need any help using Bear Traffic Contoller: Over the Cloud then
+				take a look at the user manual below.</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Launching the game</h2>
+				
+				<p>&nbsp;</p>
+				
+				<h3>Main Menu</h3>
+				<p>After launching the game, you will be presented with the following main menu.</p>
+				<img src="img/screenshots/main_menu.png" />
+				<ol>
+					<li>Current date and time are displayed in the top right corner of the main menu.</li>
+					<li>Brief Credits of the development team.</li>
+					<li>Selecting the “PLAY MULTIPLAYER” button will allow the user to host a multiplayer game or connect to an existing multiplayer host.</li>
+					<li>Selecting the “PLAY GAME” button will launch the difficulty select screen for the main game, the user can start the game from here.</li>
+					<li>Selecting the “CREDITS” button will show details of the developers of the game. The credits screen can be exited by pressing the “Escape Key”.</li>
+					<li>Selecting the “HELP” button will open this manual in your default browser.</li>
+					<li>Selecting the “EXIT” button will exit the game.</li>
+				</ol>				
+			</div>
+		</div>
+		
+		<hr>
+		
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Single Player Mode</h2>
+				
+				<p>&nbsp;</p>
+				
+				<h3>Difficulty Selection Interface</h3>
+				<p>Upon selecting the “PLAY GAME” button on the main menu, you are presented with the following difficulty select screen.</p>
+				<img src="img/screenshots/sp_difficulty_selection.png" />
+				<ol>
+					<li>Selecting the “EASY” button will launch a single player game in easy difficulty, the aircraft here travel at a slow speed.</li>
+					<li>Selecting the “MEDIUM” button will launch a single player game in medium difficulty, the aircraft here travel at a medium speed.</li>
+					<li>Selecting the “HARD” button will launch a single player game in hard difficulty, the aircraft here travel at a fast speed.</li>
+				</ol>
+				<p>The difficulty determines the speed of the aircraft, the rate at which flights spawn and the separation violation distance. This is the distance in which planes have to be from each other, breaking this rule will lead to a loss of points.</p>
+				<p>You can exit to the main menu by pressing the “Escape” key.</p>
+				
+				<p>&nbsp;</p>
+				
+				<h3>Single Player Interface</h3>
+				<p>After selecting a difficulty you will be presented with the following interface.</p>
+				<img src="img/screenshots/sp_interface.png" />
+				<ol>
+					<li>The main airspace, this displays aircraft, the waypoints and the the route in which the aircraft is taking.</li>
+					<li>This box contains information about the selected aircraft.</li>
+					<li>The altimeter, this displays the selected aircraft’s altitude and allows you to change it.</li>
+					<li>The communication log, this box will constantly update displaying messages between the air traffic controller and the pilots of the aircraft. This will warn you when aircraft will be arriving at a waypoint. </li>
+				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h4>1. Main Airspace Interface</h4>
+				<img src="img/screenshots/sp_main_airspace_interface.png" />
+				<ol type="A">
+					<li>Plane Counter, this displays the number of aircraft in the airspace.</li>
+					<li>Timer, this displays the elapsed time since the game began.</li>
+					<li>Score/Earnings, this displays the current amount of money you have earnt.</li>
+					<li>Origin/Destination Waypoint, aircraft will enter/leave the airspace via these waypoints.</li>
+					<li>Plane, this is the entity that you need to maneuver around the airspace.</li>
+					<li>Waypoint, these are used to control the route the aircraft will take around the airspace.</li>
+					<li>Landing Waypoint, there are two of these for each airport, these are the final waypoints of an aircraft’s flight plan, aircraft will circle here waiting for clearance to land.</li>
+					<li>Airport, one of two airports in the airspace that an aircraft can take-off or land in.</li>
+					<li>Terminal, aircraft that have landed at the airport will taxi to these parking points before being allowed to take-off again.</li>
+					<li>Selected Aircraft, this aircraft has been selected, you can see further detail of a selected aircraft below.</li>
+				</ol>
+				
+				<h3><small>1.J Selected Aircraft</small></h3>
+				<img src="img/screenshots/sp_selected_aircraft.png" />
+				<ol type="I">
+					<li>Plane Bearing, this large green circle denotes the bearing around the aircraft that it can yaw to (in degrees). The green pointer protruding from the aircraft denotes the current bearing, as well as allowing the user to adjust the bearing.</li>
+					<li>Separation Violation Warning, the red circle will surround two aircraft that are at risk of colliding, highlighting a separation violation. The radius that aircraft have to be separated to avoid the points penalty depends on the difficulty setting selected.</li>
+					<li>Current Altitude, all aircraft display their current altitude next to their icon.</li>
+					<li>Flight Path, this is the route which the aircraft is traveling along, this can be interacted with to change the route the aircraft will take to it’s destination.</li>
+				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h4>2. Flight Display</h4>
+				<img src="img/screenshots/sp_flight_display.png" />
+				<ol type="A">
+					<li>Flight Code, this is a unique number identifying each flight.</li>
+					<li>Altitude, this is the aircraft’s current altitude.</li>
+					<li>Speed, this is the aircraft’s current speed.</li>
+					<li>Origin, this is the entry/exit waypoint the aircraft entered the airspace via.</li>
+					<li>Destination, this is the entry/exit waypoint the aircraft should exit the airspace via, this includes landing at airports.</li>
+					<li>Value, this is the amount of points you earn for carrying that aircraft to its exit waypoint.</li>
+				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h4>3. Altitude Display</h4>
+				<img src="img/screenshots/sp_altitude_display.png" />
+				<ol type="A">
+					<li>Up Arrow, clicking this button will increase the selected aircraft’s altitude if not already at maximum.</li>
+					<li>Down Arrow, clicking this will decrease the selected aircraft’s altitude if not already at minimum.</li>
+					<li>Current Altitude, displays the current altitude of the selected aircraft.</li>
+					<li>Altimeter, displays the altitude, with the alignment of each altitude division, and the horizon line of the plane denoting it’s current altitude.</li>
+					<li>Roll Display, displays the current roll/level if the aircraft. Useful to display the direction an aircraft is turning.</li>
+				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h4>4. Communication Log</h4>
+				<img src="img/screenshots/sp_communication_log.png" />
+				<ol type="A">
+					<li>Incoming Message, (<<<) this denotes information created by the default operations of the aircraft. </li>
+					<li>Outgoing Message, (>>>) this denotes the information relevant to your intervention on the aircraft’s route.</li>
+				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h3>Shop/Game Success Screen</h3>
+				<img src="sp_shop.png" />
+				<p>The above screen is shown upon successful completion of the game, it ultimately decides the outcome of your bear’s story.</p>
+				<ol>
+					<li>MONEY, The money you earned during the game (displayed in Rubles).</li>
+					<li>Items: Clicking these items will purchase them, spending your hard earned Rubles and ultimately deciding the fate of you and your cubs.</li>
+				</ol>
+			</div>
+		</div>
+			
+		<hr>
+			
+    </div>
+
+	
+    </div>
+
+	<div class="footer">
+		<hr>
+        <p>SEPR Team FLR</p>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/docs.min.js"></script>
+  </body>
+</html>
