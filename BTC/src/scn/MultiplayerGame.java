@@ -25,10 +25,10 @@ public class MultiplayerGame extends Game {
 	};
 	
 	/** The current x co-ordinate of the line to split the game screen of the two players **/
-	private int splitLine = SPLIT_LINE_POSITIONS[9];
+	private int splitLine = SPLIT_LINE_POSITIONS[8];
 	
 	/** The x co-ordinate the split line is moving towards, equals splitLine when line is stationary **/
-	private int moveSplitLineTo = 9;
+	private int moveSplitLineTo = 8;
 	
 	/** The time the dividing line was last moved **/
 	private long lastMoveTime = System.currentTimeMillis();
