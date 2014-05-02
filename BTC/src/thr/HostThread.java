@@ -84,14 +84,22 @@ public class HostThread extends NetworkThread {
 		System.out.println("left hosting loop");
 		
 		while(hosting && playing){
-			//sync aircraft
+			//Sync aircraft
+			//sync from host
+			recieveAircraftBuffer();
+			//sync to host
+			syncAircraftBuffer();
+			//sync score
+			syncScore();
+			
+			/*//sync aircraft
 			//sync to client
 			syncAircraftBuffer();
 			//sync from client
 			recieveAircraftBuffer();
 			
 			//sync score
-			syncScore();
+			syncScore();*/
 			
 			//sleep for 1/10th of a second
 			//to reduce network load
@@ -129,7 +137,7 @@ public class HostThread extends NetworkThread {
 			sendObject(game.getTotalScore());
 			//get their score
 			oppScore = recieveInt();
-			System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
+			//System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
 		}
 		
 		if (oppScore == Integer.MAX_VALUE){

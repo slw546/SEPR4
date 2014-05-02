@@ -89,18 +89,27 @@ public class ClientThread extends NetworkThread {
 		//not done earlier, as we don't care if it takes more than 5 seconds
 		//for the host to start the game.
 		try {
-			socket.setSoTimeout(5000);
+			socket.setSoTimeout(1000);
 		} catch (SocketException e1) {
 			System.err.println("Failed to set socket timeout");
 			e1.printStackTrace();
 		}
 		
 		while (listening && playing) {
-			//Sync aircraft
+			/*//Sync aircraft
 			//sync from host
 			recieveAircraftBuffer();
 			//sync to host
 			syncAircraftBuffer();
+			//sync score
+			syncScore();*/
+			
+			//sync aircraft
+			//sync to client
+			syncAircraftBuffer();
+			//sync from client
+			recieveAircraftBuffer();
+			
 			//sync score
 			syncScore();
 			
@@ -150,7 +159,7 @@ public class ClientThread extends NetworkThread {
 		} else {
 			//update game scene with new opponent score.
 			game.setOpponentScore(oppScore);
-			System.out.printf("Sent score: %d,  recieved score: %d", game.totalScore(), oppScore);
+			//System.out.printf("Sent score: %d,  recieved score: %d", game.totalScore(), oppScore);
 		}
 	}
 	

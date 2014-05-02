@@ -174,7 +174,7 @@ public abstract class NetworkThread extends Thread {
 		}
 		*/
 		if (recv.equals(ack)){
-			//tell reciever how many aircraft to expect
+			//tell receiver how many aircraft to expect
 			sendObject(buffSize);
 			//send aircraft
 			for (int i = 0; i < buffSize; i++){

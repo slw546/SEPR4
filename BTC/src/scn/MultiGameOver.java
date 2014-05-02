@@ -82,15 +82,15 @@ public class MultiGameOver extends Scene {
 		deaths = (int)( Math.random() * 500) + 300;
 		timer = 0;
 		textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
-		textBox.addText(String.valueOf(deaths) + " people died in the crash.");
+		textBox.addText("Your airspace has been taken over");
 		textBox.delay(0.4);
-		textBox.addText("British Bearways is facing heavy legal pressure from the family and loved-ones of the dead and an investigation into the incident will be performed.");
+		textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
 		textBox.newline();
 		textBox.delay(0.8);
 		textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
 		textBox.newline();
 		textBox.delay(0.8);
-		textBox.addText("Your guilt for the deaths you caused, and your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
+		textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
 		textBox.newline();
 		textBox.newline();
 		textBox.delay(0.8);
