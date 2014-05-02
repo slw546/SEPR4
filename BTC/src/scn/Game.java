@@ -339,7 +339,7 @@ public class Game extends Scene {
         		background.width() * (Main.width() / Main.TARGET_WIDTH),
         		background.height() * (Main.width() / Main.TARGET_WIDTH));
     }
-   
+    
     /**
      * Update all objects within the scene, ie aircraft, orders box altimeter.
      * Cause collision detection to occur
@@ -352,33 +352,8 @@ public class Game extends Scene {
     	
     	for (Aircraft aircraft : aircraftInAirspace) {
     		aircraft.update(dt);
-    		totalScore += aircraft.score();
-    		aircraft.clearScore();
-    		/*if (aircraft.status() == AirportState.FINISHED) {
-    			if(aircraft.score() > 50) {
-    				switch ((new Random()).nextInt(3)) {
-    				case 0:
-    					ordersBox.addOrder(">>> Success to us!");
-    					break;
-    				case 1:
-    					ordersBox.addOrder(">>> Good job comrade.");
-    					break;
-    				case 2:
-    					ordersBox.addOrder(">>> Many thanks.");
-    					break;
-    				}
-    				// Update cumulative score
-    				totalScore += aircraft.score();
-    				aircraft.clearScore();
-    			} else if (aircraft.score() > 0
-    					&& aircraft.status() == AirportState.FINISHED) {
-    				ordersBox.addOrder(">>> You deserve nothing.");
-    				
-    				// Update cumulative score
-    				
-    				//aircraft.clearScore();
-    			}               
-    		}*/
+			totalScore += aircraft.score();
+			aircraft.clearScore();
     	}
 
     	checkCollisions(dt);
@@ -851,6 +826,8 @@ public class Game extends Scene {
     } 
     
     protected void crash(Aircraft aircraft, int collisionPlane) {
+    	aircraft.crash();
+    	aircraftList().get(collisionPlane).crash();
     	gameOver(aircraft, aircraftList().get(collisionPlane), totalScore);
     	totalScore -= 100; 
     	//ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
