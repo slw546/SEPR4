@@ -18,7 +18,7 @@ public class Title extends Scene {
 	 * A URL to the Bear Traffic Controller Website
 	 * Webpage contains explanation of game's controls and goal
 	 */
-	private final static String HELP_URL = "https://docs.google.com/document/d/1dfYelEmZgKHHfhHCVX3ipiUNdfW-zlbzc0BSpwG8Rvs/edit?usp=sharing";
+	private final static String HELP_URL = "https://github.io/slw546/SEPR4/manual.html";
 
 	/**
 	 * The 'beep' played as the radar makes a sweep
