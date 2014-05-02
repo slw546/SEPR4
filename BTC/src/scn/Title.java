@@ -213,7 +213,7 @@ public class Title extends Scene {
 		graphics.arc(true, window.height()/2, window.height()/2, window.height()/2 - 32, radarAngle, -1 * Math.PI / 8);
 
 		// Title
-		String title = "Bare Traffic Controller";
+		String title = "Bear Traffic Controller";
 		int titleLength = title.length();
 		// fades title string's characters over time
 		// characters brighten when the sweep passes over them

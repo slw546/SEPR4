@@ -100,9 +100,9 @@ public class Game extends Scene {
     private Music music;
     
     /** The background to draw in the airspace. */
-    private Image background;
+    protected Image background;
     
-    private graphics.Quad backgroundQuad;
+    protected graphics.Quad backgroundQuad;
 
     /** List of names to be assigned to flight entry points */
     public static final String[] FLIGHT_ENTRY_POINT_NAMES = new String[] {
@@ -543,7 +543,7 @@ public class Game extends Scene {
     /**
      * Draw the info of a selected aircraft in the scene GUI
      */
-    private void drawAircraftInfo() {
+    protected void drawAircraftInfo() {
         graphics.setColour(0, 128, 0);
         graphics.rectangle(false, AIRCRAFT_INFO_X, AIRCRAFT_INFO_Y, AIRCRAFT_INFO_W, AIRCRAFT_INFO_H);
         if (selectedAircraft != null) {
@@ -853,7 +853,7 @@ public class Game extends Scene {
     protected void crash(Aircraft aircraft, int collisionPlane) {
     	gameOver(aircraft, aircraftList().get(collisionPlane), totalScore);
     	totalScore -= 100; 
-    	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
+    	//ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
     	main.screenShake(24, 0.6);
     }
     
@@ -944,15 +944,15 @@ public class Game extends Scene {
         // Use the percentage capacity to determine the probability
         // that a flight will be heading to the airport
         if (ratio == 0) {
-        	p = 0.3;
+        	p = 0.7;
         } else if (ratio <= 0.25) {
-        	p = 0.25;
+        	p = 0.6;
         } else if (ratio <= 0.5) {
-        	p = 0.16;
+        	p = 0.5;
         } else if (ratio <= 0.75) {
-        	p = 0.08;
+        	p = 0.4;
         } else if (ratio <= 1) {
-        	p = 0.03;
+        	p = 0.3;
         }
         
         // However, if 

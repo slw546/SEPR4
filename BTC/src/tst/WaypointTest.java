@@ -29,8 +29,7 @@ public class WaypointTest {
 	@Test
 	public void testIsEntryOrExit2() {
 		Waypoint testWaypoint = new Waypoint(0, 0, Waypoint.WaypointType.AIRSPACE);
-		assertTrue("Entry = true", Waypoint.WaypointType.ENTRY == testWaypoint.type());
-		assertTrue("Exit = true", Waypoint.WaypointType.EXIT == testWaypoint.type());
+		assertFalse("Entry = true", Waypoint.WaypointType.ENTRY == testWaypoint.type());
 	}
 	
 	// Test mouseOver checking

@@ -1,11 +1,14 @@
 package scn;
 
+import java.io.File;
+
 import thr.NetworkThread;
 import cls.Aircraft;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
 import cls.Aircraft.AltitudeState;
+import lib.jog.audio;
 import lib.jog.graphics;
 import lib.jog.input;
 import lib.jog.window;
@@ -82,12 +85,6 @@ public class MultiplayerGame extends Game {
 	public lib.ButtonText landButton;
 	public lib.ButtonText takeOffButton;
 	
-	/**
-	 * Whether or not the AircraftInAirspace array is locked
-	 * Locked during the update loop, and when the networkThread is making changes
-	 */
-	private boolean locked = false;
-	
 	//Constructor
 	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread) {
 		super(main, 0);
@@ -140,9 +137,7 @@ public class MultiplayerGame extends Game {
 			this.setFlightGenerationTimeElapsed(0);
 		}
 		
-		lockAircraftInAirspace();
 		super.update(dt);
-		unlockAircraftInAirspace();
 		
 		
 		//if holding down the left or right key and has an aircraft selected
@@ -209,8 +204,6 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
-					//remove manual control
-					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
@@ -231,18 +224,61 @@ public class MultiplayerGame extends Game {
 					int numberOfWaypoints = tempAircraft.getRoute().length;
 					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
 					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
-					//remove manual control
-					aircraftList().get(i).setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
 					// Player 1 gets points
 					opponentScore += 10;
 				}
+				// Remove selection of plane and manual control if the plane is selected while crossing the line
+				if (selectedAircraft == tempAircraft)
+					deselectAircraft();
 				aircraftList().get(i).setOwner(0);
 			}
 		}
+		if (splitLine == 380 || splitLine == 900 ){
+			multiGameOver(totalScore);
+		}
 	}
+	 public void multiGameOver(int score) {
+	    	//if (!Main.testing) {
+	    		//playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
+	    	//}
+	    	main.closeScene();
+	    	main.setScene(new MultiGameOver(main, score));
+	    }
+	@Override
+    public void draw() {
+        graphics.setColour(0, 128, 0);
+        graphics.rectangle(false, 16, 16, window.width() - 32, window.height() - 144);
+        graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
+        graphics.setColour(255, 255, 255, 60);
+        graphics.drawq(background, backgroundQuad, 0, 0);
+        
+        for (Airport airport : airports) {
+        	for (Waypoint w : airport.entryPoints()) {
+        		w.draw(controlledByPlayer(w).getColour());
+        	}
+        	for (Waypoint w : airport.parkingPoints()) {
+        		w.draw(controlledByPlayer(w).getColour());
+        	}
+        }
+        
+        drawMap();       
+        graphics.setViewport();
+       
+        if (selectedAircraft != null
+        		&& selectedAircraft.status() != AirportState.PARKED) {
+            selectedAircraft.drawCompass();
+        }
+       
+        ordersBox.draw();
+        altimeter.draw();
+        drawAircraftInfo();
+       
+        graphics.setColour(0, 128, 0);
+        drawScore();
+    }
 	
 	@Override
 	protected void drawScore() {
@@ -614,31 +650,7 @@ public class MultiplayerGame extends Game {
         compassDragged = false;
   
     }
-    
-    /**
-     * Locks the Aircraft in Airspace array for changes
-     */
-    public synchronized void lockAircraftInAirspace(){
-    	//System.out.println("Locking airspace");
-    	while (locked){
-    		try {
-    			wait();
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    	
-    	locked = true;
-    }
-    
-    /**
-     * Unlocks the aircraft in airspace array
-     */
-    public synchronized void unlockAircraftInAirspace(){
-    	//System.out.println("unlocking airspace");
-    	locked = false;
-    	notifyAll();
-    }
+ 
     
     //Setters
     public void setOpponentScore(int opponentScore) {
