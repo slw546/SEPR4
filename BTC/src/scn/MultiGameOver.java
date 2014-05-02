@@ -23,8 +23,8 @@ public class MultiGameOver extends Scene {
 	 * in which they crashed. Used to position the explosion, and
 	 * provide graphical feedback of how and where the player failed.
 	 */
-	private Aircraft crashedAircraft1;
-	private Aircraft crashedAircraft2;
+	//private Aircraft crashedAircraft1;
+	//private Aircraft crashedAircraft2;
 	private int finalScore;
 	
 	/**
@@ -75,22 +75,22 @@ public class MultiGameOver extends Scene {
 	 */
 	@Override
 	public void start() {
-		if (!Main.testing) {
+		/*if (!Main.testing) {
 			playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
-		}
+		}*/
 		
 		deaths = (int)( Math.random() * 500) + 300;
 		timer = 0;
 		textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
-		textBox.addText(String.valueOf(deaths) + " people died in the crash.");
+		textBox.addText("Your airspace has been taken over");
 		textBox.delay(0.4);
-		textBox.addText("British Bearways is facing heavy legal pressure from the family and loved-ones of the dead and an investigation into the incident will be performed.");
+		textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
 		textBox.newline();
 		textBox.delay(0.8);
 		textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
 		textBox.newline();
 		textBox.delay(0.8);
-		textBox.addText("Your guilt for the deaths you caused, and your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
+		textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
 		textBox.newline();
 		textBox.newline();
 		textBox.delay(0.8);
@@ -115,12 +115,9 @@ public class MultiGameOver extends Scene {
 	 * otherwise, update text box instead
 	 */
 	public void update(double dt) {
-		if (explosionAnim.hasFinished()){
 			timer += dt;
 			textBox.update(dt);
-		} else {
-			explosionAnim.update(dt);
-		}
+		
 	}
 
 	@Override
@@ -157,7 +154,7 @@ public class MultiGameOver extends Scene {
 	 * Otherwise, draw the aircraft and explosion
 	 */
 	public void draw() {
-		graphics.setColour(0, 128, 0);
+	/*	graphics.setColour(0, 128, 0);
 		graphics.printCentred(crashedAircraft1.name() + 
 				" crashed into " + crashedAircraft2.name() + ".", 0, 32, 2, window.width());
 		if (explosionAnim.hasFinished()) {
@@ -170,7 +167,8 @@ public class MultiGameOver extends Scene {
 			graphics.setColour(128,0,0);
 			graphics.circle(false, midPoint.x(), midPoint.y(), radius);
 			explosionAnim.draw();
-		}
+		}*/
+		textBox.draw();
 		int opacity = (int)(255 * Math.sin(timer));
 		graphics.setColour(0, 128, 0, opacity);
 		graphics.printCentred("Press any key to continue", 0, window.height() - 100, 1, window.width());
