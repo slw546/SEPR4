@@ -448,12 +448,15 @@ public class MultiplayerGame extends Game {
 		super.keyReleased(key);
         switch (key) {
         	case input.KEY_Q:
-        		if (moveSplitLineTo > 0)
-        			moveSplitLineTo -= 1;
+        	//	if (moveSplitLineTo > 0)
+        	//		moveSplitLineTo -= 1;
+        		opponentScore += 25;
         		break;
+
         	case input.KEY_E:
-        		if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
-        			moveSplitLineTo += 1;
+        		//if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
+        	//		moveSplitLineTo += 1;
+        		totalScore += 25;
         		break;
         	case input.KEY_ESCAPE:
         		//main.closeScene() called in super.keyReleased.
