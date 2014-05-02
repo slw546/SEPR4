@@ -4,6 +4,7 @@ import java.io.File;
 
 import thr.NetworkThread;
 import cls.Aircraft;
+import cls.AircraftBuffer;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
@@ -65,6 +66,11 @@ public class MultiplayerGame extends Game {
 	private long lastManualControlSync = 0l;
 	
 	/**
+	 * The last time the entire buffer was added for sync.
+	 */
+	private long lastTotalSync = 0l;
+	
+	/**
 	 * The gameType, ie. whether we are the HOST or CLIENT.
 	 * Determined by the TYPE of networkThread associated with this instance
 	 * of MultiplayerGame
@@ -90,6 +96,8 @@ public class MultiplayerGame extends Game {
 		super(main, 0);
 		gameType = type;
 		networkThread = thread;
+		lastTotalSync = System.currentTimeMillis();
+		lastManualControlSync = System.currentTimeMillis();
 		lib.ButtonText.Action landAction = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
@@ -139,7 +147,6 @@ public class MultiplayerGame extends Game {
 		
 		super.update(dt);
 		
-		
 		//if holding down the left or right key and has an aircraft selected
 		if (selectedAircraft != null &&
 				(input.isKeyDown(input.KEY_LEFT) || input.isKeyDown(input.KEY_RIGHT))){
@@ -177,6 +184,21 @@ public class MultiplayerGame extends Game {
 				case CLIENT:
 					if (moveSplitLineTo > 0){
 						moveSplitLineTo -= 1;
+					}
+					break;
+				}
+			} else if (totalScore < opponentScore) {
+				//Losing
+				switch (gameType){
+				case HOST:
+					//move line left
+					if (moveSplitLineTo > 0){
+						moveSplitLineTo -= 1;
+					}
+					break;
+				case CLIENT:
+					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
+						moveSplitLineTo += 1;
 					}
 					break;
 				}
@@ -239,6 +261,7 @@ public class MultiplayerGame extends Game {
 		if (splitLine == 380 || splitLine == 900 ){
 			multiGameOver(totalScore);
 		}
+		
 	}
 	 public void multiGameOver(int score) {
 	    	//if (!Main.testing) {
