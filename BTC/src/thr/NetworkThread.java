@@ -18,7 +18,7 @@ import cls.Waypoint;
 import thr.Packet;
 
 public abstract class NetworkThread extends Thread {
-	
+	// Test
 	//SCENES
 	/**
 	 * The scenes associated with this networkThread instance
