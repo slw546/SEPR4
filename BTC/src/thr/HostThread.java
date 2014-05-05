@@ -173,6 +173,7 @@ public class HostThread extends NetworkThread {
 		//send a string which tells client to start the game
 		sendObject(start);
 		lobby.setStartOrdered(true);
+		game.setLastMoveTime(System.currentTimeMillis());
 	}
 	
 	/**

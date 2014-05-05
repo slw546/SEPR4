@@ -63,11 +63,6 @@ public class MultiplayerGame extends Game {
 	private long lastManualControlSync = 0l;
 	
 	/**
-	 * The last time the entire buffer was added for sync.
-	 */
-	private long lastTotalSync = 0l;
-	
-	/**
 	 * The gameType, ie. whether we are the HOST or CLIENT.
 	 * Determined by the TYPE of networkThread associated with this instance
 	 * of MultiplayerGame
@@ -100,7 +95,6 @@ public class MultiplayerGame extends Game {
 		gameType = type;
 		this.lobby = lobby;
 		networkThread = thread;
-		lastTotalSync = System.currentTimeMillis();
 		lastManualControlSync = System.currentTimeMillis();
 		lib.ButtonText.Action landAction = new lib.ButtonText.Action() {
 			@Override
@@ -693,6 +687,10 @@ public class MultiplayerGame extends Game {
     public void setOpponentScore(int opponentScore) {
 		this.player1Score = opponentScore;
 	}
+    
+    public void setLastMoveTime(long moveTime){
+    	this.lastMoveTime = moveTime;
+    }
     
     @Override
     protected void crash(Aircraft aircraft, int collisionState) {
