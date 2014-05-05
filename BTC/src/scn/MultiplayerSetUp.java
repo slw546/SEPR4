@@ -213,6 +213,7 @@ public class MultiplayerSetUp extends Scene {
 		//hide buttons
 		buttons[0].setAvailability(false);
 		buttons[1].setAvailability(false);
+		textInput.active = false;
 
 		//create and start a client thread
 		client = new ClientThread(address, port, this, main);
