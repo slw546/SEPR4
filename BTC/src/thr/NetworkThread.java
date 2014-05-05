@@ -272,7 +272,10 @@ public abstract class NetworkThread extends Thread {
 		} catch (IOException e) {
 			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
-			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			//Check we aren't overwriting a socket timeout message
+			if (lobby.getErrorCause() != MultiplayerSetUp.errorCauses.SOCKET_TIMEOUT){
+				lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			}
 			//report error in console
 			System.err.println("IOException communicating with host");
 			//kill the thread which caused the error.
@@ -283,7 +286,6 @@ public abstract class NetworkThread extends Thread {
 			//On quit, -1 is sent to other player intentionally to cause an error
 			//If the other thread is waiting for an integer, it can quit gracefully
 			//Otherwise a ClassCastException will cause the other player to quit out.
-			
 			//set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
