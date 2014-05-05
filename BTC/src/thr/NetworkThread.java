@@ -7,12 +7,15 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import scn.MultiplayerGame;
 import scn.MultiplayerSetUp;
 import btc.Main;
 import cls.Aircraft;
 import cls.AircraftBuffer;
+import cls.Waypoint;
+import thr.Packet;
 
 public abstract class NetworkThread extends Thread {
 	
@@ -30,6 +33,8 @@ public abstract class NetworkThread extends Thread {
 	 * The buffer of aircraft with changes requiring synchronisation to the other player
 	 */
 	protected AircraftBuffer aircraftBuffer;
+	
+	protected ArrayList<Packet> packetBuffer;
 	
 	// an ACK used to syncronise the thread execution with the other player's networkThread
 	protected String ack = "ACK";
@@ -70,6 +75,10 @@ public abstract class NetworkThread extends Thread {
 	abstract public void setUp() throws UnknownHostException, IOException;
 	//Test
 	abstract public void testCommunication();
+	
+	public void addToPacketBuffer(Packet packet) {
+		packetBuffer.add(packet);
+	}
 	
 	/**
 	 * Add an aircraft to the thread's aircraft buffer for sync.
@@ -134,19 +143,236 @@ public abstract class NetworkThread extends Thread {
 	 * @param object the object to be sent
 	 */
 	protected void sendObject(Object object){
-		//System.out.println("Sending object");
+		
 		try {
+			
 			objOutputWriter.writeObject(object);
+		
 		} catch (IOException e){
-			//set flags for lobby to report the error.
+			
+			// Set flags for lobby to report the error.
 			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
 			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_SEND);
-			//report error in console
+			
+			// Report error in console
 			System.out.println("IO error when sending object");
 			e.printStackTrace();
-			//kill the thread which caused the error.
+			
+			// Kill the thread which caused the error.
+			killThread();
+			
+		}
+		
+	}
+	
+	protected void syncPacketBuffer() {
+		
+		// Send a handshake
+		Packet handShake = new Packet(Packet.PacketType.HANDSHAKE, new Object[0]);
+		sendObject(handShake);
+		//System.out.println("Sent Handshake");
+		
+		// Recieve the acknowledgement
+		Packet recieve = recievePacket();
+		if (recieve.getType() != Packet.PacketType.ACKNOWLEDGE) {
+			System.err.println("Expected Acknowledgement");
+			return;
+		}
+		
+		//System.out.println("Recieved Acknowledgement");
+		
+		// Get buffer size early in case a packet is added during the send
+		int buffSize = packetBuffer.size();
+		
+		// Tell receiver how many packets to expect
+		Packet buffSizePacket = new Packet(Packet.PacketType.BUFFERSIZE, new Object[] { buffSize } );
+		sendObject(buffSizePacket);
+		
+		//System.out.println("Sent Buffersize");
+		
+		// Send packets
+		for (int i = 0; i < buffSize; i++){
+			
+			Packet temp = packetBuffer.get(i);
+			
+			// Remove packet from buffer
+			packetBuffer.remove(i);
+			
+			sendObject(temp);
+			System.out.println("Sent Packet, type: " + temp.getType().toString());
+		}
+		
+	}
+	
+	protected void recievePacketBuffer(){
+		
+		// Get Packet
+		Packet order = recievePacket();
+		
+		if (order.getType() != Packet.PacketType.HANDSHAKE){
+			System.err.println("Expected handshake");
+			return;
+		}
+		
+		//System.out.println("Recieved Handshake");
+		
+		// Ackowledge the order
+		Packet acknowledge = new Packet(Packet.PacketType.ACKNOWLEDGE, new Object[0]);
+		sendObject(acknowledge);
+		//System.out.println("Sent Acknowledgement");
+		
+		// Get how many packets to expect
+		Packet expectedBuffSize = recievePacket();
+		
+		if (expectedBuffSize.getType() != Packet.PacketType.BUFFERSIZE) {
+			System.err.println("Expected Buffersize, recieved: " + expectedBuffSize.toString());
+			return;
+		}
+		
+		//System.out.println("Recieved Buffersize");
+		
+		int expected = (int) expectedBuffSize.getData()[0];
+		
+		if (expected > 0){
+			System.out.format("Expecting %d packets\n", expected);
+		}
+		
+		
+		// If we recieve -1 sender has exited.
+		if (expected == -1){
+			//quit out
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
 			killThread();
 		}
+		
+		// Get the packets
+		for (int i = 0; i < expected; i++){
+			
+			Packet p = recievePacket();
+			System.out.println("Recieved Packet, type: " + p.getType().toString());
+
+			switch(p.getType()) {
+			case DISCONNECT:
+				escapeThread();
+				break;
+			case NEWFLIGHT:
+				Aircraft newPlane = (Aircraft) p.getData()[0];
+				
+				// Make sure we don't already have this aircraft
+				if (game.existsInAirspace(newPlane) != -2)
+				{
+					System.err.println("Recieved New Flight with aircraft that already exists");
+				} else {
+					game.addFlight(newPlane);
+				}
+				break;
+			case UPDATEWAYPOINT:
+				Aircraft aircraftRecievedWaypoint = (Aircraft) p.getData()[0];
+				int routeIndex = (int) p.getData()[1];
+				Waypoint waypoint = (Waypoint) p.getData()[2];
+				
+				int updateAircraftIndex = game.existsInAirspace(aircraftRecievedWaypoint);
+				
+				if (updateAircraftIndex == -2) {
+					System.err.println("Recieved Update Waypoint with aircraft that does not exist");
+				} else {
+					Aircraft aircraftToUpdate = game.aircraftInAirspace().get(updateAircraftIndex);
+					System.out.println("Update Waypoint data: Aircraft: " + aircraftToUpdate.name() + " RouteIndex: " + routeIndex + " New Waypoint Location: " + waypoint.toString());
+					game.changeFlightPath(aircraftToUpdate, routeIndex, waypoint);
+				}
+				break;
+			case MANUALCONTROL:
+				Aircraft aircraftRecievedManual = (Aircraft) p.getData()[0];
+				Packet.ManualType manualType = (Packet.ManualType) p.getData()[1];
+				
+				int manualAircraftIndex = game.existsInAirspace(aircraftRecievedManual);
+				
+				if (manualAircraftIndex == -2) {
+					System.err.println("Recieved Manual Control with aircraft that does not exist");
+				} else {
+					Aircraft aircraftManuallyControlled = game.aircraftInAirspace().get(manualAircraftIndex);
+					System.out.println("Manual Control data: Aircraft: " + aircraftManuallyControlled.name() + " Manual Control Type: " + manualType.toString());
+					if (manualType == Packet.ManualType.STOP)
+						game.stopOpponentManuallyControlled(aircraftManuallyControlled);
+					else
+						game.opponentManuallyControlling(manualType, aircraftManuallyControlled);
+				}
+				break;
+			}
+		}
+	}
+	
+	protected Packet recievePacket() {
+		
+		try {
+			
+			Packet recieved;
+			recieved = (Packet) objInputStream.readObject();
+			if (recieved.getType() == Packet.PacketType.DISCONNECT) {
+				// Quit out
+				lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+				lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+				killThread();
+			}
+			return recieved;
+			
+		}  catch (ClassNotFoundException e) {
+			
+			// Set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_NOT_FOUND);
+			
+			// Report error in console
+			System.err.println("Could not find class Packet");
+			e.printStackTrace();
+			
+			// Kill the thread which caused the error.
+			killThread();
+			
+		} catch (SocketTimeoutException e){
+			
+			// Set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.SOCKET_TIMEOUT);
+			
+			// Report error in console
+			System.err.println("Timed out communicating with host");
+			
+			// Kill the thread which caused the error.
+			e.printStackTrace();
+			killThread();
+			
+		} catch (IOException e) {
+			
+			// Set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.IO_ERROR_ON_RECIEVE);
+			
+			// Report error in console
+			System.err.println("IOException communicating with host");
+			e.printStackTrace();
+			
+			// Kill the thread which caused the error.
+			killThread();
+			
+		} catch (ClassCastException e){
+			
+			// Set flags for lobby to report the error.
+			lobby.setNetworkState(MultiplayerSetUp.networkStates.CONNECTION_LOST);
+			lobby.setErrorCause(MultiplayerSetUp.errorCauses.CLASS_CAST_EXCEPTION);
+			
+			// Report error in console
+			System.err.println("Recieved object does not match expected: Packet");
+			
+			// Kill the thread which caused the error.
+			killThread();
+			e.printStackTrace();
+			
+		}
+		
+		return null;
+		
 	}
 	
 	/**
@@ -457,5 +683,9 @@ public abstract class NetworkThread extends Thread {
 	 */
 	public int getBufferSize(){
 		return this.aircraftBuffer.size();
+	}
+	
+	public int getPacketBufferSize() {
+		return this.packetBuffer.size();
 	}
 }

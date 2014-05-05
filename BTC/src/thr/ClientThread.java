@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import lib.jog.input;
 import btc.Main;
@@ -44,6 +45,7 @@ public class ClientThread extends NetworkThread {
 		this.main = main;
 		//init aircraftBuffer
 		aircraftBuffer = new AircraftBuffer();
+		packetBuffer = new ArrayList<Packet>();
 		System.out.println("Constructed a client");
 	}
 	
@@ -103,12 +105,13 @@ public class ClientThread extends NetworkThread {
 			syncAircraftBuffer();
 			//sync score
 			syncScore();*/
-			
+			recievePacketBuffer();
 			//sync aircraft
 			//sync to client
-			syncAircraftBuffer();
+			//syncAircraftBuffer();
+			syncPacketBuffer();
 			//sync from client
-			recieveAircraftBuffer();
+			//recieveAircraftBuffer();
 			
 			//sync score
 			syncScore();

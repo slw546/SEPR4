@@ -3,6 +3,7 @@ package scn;
 import java.io.File;
 
 import thr.NetworkThread;
+import thr.Packet;
 import cls.Aircraft;
 import cls.AircraftBuffer;
 import cls.Airport;
@@ -70,6 +71,12 @@ public class MultiplayerGame extends Game {
 	 */
 	private long lastTotalSync = 0l;
 	
+	private boolean manualControlButtonPressed = false; 
+	
+	private Packet.ManualType opponentManualControlType = Packet.ManualType.STOP;
+	
+	private Aircraft opponentManualControlPlane;
+	
 	/**
 	 * The gameType, ie. whether we are the HOST or CLIENT.
 	 * Determined by the TYPE of networkThread associated with this instance
@@ -121,6 +128,7 @@ public class MultiplayerGame extends Game {
 			}
 		};
 		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 32, 128, 25, 18, -6);
+		opponentManualControlPlane = null;
 	}
 	
 	/** 
@@ -140,6 +148,18 @@ public class MultiplayerGame extends Game {
 			return MultiplayerRole.HOST;
 		else
 			return MultiplayerRole.CLIENT;
+	}
+	
+	public void opponentManuallyControlling(Packet.ManualType manualType, Aircraft plane) {
+		opponentManualControlType = manualType;
+		opponentManualControlPlane = plane;
+		plane.setManuallyControlled(true);
+	}
+	
+	public void stopOpponentManuallyControlled(Aircraft plane) {
+		opponentManualControlType = Packet.ManualType.STOP;
+		opponentManualControlPlane = null;
+		plane.setManuallyControlled(false);
 	}
 	
 	//Update and draw
@@ -163,10 +183,30 @@ public class MultiplayerGame extends Game {
 		
 		super.update(dt);
 		
+		if (opponentManualControlType == Packet.ManualType.LEFT) {
+			opponentManualControlPlane.turnLeft(dt);
+		}
+		
+		if (opponentManualControlType == Packet.ManualType.RIGHT) {
+			opponentManualControlPlane.turnRight(dt);
+		}
+		
 		//if holding down the left or right key and has an aircraft selected
-		if (selectedAircraft != null &&
-				(input.isKeyDown(input.KEY_LEFT) || input.isKeyDown(input.KEY_RIGHT))){
-			//selected flight's heading has been manually altered
+		if (selectedAircraft != null) {
+			if (manualControlButtonPressed && !(input.isKeyDown(input.KEY_LEFT)) && !(input.isKeyDown(input.KEY_RIGHT))) {
+				networkThread.addToPacketBuffer(new Packet(Packet.PacketType.MANUALCONTROL, new Object[] { selectedAircraft, Packet.ManualType.NONE }));
+				manualControlButtonPressed = false;
+			}
+			if (!manualControlButtonPressed) {
+				if (input.isKeyDown(input.KEY_LEFT)) {
+					networkThread.addToPacketBuffer(new Packet(Packet.PacketType.MANUALCONTROL, new Object[] { selectedAircraft, Packet.ManualType.LEFT }));
+					manualControlButtonPressed = true;
+				} else if (input.isKeyDown(input.KEY_RIGHT)) {
+					networkThread.addToPacketBuffer(new Packet(Packet.PacketType.MANUALCONTROL, new Object[] { selectedAircraft, Packet.ManualType.RIGHT }));
+					manualControlButtonPressed = true;
+				}
+			}
+			/*//selected flight's heading has been manually altered
 			//send to buffer for sync
 			long sysTime = System.currentTimeMillis();
 			
@@ -183,7 +223,7 @@ public class MultiplayerGame extends Game {
 				lastManualControlSync = sysTime;
 				//reset manual control for local player
 				selectedAircraft.setManuallyControlled(true);
-			}
+			}*/
 		}
 		
 		//Move line if it's been 5 seconds since the last move
@@ -438,7 +478,8 @@ public class MultiplayerGame extends Game {
 		addFlight(a);
 
 		//add the aircraft to the thread's buffer to be sent.
-		networkThread.addToBuffer(a);
+		//networkThread.addToBuffer(a);
+		networkThread.addToPacketBuffer(new Packet(Packet.PacketType.NEWFLIGHT, new Object[] { a }));
        
     }
 	
@@ -507,6 +548,7 @@ public class MultiplayerGame extends Game {
         		break;
         	case input.KEY_ESCAPE:
         		//main.closeScene() called in super.keyReleased.
+        		networkThread.addToPacketBuffer(new Packet(Packet.PacketType.DISCONNECT, new Object[0]));
         		networkThread.escapeThread();
         		break;
         	case input.KEY_UP:
@@ -615,7 +657,9 @@ public class MultiplayerGame extends Game {
         
         // Deselect aircraft on right click
         if (key == input.MOUSE_RIGHT) {
-        	deselectAircraft();	
+        	networkThread.addToPacketBuffer(new Packet(Packet.PacketType.MANUALCONTROL, new Object[] { selectedAircraft, Packet.ManualType.STOP }));
+			manualControlButtonPressed = false;
+        	deselectAircraft();
         }
         
         // Trigger altimeter actions - not in use?
@@ -639,15 +683,18 @@ public class MultiplayerGame extends Game {
     			// 'normal' state
     			if (selectedAircraft.status() == AirportState.NORMAL) {
     				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && controlledByType(w) == gameType && w.isMouseOver(x-16, y-16)) {
-    					selectedAircraft.alterPath(selectedPathpoint, w);
+    					networkThread.addToPacketBuffer(new Packet(Packet.PacketType.UPDATEWAYPOINT, new Object[] { selectedAircraft, selectedPathpoint, w }));
+    					System.out.println("Added packet to buffer; Buffersize: " + networkThread.getPacketBufferSize() + " Aircraft: " + selectedAircraft.name() + " RouteIndex: " + selectedPathpoint + " New Waypoint location: " + w.toString());
+    					changeFlightPath(selectedAircraft, selectedPathpoint, w);
+    					//selectedAircraft.alterPath(selectedPathpoint, w);
     					ordersBox.addOrder(">>> " + selectedAircraft.name()
     							+ " please alter your course");
     					ordersBox.addOrder("<<< Roger that. Altering course now.");
     					selectedPathpoint = -1;
     					selectedWaypoint = null;
     					System.out.println("Flight route was altered");
-    					networkThread.addToBuffer(selectedAircraft);
-    					System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
+    					///networkThread.addToBuffer(selectedAircraft);
+    					//System.out.println("Added flight to buffer; Buffersize: " + networkThread.getBufferSize());
     				} else {
     					selectedWaypoint = null;
     				}
@@ -699,6 +746,10 @@ public class MultiplayerGame extends Game {
         }
         compassDragged = false;
   
+    }
+    
+    public void changeFlightPath(Aircraft a, int routeIndex, Waypoint newWaypoint) {
+    	a.alterPath(routeIndex, newWaypoint);
     }
  
     

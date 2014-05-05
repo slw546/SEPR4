@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import lib.jog.input;
 import btc.Main;
@@ -49,6 +50,7 @@ public class HostThread extends NetworkThread {
 		this.main = main;
 		//init aircraftBuffer
 		aircraftBuffer = new AircraftBuffer();
+		packetBuffer = new ArrayList<Packet>();
 	}
 	
 	@Override
@@ -86,9 +88,12 @@ public class HostThread extends NetworkThread {
 		while(hosting && playing){
 			//Sync aircraft
 			//sync from host
-			recieveAircraftBuffer();
+			//recieveAircraftBuffer();
+			//recievePacketBuffer();
 			//sync to host
-			syncAircraftBuffer();
+			//syncAircraftBuffer();
+			syncPacketBuffer();
+			recievePacketBuffer();
 			//sync score
 			syncScore();
 			
