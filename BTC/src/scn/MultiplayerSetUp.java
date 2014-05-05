@@ -189,7 +189,7 @@ public class MultiplayerSetUp extends Scene {
 		//Create and start a host thread
 		host = new HostThread(port, this, main);
 		//create a game scene to be used when the game starts
-		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.HOST, host);
+		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.HOST, host, this);
 		
 		host.start();
 		host_active = true;
@@ -217,7 +217,7 @@ public class MultiplayerSetUp extends Scene {
 		//create and start a client thread
 		client = new ClientThread(address, port, this, main);
 		//create a game scene to be used when the game starts
-		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.CLIENT, client);
+		game = new MultiplayerGame(main, MultiplayerGame.MultiplayerRole.CLIENT, client, this);
 		client.setGameScene(game);
 		
 		client.start();
@@ -229,10 +229,11 @@ public class MultiplayerSetUp extends Scene {
 		//update the textbox
 		textBox.update(dt);
 		textInput.update(dt);
-		if (state == networkStates.CONNECTION_LOST){
+		if (state == networkStates.CONNECTION_LOST || state == networkStates.NO_CONNECTION){
 			buttons[0].setAvailability(true);
 			buttons[1].setAvailability(true);
 			buttons[2].setAvailability(false);
+			textInput.active = true;
 		}
 		
 		//make start game button available once connection established, but only for the host.

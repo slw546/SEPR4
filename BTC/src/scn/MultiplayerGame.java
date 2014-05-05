@@ -84,6 +84,11 @@ public class MultiplayerGame extends Game {
 	private NetworkThread networkThread;
 	
 	/**
+	 * A handle to the lobby scene
+	 */
+	private MultiplayerSetUp lobby;
+	
+	/**
 	 * The opponent's score
 	 */
 	private int player1Score = 0;
@@ -93,9 +98,10 @@ public class MultiplayerGame extends Game {
 	public lib.ButtonText takeOffButton;
 	
 	//Constructor
-	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread) {
+	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread, MultiplayerSetUp lobby) {
 		super(main, 0);
 		gameType = type;
+		this.lobby = lobby;
 		networkThread = thread;
 		lastTotalSync = System.currentTimeMillis();
 		lastManualControlSync = System.currentTimeMillis();
@@ -188,12 +194,12 @@ public class MultiplayerGame extends Game {
 				case HOST:
 					//move line right
 					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
-						moveSplitLineTo += 1;
+						moveSplitLineTo -= 1;
 					}
 					break;
 				case CLIENT:
 					if (moveSplitLineTo > 0){
-						moveSplitLineTo -= 1;
+						moveSplitLineTo += 1;
 					}
 					break;
 				}
@@ -279,9 +285,9 @@ public class MultiplayerGame extends Game {
 	    	//}
 	    	main.closeScene();
 	    	if (totalScore > player2Score){
-	    		main.setScene(new MultiGameOver(main, score, 1));
+	    		main.setScene(new MultiGameOver(main, score, 1, lobby, networkThread));
 	    	} else {
-	    		main.setScene(new MultiGameOver(main, score, 0));
+	    		main.setScene(new MultiGameOver(main, score, 0, lobby, networkThread));
 	    	}
 	    }
 	@Override

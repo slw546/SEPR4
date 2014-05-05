@@ -1,5 +1,6 @@
 package scn;
 
+import thr.NetworkThread;
 import cls.Vector;
 import lib.SpriteAnimation;
 import lib.jog.audio.Sound;
@@ -27,6 +28,9 @@ public class MultiGameOver extends Scene {
 	//private Aircraft crashedAircraft1;
 	//private Aircraft crashedAircraft2;
 	private int finalScore;
+	
+	private MultiplayerSetUp lobby;
+	private NetworkThread networkThread;
 	
 	/**
 	 * A random number of deaths caused by the crash
@@ -60,7 +64,7 @@ public class MultiGameOver extends Scene {
 	 * @param aircraft1 one of the aircraft involved in the crash
 	 * @param aircraft2 the second aircraft involved in the crash
 	 */
-	public MultiGameOver(Main main,int score, int winner) {
+	public MultiGameOver(Main main,int score, int winner, MultiplayerSetUp lobby, NetworkThread netThread) {
 		super(main);
 		//crashedAircraft1 = aircraft1;
 		//crashedAircraft2 = aircraft2;
@@ -68,6 +72,8 @@ public class MultiGameOver extends Scene {
 		//crash = new Vector(aircraft1.position().x(), aircraft2.position().y(), 0);
 		int framesAcross = 8;
 		int framesDown = 4;
+		this.networkThread = netThread;
+		this.lobby = lobby;
 	}
 	
 	/**
@@ -191,6 +197,8 @@ public class MultiGameOver extends Scene {
 	@Override
 	public void mouseReleased(int key, int x, int y) {
 		main.closeScene();
+    	lobby.setNetworkState(MultiplayerSetUp.networkStates.NO_CONNECTION);
+    	networkThread.endGame();
 	}
 
 	@Override
@@ -208,7 +216,9 @@ public class MultiGameOver extends Scene {
 	@Override
 	public void keyReleased(int key) {
 		if (key == keyPressed) {
-			main.closeScene();
+	    	lobby.setNetworkState(MultiplayerSetUp.networkStates.NO_CONNECTION);
+	    	networkThread.endGame();
+	    	main.closeScene();
 		}
 	}
 

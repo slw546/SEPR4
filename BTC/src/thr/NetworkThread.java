@@ -114,6 +114,11 @@ public abstract class NetworkThread extends Thread {
 	 */
 	abstract public void escapeThread();
 	
+	/**
+	 * End the game cleanly after a game over
+	 */
+	abstract public void endGame();
+	
 	//SEND
 	
 	/*

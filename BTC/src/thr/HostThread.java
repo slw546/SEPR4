@@ -274,6 +274,12 @@ public class HostThread extends NetworkThread {
 
 	}
 	
+	public void endGame(){
+		//set flags to exit while loops
+		this.playing = false;
+		this.hosting = false;
+	}
+	
 	
 	//Getters and Setters
 	public void setGameScene(MultiplayerGame game){
