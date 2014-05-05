@@ -163,10 +163,10 @@ public class MultiplayerGame extends Game {
 			//send to buffer for sync
 			long sysTime = System.currentTimeMillis();
 			
-			//only add the flight if it's been 0.25 secs since it was last synced
+			//only add the flight if it's been 0.1 secs since it was last synced
 			//enforces several syncs in between the last send and this
 			//prevents one side spamming the other player's thread with sends
-			if (lastManualControlSync + 250 < sysTime){
+			if (lastManualControlSync + 100 < sysTime){
 				//unset manual control
 				//prevents other player getting an unselectable aircraft
 				selectedAircraft.setManuallyControlled(false);
