@@ -15,7 +15,7 @@ import cls.Aircraft;
 import cls.AircraftBuffer;
 
 public abstract class NetworkThread extends Thread {
-	
+	// Test
 	//SCENES
 	/**
 	 * The scenes associated with this networkThread instance
