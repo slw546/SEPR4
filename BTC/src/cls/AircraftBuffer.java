@@ -31,6 +31,8 @@ public class AircraftBuffer implements Iterable<Aircraft> {
 	
 	/**
 	 * Gets the aircraft at the specified index.
+	 * Requires monitor lock
+	 * If an out of bounds index is accessed, returns the last element of the list instead.
 	 * @param index the index of the desired aircraft
 	 * @return the aircraft at the given index.
 	 */
@@ -40,7 +42,7 @@ public class AircraftBuffer implements Iterable<Aircraft> {
 		if (index < buffer.size()){
 			a = buffer.get(index);
 		} else {
-			a = buffer.get(buffer.size() - 1);
+			a = buffer.get(-1);
 		}
 		unlockBuffer();
 		return a;
