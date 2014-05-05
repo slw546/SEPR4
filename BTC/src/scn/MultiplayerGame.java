@@ -154,6 +154,7 @@ public class MultiplayerGame extends Game {
 			aircraft.clearScore();
     	}
 		
+		//Main game logic - uses update from scn.Game
 		super.update(dt);
 		
 		//if holding down the left or right key and has an aircraft selected
@@ -263,9 +264,10 @@ public class MultiplayerGame extends Game {
 					player1Score += 10;
 				}
 				// Remove selection of plane and manual control if the plane is selected while crossing the line
-				if (selectedAircraft == tempAircraft)
+				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft))
+					networkThread.addToBuffer(selectedAircraft);
 					deselectAircraft();
-				aircraftList().get(i).setOwner(0);
+					aircraftList().get(i).setOwner(0);
 			}
 		}
 		if (splitLine == 380 || splitLine == 900 ){

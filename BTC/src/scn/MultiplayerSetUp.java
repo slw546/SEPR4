@@ -368,5 +368,9 @@ public class MultiplayerSetUp extends Scene {
 	public void setStartOrdered(boolean order){
 		this.startOrdered = order;
 	}
+	
+	public errorCauses getErrorCause(){
+		return this.error;
+	}
 
 }

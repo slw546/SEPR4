@@ -64,7 +64,6 @@ public class ClientThread extends NetworkThread {
 		
 		while (listening){
 			//carry out pre-game lobby operations.
-			
 			//wait for the order from the host to begin the game
 			String order = recieveString();
 			if (order.equals("start")){
