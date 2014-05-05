@@ -1,11 +1,8 @@
 package thr;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,19 +21,20 @@ public class HostThread extends NetworkThread {
 	 * As a result only one client may be connected at a time.
 	 */
 	
+	// The port to open the socket on.
+		private int portNumber = 4445;
+		
+	// A socket through which communications can take place
+	// communication is bidirectional.
+	// available when a client attempting to connect to the ServerSocket is accepted.
+	private Socket clientSocket = null;
+		
 	// The socket to which clients will attach.
 	// Clients may latch to a ServerSocket to recieve the service
 	// In this case, the service will be the hosting work for the multiplayer mode.
 	// A server socket only needs a port. Clients may access the socket given the IP of the server AND the port used.
 	private ServerSocket socket = null;
-	
-	// A socket through which communications can take place
-	// communication is bidirectional.
-	// available when a client attempting to connect to the ServerSocket is accepted.
-	private Socket clientSocket = null;
-	
-	// The port to open the socket on.
-	private int portNumber = 4445;
+
 	// Flag to raise when we are hosting the service.
 	private boolean hosting = false;
 	//flag to raise when we are playing the game.
@@ -65,7 +63,6 @@ public class HostThread extends NetworkThread {
 		
 		//Sending a test object
 		testCommunication();
-		System.out.println("test object send finished");
 		
 		while (hosting){
 			//If lobby has started the game, send game to client and leave this loop.
@@ -75,45 +72,23 @@ public class HostThread extends NetworkThread {
 			
 			//See if the lobby has clicked start game
 			if (playing){
-				System.out.println("inside if playing");
 				startGame();
 				//exit loop and move to the next loop.
 				break;
 			}
 		}
-		System.out.println("left hosting loop");
-		
+		System.out.println("----------------------------------");
 		while(hosting && playing){
-			//Sync aircraft
-			//sync from host
 			recieveAircraftBuffer();
-			//sync to host
-			syncAircraftBuffer();
-			//sync score
+			sendAircraftBuffer();
 			syncScore();
-			
-			/*//sync aircraft
-			//sync to client
-			syncAircraftBuffer();
-			//sync from client
-			recieveAircraftBuffer();
-			
-			//sync score
-			syncScore();*/
-			
-			//sleep for 1/10th of a second
-			//to reduce network load
+			//sleep for 1/10th of a second to reduce network load
 			try {
 				sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		
-		// alert host that thread is exiting
-		System.out.println("HostThread exiting");
-		
 		//close the sockets on the way out.
 		//allows for a new connection to be started in the lobby without exiting the program
 		try {
@@ -137,7 +112,6 @@ public class HostThread extends NetworkThread {
 			sendObject(game.getTotalScore());
 			//get their score
 			oppScore = recieveInt();
-			//System.out.printf("Sent score: %d, recieved score: %d \n", game.getTotalScore(), oppScore );
 		}
 		
 		if (oppScore == Integer.MAX_VALUE){
@@ -161,7 +135,6 @@ public class HostThread extends NetworkThread {
 	 */
 	@Override
 	public void setUp() throws IOException {
-		System.out.println("Set up start");
 		//get the local address and tell the lobby it
 		//this is the address of the host pc on the LAN
 		InetAddress addr = InetAddress.getLocalHost();
@@ -176,12 +149,9 @@ public class HostThread extends NetworkThread {
 		this.clientSocket = clientSocket;
 		//set up IO
 		//Outputs
-		textOutputWriter = new PrintWriter(clientSocket.getOutputStream());
-		textOutputWriter.flush();
 		objOutputWriter = new ObjectOutputStream(clientSocket.getOutputStream());
 		objOutputWriter.flush();
 		//Inputs
-		textInputStream = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
 		objInputStream = new ObjectInputStream(clientSocket.getInputStream());
 		//Raise hosting flag
 		hosting = true;
@@ -200,7 +170,6 @@ public class HostThread extends NetworkThread {
 	public void startGame(){
 		//Alert client that game has started.
 		String start = "start";
-		System.out.println(start);
 		//send a string which tells client to start the game
 		sendObject(start);
 		lobby.setStartOrdered(true);
@@ -282,7 +251,6 @@ public class HostThread extends NetworkThread {
 	
 	public void setPlaying(boolean playing){
 		this.playing = playing;
-		System.out.println("set playing");
 	}
 	
 }
