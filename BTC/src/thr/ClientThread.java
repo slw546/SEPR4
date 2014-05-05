@@ -236,6 +236,12 @@ public class ClientThread extends NetworkThread {
 		sendObject(Integer.MAX_VALUE);
 	}
 	
+	public void endGame(){
+		//set flags to exit while loops
+		this.playing = false;
+		this.listening = false;
+	}
+	
 	//Getters and Setters
 	public void setGameScene(MultiplayerGame game){
 		this.game = game;
