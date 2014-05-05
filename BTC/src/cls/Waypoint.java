@@ -12,7 +12,7 @@ public class Waypoint implements Serializable {
 	 */
 	private static final long serialVersionUID = 5196702347805188897L;
 
-	public enum WaypointType {
+	public enum WaypointType implements Serializable {
 		AIRSPACE,
 		ENTRY,
 		EXIT,
@@ -134,7 +134,7 @@ public class Waypoint implements Serializable {
 	 * @return the textual representation of the vector
 	 */
 	public String toString() {
-		return ("Pos: " + position.toString() + " | " + "Type: " + type);
+		return ("Pos: " + position.toString() + " | " + "Type: " + type.toString());
 	}
 
 }

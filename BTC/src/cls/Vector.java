@@ -160,8 +160,9 @@ public class Vector implements Serializable {
 	 * Outputs the vectors's details in a readable format.
 	 * @return the textual representation of the vector
 	 */
+	@Override
 	public String toString() {
-		return ("XPos: " + x + " | " + "YPos: " + y + "ZPos: " + z);
+		return ("x: " + x + " | y: " + y + " | z: " + z);
 	}
 
 }

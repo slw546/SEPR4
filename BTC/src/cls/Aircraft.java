@@ -1079,6 +1079,14 @@ public class Aircraft implements Serializable {
 		turnTowardsTarget(0);
 	}
 	
+	// TODO Remove: is for debug only
+	public void printPath() {
+		System.out.println(name() + ": ");
+		for (Waypoint w : route) {
+			System.out.println("\t" + w.toString());
+		}
+	}
+	
 	/**
 	 * Increases the aircraft's altitude.
 	 */
