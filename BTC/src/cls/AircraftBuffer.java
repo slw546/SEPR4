@@ -34,7 +34,7 @@ public class AircraftBuffer implements Iterable<Aircraft> {
 	 * @param index the index of the desired aircraft
 	 * @return the aircraft at the given index.
 	 */
-	public Aircraft get(int index){
+	public synchronized Aircraft get(int index){
 		return buffer.get(index);
 	}
 	
