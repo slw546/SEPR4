@@ -25,11 +25,16 @@
 		text-align: center;
 		margin-top: 110px;
 	}
+	
+	.scroll-adjust{
+		padding-top:110px;
+		margin-top:-110px;
+		}
 	</style>
     
   </head>
 
-  <body>
+  <body data-spy="scroll" data-offset-top="585" data-offset-bottom="425" data-target="#scrollspynavbar">
 
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
@@ -52,16 +57,31 @@
 		</div>
     </div>
 	
-	<div class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-top:50px">
+	<nav class="navbar navbar-default navbar-fixed-top" id="scrollspynavbar" role="navigation" style="margin-top:50px">
 		<div class="container">
 			<div class="collapse navbar-collapse">
 				 <ul class="nav navbar-nav">
-					<li><a href="#">Single Player</a></li>
-					<li><a href="#">Multiplayer</a></li>
+				 	<li><a href="#launchinggame">Launching the game</a></li>
+				 	<li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Single Player <b class="caret"></b></a>
+			          <ul class="dropdown-menu">
+			            <li><a href="#sp_difficulty_selection">Difficulty Selection</a></li>
+			            <li><a href="#sp_interface">Single Player Interface</a></li>
+			            <li><a href="#sp_shop">Shop and Game Success Screen</a></li>
+			          </ul>
+			        </li>
+					<li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Multiplayer <b class="caret"></b></a>
+			          <ul class="dropdown-menu">
+			            <li><a href="#">Difficulty Selection</a></li>
+			            <li><a href="#">Single Player Interface</a></li>
+			            <li><a href="#">Shop and Game Success Screen</a></li>
+			          </ul>
+			        </li>
 				 </ul>
 			</div><!--/.nav-collapse -->
 		</div>
-    </div>
+    </nav>
     
     <div class="container">
 		<div class="row">
@@ -71,8 +91,10 @@
 				take a look at the user manual below.</p>
 			</div>
 		</div>
+		
+		<hr>
 
-		<div class="row">
+		<div class="row scroll-adjust" id="launchinggame">
 			<div class="col-md-12">
 				<h2>Launching the game</h2>
 				
@@ -80,7 +102,7 @@
 				
 				<h3>Main Menu</h3>
 				<p>After launching the game, you will be presented with the following main menu.</p>
-				<img src="img/screenshots/main_menu.png" />
+				<img style="width: 50%" src="img/screenshots/main_menu.png" />
 				<ol>
 					<li>Current date and time are displayed in the top right corner of the main menu.</li>
 					<li>Brief Credits of the development team.</li>
@@ -97,13 +119,13 @@
 		
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Single Player Mode</h2>
+				<h2 id="singleplayer">Single Player Mode</h2>
 				
 				<p>&nbsp;</p>
 				
-				<h3>Difficulty Selection Interface</h3>
+				<h3 id="sp_difficulty_selection">Difficulty Selection Interface</h3>
 				<p>Upon selecting the “PLAY GAME” button on the main menu, you are presented with the following difficulty select screen.</p>
-				<img src="img/screenshots/sp_difficulty_selection.png" />
+				<img style="width: 50%" src="img/screenshots/sp_difficulty_selection.png" />
 				<ol>
 					<li>Selecting the “EASY” button will launch a single player game in easy difficulty, the aircraft here travel at a slow speed.</li>
 					<li>Selecting the “MEDIUM” button will launch a single player game in medium difficulty, the aircraft here travel at a medium speed.</li>
@@ -114,9 +136,9 @@
 				
 				<p>&nbsp;</p>
 				
-				<h3>Single Player Interface</h3>
+				<h3 id="sp_interface">Single Player Interface</h3>
 				<p>After selecting a difficulty you will be presented with the following interface.</p>
-				<img src="img/screenshots/sp_interface.png" />
+				<img style="width: 50%" src="img/screenshots/sp_interface.png" />
 				<ol>
 					<li>The main airspace, this displays aircraft, the waypoints and the the route in which the aircraft is taking.</li>
 					<li>This box contains information about the selected aircraft.</li>
@@ -127,7 +149,7 @@
 				<p>&nbsp;</p>
 				
 				<h4>1. Main Airspace Interface</h4>
-				<img src="img/screenshots/sp_main_airspace_interface.png" />
+				<img style="width: 50%" src="img/screenshots/sp_main_airspace_interface.png" />
 				<ol type="A">
 					<li>Plane Counter, this displays the number of aircraft in the airspace.</li>
 					<li>Timer, this displays the elapsed time since the game began.</li>
@@ -142,7 +164,7 @@
 				</ol>
 				
 				<h3><small>1.J Selected Aircraft</small></h3>
-				<img src="img/screenshots/sp_selected_aircraft.png" />
+				<img style="width: 50%" src="img/screenshots/sp_selected_aircraft.png" />
 				<ol type="I">
 					<li>Plane Bearing, this large green circle denotes the bearing around the aircraft that it can yaw to (in degrees). The green pointer protruding from the aircraft denotes the current bearing, as well as allowing the user to adjust the bearing.</li>
 					<li>Separation Violation Warning, the red circle will surround two aircraft that are at risk of colliding, highlighting a separation violation. The radius that aircraft have to be separated to avoid the points penalty depends on the difficulty setting selected.</li>
@@ -153,7 +175,7 @@
 				<p>&nbsp;</p>
 				
 				<h4>2. Flight Display</h4>
-				<img src="img/screenshots/sp_flight_display.png" />
+				<img style="width: 50%" src="img/screenshots/sp_flight_display.png" />
 				<ol type="A">
 					<li>Flight Code, this is a unique number identifying each flight.</li>
 					<li>Altitude, this is the aircraft’s current altitude.</li>
@@ -166,7 +188,7 @@
 				<p>&nbsp;</p>
 				
 				<h4>3. Altitude Display</h4>
-				<img src="img/screenshots/sp_altitude_display.png" />
+				<img style="width: 50%" src="img/screenshots/sp_altitude_display.png" />
 				<ol type="A">
 					<li>Up Arrow, clicking this button will increase the selected aircraft’s altitude if not already at maximum.</li>
 					<li>Down Arrow, clicking this will decrease the selected aircraft’s altitude if not already at minimum.</li>
@@ -178,7 +200,7 @@
 				<p>&nbsp;</p>
 				
 				<h4>4. Communication Log</h4>
-				<img src="img/screenshots/sp_communication_log.png" />
+				<img style="width: 50%" src="img/screenshots/sp_communication_log.png" />
 				<ol type="A">
 					<li>Incoming Message, (<<<) this denotes information created by the default operations of the aircraft. </li>
 					<li>Outgoing Message, (>>>) this denotes the information relevant to your intervention on the aircraft’s route.</li>
@@ -186,13 +208,80 @@
 				
 				<p>&nbsp;</p>
 				
-				<h3>Shop/Game Success Screen</h3>
-				<img src="sp_shop.png" />
+				<h3 id="sp_shop">Shop/Game Success Screen</h3>
+				<img style="width: 50%" src="img/screenshots/sp_shop.png" />
 				<p>The above screen is shown upon successful completion of the game, it ultimately decides the outcome of your bear’s story.</p>
 				<ol>
 					<li>MONEY, The money you earned during the game (displayed in Rubles).</li>
 					<li>Items: Clicking these items will purchase them, spending your hard earned Rubles and ultimately deciding the fate of you and your cubs.</li>
 				</ol>
+				
+				<p>&nbsp;</p>
+				
+				<h3 id="sp_gameplay">Playing Singleplayer</h3>
+				
+				<h4>Objective</h4>
+				<p>The primary objective of Bear Traffic Control is to earn the maximum amount of money possible by instructing planes so as they travel safely through the airspace, along their intended path between point of origin and destination.</p>
+				<p>To win the game, regardless of money earned, you must successfully guide all planes around the airspace, between its the defined origin/destination points of the plane</p>
+				
+				<h4>Money</h4>
+				<ul>
+					<li>Each plane starts off with a value of 100 Rubles (R100).</li>
+					<li>Poor/careless manoeuvring of planes will result in deductions from a plane’s value:</li>
+					<ul>
+				    	<li>A deduction of between R10-R1 for separation violations.</li>
+				    	<li>A deduction of R2 or R1 for each time the flight plan is altered (i.e., the path changed to use different waypoints).</li>
+				    </ul>
+				    <li>The value of a plane is banked upon it successfully leaving the airspace (having visited the airport if necessary).</li>
+				    <ul>
+				    	<li>Banking is where the value of a plane is added to the total, cumulative score/amount earned.</li>
+				    </ul>
+				</ul>
+				<p>Money can be exchanged for goods and services. A variety of goods are available to purchase in the in-game shop.</p>
+				
+				<h4>Flights</h4>
+				<ul>
+					<li>Each plane will originate from one of the four corners of the map, Moscow, Khorlovo, Peski, or Malino (Clockwise from top-right/North-West, 1.d/2.d).</li>
+					<ul>
+						<li>These four points also act as destinations, along with Chkalovsky Airport (1.h).</li>
+					</ul>
+					<li>The plane will automatically be given a destination (2.e) and a flightpath (1.j.IV) via any assortment of waypoints (1.f) to travel via to reach that destination.</li>
+					<li>The flight will automatically fly along the flightpath, taking the straightest, most direct route permitted by its turn radius, unless the user intervenes.</li>
+					<ul>
+						<li>Altitude (1.j.III, 2.b, 3) will remain fixed unless altered by the player.</li>
+					</ul>
+					<li>The destination will be one of two categories:</li>
+					<ul>
+						<li>One of the origin points, in which case the plane will depart the airspace having reached such point (completed flight).</li>
+						<li>A landing point (1.g), a point that must be passed, in order the plane can subsequently land at the airport (1.h).</li>
+						<ul>
+							<li>In order for a plane to land having passed the landing point, the player must instruct it to do so (i.e., a plane will not land automatically).</li>
+							<li>The plane will circle its assigned landing point until the player clears it to land.</li>
+						</ul>
+					</ul>
+					<li>If the destination is a landing point, upon reaching the terminal and parking (1.i), the player must then clear the aircraft to take off.</li>
+					<ul>
+						<li>Upon take off, the plane will be given a new destination and flightpath (and value).</li>
+						<li>Having taken off, it will then behave as any plane with a destination from (1.d), designated automatically and listed at (2.d).</li>
+					</ul>
+				</ul>
+			
+			</div>
+		</div>
+			
+			<hr>
+			
+		<div class="row">
+			<div class="col-md-12">
+				<h2 id="multiplayer">Multiplayer Mode</h2>
+				<p>Bear Traffic Control supports a two player multiplayer mode which allows two players to play against each other on a local area network.</p>
+				
+				<h3 id="mp_menu_interface">Multiplayer Menu Interface</h3>
+				<p>When the multiplayer button on the main menu is selected, the multiplayer menu is displayed. The escape key can be pressed to return to the main menu. </p>
+				
+				
+				
+				
 			</div>
 		</div>
 			
@@ -200,8 +289,6 @@
 			
     </div>
 
-	
-    </div>
 
 	<div class="footer">
 		<hr>
