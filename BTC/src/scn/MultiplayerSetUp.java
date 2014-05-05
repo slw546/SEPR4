@@ -229,6 +229,8 @@ public class MultiplayerSetUp extends Scene {
 		//update the textbox
 		textBox.update(dt);
 		textInput.update(dt);
+		
+		//reset buttons and text input if connection lost or no connection
 		if (state == networkStates.CONNECTION_LOST || state == networkStates.NO_CONNECTION){
 			buttons[0].setAvailability(true);
 			buttons[1].setAvailability(true);

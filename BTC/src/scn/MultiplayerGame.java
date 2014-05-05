@@ -194,12 +194,12 @@ public class MultiplayerGame extends Game {
 				case HOST:
 					//move line right
 					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
-						moveSplitLineTo -= 1;
+						moveSplitLineTo += 1;
 					}
 					break;
 				case CLIENT:
 					if (moveSplitLineTo > 0){
-						moveSplitLineTo += 1;
+						moveSplitLineTo -= 1;
 					}
 					break;
 				}
