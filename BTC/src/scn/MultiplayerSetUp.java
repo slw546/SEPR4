@@ -131,13 +131,13 @@ public class MultiplayerSetUp extends Scene {
 	@Override
 	public void start() {
 		//Text for the textbox to write to the screen
-		textBox.addText("You are working in a busier workspace with other ACTOs.");
-		textBox.addText("The risk is greater, but so to is the reward.");
-		textBox.addText("Success could buy some comfort in the harsh winter months ahead, for you and your family.");
-		textBox.addText("There are rumours that one of the controllers is very hairy with a gruff voice.");
-		textBox.addText("Do not trust the others. If the humans discover your secret, you will but put in a zoo.");
-		textBox.delay(0.5);
-		textBox.addText("Or worse..");
+		textBox.addText("You are embroiled in competition with a nearby airport.");
+		textBox.addText("There are rumours your opponent is large and hairy with a gruff voice");
+		textBox.addText("He may be like you - a bear - but there is no time for sentimentality");
+		textBox.addText("Winter is approaching. You must provide for your family.");
+		textBox.addText("Defeat the opposing ACTO to secure a promotion.");
+		textBox.addText("If you succeed, you will be greatly rewarded.");
+		textBox.addText("If you fail, the humans may discover you secret..");
 		
 		//Initialise buttons
 		buttons = new lib.ButtonText[3];
@@ -253,7 +253,13 @@ public class MultiplayerSetUp extends Scene {
 		textInput.draw();
 		
 		graphics.setColour(0, 128, 0);
+		graphics.print("Guide planes to their destination to earn money for your family and influence for your airport.",
+				window.width()/2-350, window.height()/2-150);
+		
 		switch (state){
+		case NO_CONNECTION:
+			graphics.print("Connect client to: ", CLIENT_BUTTON_X - 290, CLIENT_BUTTON_Y + 4);
+			break;
 		case WAITING_FOR_CONNECTION:
 			graphics.printCentred("Waiting for a player to join", 0, window.height()/2-30, 1, window.width());
 			graphics.printCentred("Hosting at: " + address + ".", 
@@ -278,6 +284,7 @@ public class MultiplayerSetUp extends Scene {
 			break;
 		case CONNECTION_LOST:
 			graphics.print("Connection lost", window.width()/2-60, window.height()/2-60);
+			graphics.print("Connect client to: ", CLIENT_BUTTON_X - 290, CLIENT_BUTTON_Y + 4);
 			printError();
 			break;
 		default:
