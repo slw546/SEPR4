@@ -1,11 +1,7 @@
 package scn;
 
-import java.io.File;
-
-import cls.Aircraft;
 import cls.Vector;
 import lib.SpriteAnimation;
-import lib.jog.audio;
 import lib.jog.audio.Sound;
 import lib.jog.graphics;
 import lib.jog.graphics.Image;
@@ -17,6 +13,11 @@ public class MultiGameOver extends Scene {
 	 * Text box to write the details of the game failure
 	 */
 	private lib.TextBox textBox;
+	
+	/**
+	 * Whether or not the player won.
+	 */
+	private int winner = 0;
 	
 	/**
 	 * The two crashed aircraft, passed to the scene by the scene
@@ -59,7 +60,7 @@ public class MultiGameOver extends Scene {
 	 * @param aircraft1 one of the aircraft involved in the crash
 	 * @param aircraft2 the second aircraft involved in the crash
 	 */
-	public MultiGameOver(Main main,int score) {
+	public MultiGameOver(Main main,int score, int winner) {
 		super(main);
 		//crashedAircraft1 = aircraft1;
 		//crashedAircraft2 = aircraft2;
@@ -78,35 +79,99 @@ public class MultiGameOver extends Scene {
 		/*if (!Main.testing) {
 			playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
 		}*/
+		switch (winner){
+		case 0:
+			deaths = (int)( Math.random() * 500) + 300;
+			timer = 0;
+			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
+			textBox.addText("Your airspace has been taken over");
+			textBox.delay(0.4);
+			textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((finalScore/20)) + " days.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("With no income, there is no way your family can survive the fast-approaching winter months.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Your wife, Kseniya, leaves you, taking your children Dmitriy and Gustav with her. You spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Game Over.");
+			break;
+		case 1:
+			deaths = (int)( Math.random() * 500) + 300;
+			timer = 0;
+			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
+			textBox.addText("You took over the opposing airspace");
+			textBox.delay(0.4);
+			textBox.addText("It seems you succeeded in controlling and landing more planes than the other ACTO");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("You have been commended for your competance and offered a promotion");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Your success passing as a human will improve the quality of you and your family's life");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("You earned `" + String.valueOf(finalScore) + ". Your promotion will help feed your family for " + String.valueOf((finalScore/20)) + " days.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("You will be comfortable in the fast approaching winter months.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Keep up the good work, ACTO.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Game Over.");
+			break;
+		case 2:
+			deaths = (int)( Math.random() * 500) + 300;
+			timer = 0;
+			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
+			textBox.addText("You somehow drew with the opponent ACTO.");
+			textBox.delay(0.4);
+			textBox.addText("It seems neither of you succeeded in controlling and landing more planes than the other ACTO");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("The airport expects better results. You are at risk of losing your job.");
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((finalScore/20)) + " days.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("If you lose your job, there is no way your family can survive the fast-approaching winter months.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Your wife, Kseniya, will leave you, taking your children Dmitriy and Gustav with her. You will spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
+			textBox.newline();
+			textBox.newline();
+			textBox.delay(0.8);
+			textBox.addText("Game Over.");
+			break;
+		}
 		
-		deaths = (int)( Math.random() * 500) + 300;
-		timer = 0;
-		textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
-		textBox.addText("Your airspace has been taken over");
-		textBox.delay(0.4);
-		textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
-		textBox.newline();
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((finalScore/20)) + " days.");
-		textBox.newline();
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("With no income, there is no way your family can survive the fast-approaching winter months.");
-		textBox.newline();
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("Your wife, Kseniya, leaves you, taking your children Dmitriy and Gustav with her. You spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
-		textBox.newline();
-		textBox.newline();
-		textBox.delay(0.8);
-		textBox.addText("Game Over.");
 	}
 
 	@Override

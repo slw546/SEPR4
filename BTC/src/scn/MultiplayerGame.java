@@ -278,7 +278,11 @@ public class MultiplayerGame extends Game {
 	    		//playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
 	    	//}
 	    	main.closeScene();
-	    	main.setScene(new MultiGameOver(main, score));
+	    	if (totalScore > player2Score){
+	    		main.setScene(new MultiGameOver(main, score, 1));
+	    	} else {
+	    		main.setScene(new MultiGameOver(main, score, 0));
+	    	}
 	    }
 	@Override
     public void draw() {
