@@ -1,5 +1,7 @@
 package scn;
 
+import java.util.Random;
+
 import thr.NetworkThread;
 import cls.Aircraft;
 import cls.AircraftBuffer;
@@ -232,18 +234,19 @@ public class MultiplayerGame extends Game {
 					// Player 1 looses points
 					hostScore -= 20; 
 					// Generating a new route for the aircraft
-					Waypoint origin = tempAircraft.getRoute()[0];
-					Waypoint[] waypoints = tempAircraft.getRoute();
-					int numberOfWaypoints = tempAircraft.getRoute().length;
-					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
-					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
+					regenRoute(i, tempAircraft);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
 					// Player 0 gets points
 					clientScore += 10; 
 				}
-				aircraftList().get(i).setOwner(1);
+				// Remove selection of plane and manual control if the plane is selected while crossing the line
+				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft))
+					networkThread.addToBuffer(selectedAircraft);
+					deselectAircraft();
+					aircraftList().get(i).setOwner(0);
+					aircraftList().get(i).setOwner(1);
 			}
 			else if ((tempAircraft.position().x()< splitLine) && (tempAircraft.owner() == 1)){
 				// If left side aircraft pases to right side
@@ -252,11 +255,7 @@ public class MultiplayerGame extends Game {
 					// Player 0 loses points
 					clientScore -= 20;
 					// Generating a new route
-					Waypoint origin = tempAircraft.getRoute()[0];
-					Waypoint[] waypoints = tempAircraft.getRoute();
-					int numberOfWaypoints = tempAircraft.getRoute().length;
-					Waypoint destination = tempAircraft.getRoute()[numberOfWaypoints - 1];
-					aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
+					regenRoute(i, tempAircraft);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
@@ -273,6 +272,16 @@ public class MultiplayerGame extends Game {
 		if (splitLine == 380 || splitLine == 900 ){
 			multiGameOver(splitLine,hostScore,clientScore);
 		}
+	}
+	
+	private void regenRoute(int i, Aircraft tempAircraft){
+		// Generating a new route for the aircraft
+		Waypoint origin = tempAircraft.getRoute()[0];
+		Waypoint[] waypoints = this.airspaceWaypoints;
+		int numberOfWaypoints = 3;
+		int d = (new Random()).nextInt(flightExitPoints.length);
+		Waypoint destination = flightExitPoints[d];
+		aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
 	}
 	
 	 public void multiGameOver(int linePos, int score1, int score2) {
@@ -346,9 +355,9 @@ public class MultiplayerGame extends Game {
         String earnings = "";
         // Write total score to string for printing
         if (gameType == MultiplayerRole.HOST) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", hostScore, clientScore);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, hostScore);
         } else if (gameType == MultiplayerRole.CLIENT) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", clientScore, hostScore);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, hostScore);
         }
         
         // Print previous string in bottom centre of display
