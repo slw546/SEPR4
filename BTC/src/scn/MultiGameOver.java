@@ -1,6 +1,7 @@
 package scn;
 
 import thr.NetworkThread;
+import cls.Aircraft;
 import cls.Vector;
 import lib.SpriteAnimation;
 import lib.jog.audio.Sound;
@@ -66,12 +67,8 @@ public class MultiGameOver extends Scene {
 	 */
 	public MultiGameOver(Main main,int score, int winner, MultiplayerSetUp lobby, NetworkThread netThread) {
 		super(main);
-		//crashedAircraft1 = aircraft1;
-		//crashedAircraft2 = aircraft2;
 		finalScore = score;
 		//crash = new Vector(aircraft1.position().x(), aircraft2.position().y(), 0);
-		int framesAcross = 8;
-		int framesDown = 4;
 		this.networkThread = netThread;
 		this.lobby = lobby;
 	}
@@ -228,24 +225,10 @@ public class MultiGameOver extends Scene {
 	 * Otherwise, draw the aircraft and explosion
 	 */
 	public void draw() {
-	/*	graphics.setColour(0, 128, 0);
-		graphics.printCentred(crashedAircraft1.name() + 
-				" crashed into " + crashedAircraft2.name() + ".", 0, 32, 2, window.width());
-		if (explosionAnim.hasFinished()) {
-			textBox.draw();
-		} else {
-			crashedAircraft1.draw((int) crashedAircraft1.position().z());
-			crashedAircraft2.draw((int) crashedAircraft1.position().z());
-			Vector midPoint = crash.add(crashedAircraft2.position()).scaleBy(0.5);
-			double radius = 20;
-			graphics.setColour(128,0,0);
-			graphics.circle(false, midPoint.x(), midPoint.y(), radius);
-			explosionAnim.draw();
-		}*/
 		textBox.draw();
-		int opacity = (int)(255 * Math.sin(timer));
-		graphics.setColour(0, 128, 0, opacity);
-		graphics.printCentred("Press any key to continue", 0, window.height() - 100, 1, window.width());
+		graphics.setColour(0, 128, 0);
+		graphics.printCentred("Press any key to continue", 330, 860, 1, 240);
+		super.draw();
 	}
 
 	@Override

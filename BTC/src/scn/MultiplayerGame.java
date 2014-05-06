@@ -315,6 +315,7 @@ public class MultiplayerGame extends Game {
        
         graphics.setColour(0, 128, 0);
         drawScore();
+        super.draw();
     }
 	
 	@Override

@@ -257,7 +257,7 @@ public class Shop extends Scene {
 			graphics.printScaled("PRESS ANY KEY TO RETURN HOME", 300, 800, 2, scale);
 		}
 		graphics.setColour(0, 0, 0); //change colour to black
-
+		super.draw();
 	}
 	
 	/**

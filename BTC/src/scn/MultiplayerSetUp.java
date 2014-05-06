@@ -10,22 +10,26 @@ import btc.Main;
 
 public class MultiplayerSetUp extends Scene {
 	
-	
 	//Places to draw things
-	private final int HOST_BUTTON_W = 128;
-	private final int HOST_BUTTON_H = 16;
-	private final int HOST_BUTTON_X = window.width() / 2;
-	private final int HOST_BUTTON_Y = window.height() / 2 + 60;
+	private final int HOST_BUTTON_W = 620 / 3;
+	private final int HOST_BUTTON_H = 110;
+	private final int HOST_BUTTON_X = 580;
+	private final int HOST_BUTTON_Y = 840;
 	
-	private final int CLIENT_BUTTON_W = 128;
-	private final int CLIENT_BUTTON_H = 16;
-	private final int CLIENT_BUTTON_X = window.width() /2;
-	private final int CLIENT_BUTTON_Y = window.height() / 2 + 90;
+	private final int START_BUTTON_W = HOST_BUTTON_W;
+	private final int START_BUTTON_H = HOST_BUTTON_H;
+	private final int START_BUTTON_X = HOST_BUTTON_X + HOST_BUTTON_W;
+	private final int START_BUTTON_Y = HOST_BUTTON_Y;
 	
-	private final int START_BUTTON_W = 128;
-	private final int START_BUTTON_H = 16;
-	private final int START_BUTTON_X = window.width() /2;
-	private final int START_BUTTON_Y = window.height() / 2 + 120;
+	private final int CLIENT_BUTTON_W = HOST_BUTTON_W;
+	private final int CLIENT_BUTTON_H = HOST_BUTTON_H;
+	private final int CLIENT_BUTTON_X = START_BUTTON_X + START_BUTTON_W;
+	private final int CLIENT_BUTTON_Y = HOST_BUTTON_Y;
+	
+	private final int IP_INPUT_W = 360;
+	private final int IP_INPUT_H = 48;
+	private final int IP_INPUT_X = 480;
+	private final int IP_INPUT_Y = 615;
 	
 	//Network threads
 	private HostThread host;
@@ -86,7 +90,7 @@ public class MultiplayerSetUp extends Scene {
 				return string.matches("\\d+\\.\\d+\\.\\d+\\.\\d+") || string.equals("localhost");
 			}
 		};
-		textInput = new lib.TextInput(CLIENT_BUTTON_X - 140, CLIENT_BUTTON_Y - 4, 132, 24, ip, "127.0.0.1");
+		textInput = new lib.TextInput(IP_INPUT_X, IP_INPUT_Y, IP_INPUT_W, IP_INPUT_H, ip, "127.0.0.1");
 		state = networkStates.NO_CONNECTION;
 	}
 	
@@ -251,41 +255,40 @@ public class MultiplayerSetUp extends Scene {
 	public void draw() {
 		//draw the textbox
 		textBox.draw();
-		textInput.draw();
+		textInput.draw(2);
 		
 		graphics.setColour(0, 128, 0);
 		graphics.print("Guide planes to their destination to earn money for your family and influence for your airport.",
 				window.width()/2-350, window.height()/2-150);
 		
+		graphics.printCentred("[Escape] to return.", 330, 860, 1, 240);
+		
+		int y = window.height()/2-30;
+		
 		switch (state){
 		case NO_CONNECTION:
-			graphics.print("Connect client to: ", CLIENT_BUTTON_X - 290, CLIENT_BUTTON_Y + 4);
+			graphics.printCentred("Connect client to: ", 0, y + 128, 1, window.width());
 			break;
 		case WAITING_FOR_CONNECTION:
-			graphics.printCentred("Waiting for a player to join", 0, window.height()/2-30, 1, window.width());
-			graphics.printCentred("Hosting at: " + address + ".", 
-					0, window.height()/2-10, 1, window.width());
+			graphics.printCentred("Waiting for a player to join", 0, y, 1, window.width());
+			graphics.printCentred("Hosting at: " + address + ".", 0, y + 24, 1, window.width());
 			break;
 		case ATTEMPTING_CONNECTION:
-			graphics.print("Connecting..", window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Connecting...", 0, y, 1, window.width());
 			break;
 		case CONNECTION_ESTABLISHED:
-			graphics.print("Connection established", window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Connection established", 0, y, 1, window.width());
 			if (host_active){
-				graphics.print("Hosting at: " + address + " Port: " + port, 
-						window.width()/2-120, window.height()/2-10);
-				graphics.print("You are the ACTO for Syrrilicovich, on the Left of the airspace.", 
-						window.width()/2-180, window.height()/2-50);
+				graphics.printCentred("Hosting at: " + address + " Port: " + port, 0, y + 24, 1, window.width());
+				graphics.printCentred("You are the ACTO for Syrrilicovich, on the Left of the airspace.", 0, y + 96, 1, window.width());
 			} else {
-				graphics.print("Waiting for the host to start the game.",
-						window.width()/2-120, window.height()/2-10);
-				graphics.print("You are the ACTO for Chkalovsky, on the Right of the airspace.", 
-						window.width()/2-180, window.height()/2-50);
+				graphics.printCentred("Waiting for the host to start the game.", 0, y + 24, 1, window.width());
+				graphics.printCentred("You are the ACTO for Chkalovsky, on the Right of the airspace.", 0, y + 96, 1, window.width());
 			}
 			break;
 		case CONNECTION_LOST:
-			graphics.print("Connection lost", window.width()/2-60, window.height()/2-60);
-			graphics.print("Connect client to: ", CLIENT_BUTTON_X - 290, CLIENT_BUTTON_Y + 4);
+			graphics.printCentred("Connection lost", 0, y - 24, 1, window.width());
+			graphics.printCentred("Connect client to: ", 0, y + 128, 1, window.width());
 			printError();
 			break;
 		default:
@@ -296,45 +299,38 @@ public class MultiplayerSetUp extends Scene {
 		for (lib.ButtonText b : buttons) {
 			b.draw();
 		}
+		super.draw();
 	}
 	
 	private void printError(){
+		int y = window.height()/2-30;;
 		switch(error){
 		case UNKNOWN_HOST:
-			graphics.print("Error: Unknown Host. Check host address and port. ", 
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: Unknown Host. Check host address and port. ", 0, y, 1, window.width());
 			break;
 		case NO_HOST_RUNNING:
-			graphics.print("Error: Host unresponsive or not running.",
-					window.width()/2-60, window.height()/2-30 );
+			graphics.printCentred("Error: Host unresponsive or not running.", 0, y, 1, window.width());
 			break;
 		case SOCKET_IO_UNAVAILABLE:
-			graphics.print("Error: Unable to set up IO streams.", 
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: Unable to set up IO streams.", 0, y, 1, window.width());
 			break;
 		case CLASS_NOT_FOUND:
-			graphics.print("Error: Unknown class recieved.",
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: Unknown class recieved.", 0, y, 1, window.width());
 			break;
 		case IO_ERROR_ON_SEND:
-			graphics.print("Error: IO send failed. Connection lost.",
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: IO send failed. Connection lost.", 0, y, 1, window.width());
 			break;
 		case IO_ERROR_ON_RECIEVE:
-			graphics.print("Error: IO recieve failed. Connection lost. ",
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: IO recieve failed. Connection lost. ", 0, y, 1, window.width());
 			break;
 		case CLOSED_BY_YOU:
-			graphics.print("Connection closed", window.width()/2-60,
-					window.height()/2-30);
+			graphics.printCentred("Connection closed", 0, y, 1, window.width());
 			break;
 		case CLASS_CAST_EXCEPTION:
-			graphics.print("Error: Game quit or Synchronisation failed",
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: Game quit or Synchronisation failed", 0, y, 1, window.width());
 			break;
 		case SOCKET_TIMEOUT:
-			graphics.print("Error: Connection timed out.",
-					window.width()/2-60, window.height()/2-30);
+			graphics.printCentred("Error: Connection timed out.", 0, y, 1, window.width());
 			break;
 		}
 	}

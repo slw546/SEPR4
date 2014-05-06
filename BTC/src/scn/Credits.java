@@ -96,6 +96,7 @@ public class Credits extends Scene {
 		graphics.setColour(0, 128, 0);
 		graphics.push();
 		graphics.translate(0, scrollPosition);
+		graphics.setViewport(0, 0, window.width(), 820);
 		currentHeight += gap;
 		graphics.printCentred("Bear Traffic Controller", 0, currentHeight, 3, window.width());
 		currentHeight += gap * 2;
@@ -177,7 +178,7 @@ public class Credits extends Scene {
 		currentHeight += gap;
 		graphics.printCentred("for their consultation in internal role development.", 0, currentHeight, 2, window.width());
 		
-		currentHeight += gap * 4;
+		currentHeight += gap * 6;
 		
 		graphics.printCentred("Very few bears were harmed in", 0, currentHeight, 2, window.width());
 		currentHeight += gap;
@@ -186,7 +187,11 @@ public class Credits extends Scene {
 		
 		currentHeight += gap * 4;
 		graphics.printCentred("Bear Traffic Controller", 0, currentHeight, 2, window.width());
+		graphics.setViewport();
 		graphics.pop();
+		graphics.printCentred("[Escape] to return.", 330, 860, 1, 240);
+		graphics.printCentred("[Space] to speed up.", 330, 860 + 32, 1, 240);
+		super.draw();
 	}
 
 	@Override

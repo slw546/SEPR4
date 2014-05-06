@@ -11,19 +11,19 @@ import btc.Main;
 public class DifficultySelect extends Scene {
 
 	//Position of things to draw in the window
-	private final int EASY_BUTTON_W = 128;
-	private final int EASY_BUTTON_H = 16;
-	private final int EASY_BUTTON_X = window.width()/4 - (EASY_BUTTON_W / 2);
-	private final int EASY_BUTTON_Y = 2*window.height()/3;
+	private final int EASY_BUTTON_W = 620 / 3;
+	private final int EASY_BUTTON_H = 110;
+	private final int EASY_BUTTON_X = 580;
+	private final int EASY_BUTTON_Y = 840;
 
 	private final int MEDIUM_BUTTON_W = EASY_BUTTON_W;
 	private final int MEDIUM_BUTTON_H = EASY_BUTTON_H;
-	private final int MEDIUM_BUTTON_X = window.width()/2 - (MEDIUM_BUTTON_W / 2);
+	private final int MEDIUM_BUTTON_X = EASY_BUTTON_X + (620 / 3);
 	private final int MEDIUM_BUTTON_Y = EASY_BUTTON_Y;
 
 	private final int HARD_BUTTON_W = EASY_BUTTON_W;
 	private final int HARD_BUTTON_H = EASY_BUTTON_H;
-	private final int HARD_BUTTON_X = 3*window.width()/4 - (HARD_BUTTON_W / 2);
+	private final int HARD_BUTTON_X = MEDIUM_BUTTON_X + (620 / 3);
 	private final int HARD_BUTTON_Y = EASY_BUTTON_Y;
 
 	//list of buttons
@@ -165,21 +165,15 @@ public class DifficultySelect extends Scene {
 		String chooseDifficulty = "Select the difficulty";
 		
 		graphics.setColour(0,128,0);
-		graphics.printCentred(chooseDifficulty, window.width()/2 - 50,
-				window.height()/2 + 50, 1, 100);
-		
-		graphics.rectangle(false, EASY_BUTTON_X, EASY_BUTTON_Y,
-				EASY_BUTTON_W, EASY_BUTTON_H);
-		graphics.rectangle(false, MEDIUM_BUTTON_X, MEDIUM_BUTTON_Y,
-				MEDIUM_BUTTON_W, MEDIUM_BUTTON_H);
-		graphics.rectangle(false, HARD_BUTTON_X, HARD_BUTTON_Y,
-				HARD_BUTTON_W, HARD_BUTTON_H);
+		graphics.printCentred(chooseDifficulty, window.width()/2 - 50,	window.height() * 2 / 3, 1, 100);
 		
 		for (lib.ButtonText b : buttons) {
-			b.draw();
+			b.draw(1.8);
 		}
 		
 		textBox.draw();
+		graphics.printCentred("[Escape] to return.", 330, 860, 1, 240);
+		super.draw();
 	}
 
 	@Override

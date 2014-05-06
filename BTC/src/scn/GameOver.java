@@ -178,9 +178,9 @@ public class GameOver extends Scene {
 			graphics.circle(false, midPoint.x(), midPoint.y(), radius);
 			explosionAnim.draw();
 		}
-		int opacity = (int)(255 * Math.sin(timer));
-		graphics.setColour(0, 128, 0, opacity);
-		graphics.printCentred("Press any key to continue", 0, window.height() - 100, 1, window.width());
+		graphics.setColour(0, 128, 0);
+		graphics.printCentred("Press any key to continue", 330, 860, 1, 240);
+		super.draw();
 	}
 
 	@Override

@@ -83,6 +83,7 @@ public class GameEnding extends Scene {
 		int opacity = (int)(255 * Math.sin(timer));
 		graphics.setColour(0, 128, 0, opacity);
 		graphics.printCentred("Press any key to continue", 0, window.height() - 100, 1, window.width());
+		super.draw();
 	}
 	
 	/**
