@@ -16,7 +16,7 @@ public class Credits extends Scene {
 	 */
 	private final static int SCROLL_SPEED = 64;
 	
-	private final static int SCROLL_LENGTH = 2560;
+	private final static int SCROLL_LENGTH = 3000;
 
 	private float speed;
 
@@ -100,35 +100,46 @@ public class Credits extends Scene {
 		graphics.printCentred("Bear Traffic Controller", 0, currentHeight, 3, window.width());
 		currentHeight += gap * 2;
 
-		graphics.printCentred("Programming", 0, currentHeight, 2, window.width());
-		graphics.printCentred("___________", 0, currentHeight + 8, 2, window.width());
-		graphics.printCentred("__________", 4, currentHeight + 8, 2, window.width());
+		graphics.printCentred("Internal Infrastructure Strategist", 0, currentHeight, 2, window.width());
+		graphics.printCentred("__________________________________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("_________________________________", 4, currentHeight + 8, 2, window.width());
 		currentHeight += gap;
-		graphics.printCentred("Josh Adams", 0, currentHeight, 2, window.width()/3);
-		graphics.printCentred("Huw Taylor", window.width()/3, currentHeight, 2, window.width()/3);
-		graphics.printCentred("Stephen Webb", 2*window.width()/3, currentHeight, 2, window.width()/3);
+		graphics.printCentred("Josh Adams", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
 
-		graphics.printCentred("Website", 0, currentHeight, 2, window.width());
-		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
-		graphics.printCentred("______", 4, currentHeight + 8, 2, window.width());
+		graphics.printCentred("Director of Marketing", 0, currentHeight, 2, window.width());
+		graphics.printCentred("_____________________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("____________________", 4, currentHeight + 8, 2, window.width());
 		currentHeight += gap;
 		graphics.printCentred("Gareth Handley", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
 		
-		graphics.printCentred("Networking", 0, currentHeight, 2, window.width());
-		graphics.printCentred("__________", 0, currentHeight + 8, 2, window.width());
-		graphics.printCentred("_________", 4, currentHeight + 8, 2, window.width());
+		graphics.printCentred("Project Director", 0, currentHeight, 2, window.width());
+		graphics.printCentred("_______________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("______________", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("Sanjit Samaddar", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
+		
+		graphics.printCentred("Senior Functionality Analyst", 0, currentHeight, 2, window.width());
+		graphics.printCentred("____________________________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("___________________________", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("Alex Stewart", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
+		
+		graphics.printCentred("Principal Solutions Facilitator", 0, currentHeight, 2, window.width());
+		graphics.printCentred("_______________________________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("______________________________", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("Huw Taylor", 0, currentHeight, 2, window.width());
+		currentHeight += gap * 2;
+		
+		graphics.printCentred("Creative Consultant for Competative Computer Communiucations", 0, currentHeight, 2, window.width());
+		graphics.printCentred("____________________________________________________________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("___________________________________________________________", 4, currentHeight + 8, 2, window.width());
 		currentHeight += gap;
 		graphics.printCentred("Stephen Webb", 0, currentHeight, 2, window.width());
-		currentHeight += gap * 2;
-
-		graphics.printCentred("Testing", 0, currentHeight, 2, window.width());
-		graphics.printCentred("_______", 0, currentHeight + 8, 2, window.width());
-		graphics.printCentred("______", 4, currentHeight + 8, 2, window.width());
-		currentHeight += gap;
-		graphics.printCentred("Sanjit Samaddar", 0, currentHeight, 2, window.width()/2);
-		graphics.printCentred("Alex Stewart", window.width()/2, currentHeight, 2, window.width()/2);
 		currentHeight += gap * 2;
 		
 		graphics.printCentred("Music", 0, currentHeight, 2, window.width());
@@ -154,10 +165,17 @@ public class Credits extends Scene {
 
 		currentHeight += gap * 4;
 		
-		graphics.printCentred("Special thanks to SEPR Team GOA", 0, currentHeight, 2, window.width());
+		graphics.printCentred("Special Thanks", 0, currentHeight, 2, window.width());
+		graphics.printCentred("______________", 0, currentHeight + 8, 2, window.width());
+		graphics.printCentred("_____________", 4, currentHeight + 8, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("SEPR Team GOA", 0, currentHeight, 2, window.width());
 		currentHeight += gap;
 		graphics.printCentred("for their modifications in stage 3.", 0, currentHeight, 2, window.width());
 		currentHeight += gap * 2;
+		graphics.printCentred("http://www.bullshitjob.com/title/", 0, currentHeight, 2, window.width());
+		currentHeight += gap;
+		graphics.printCentred("for their consultation in internal role development.", 0, currentHeight, 2, window.width());
 		
 		currentHeight += gap * 4;
 		
