@@ -692,7 +692,7 @@ public class MultiplayerGame extends Game {
     
     //Setters
     public void setOpponentScore(int opponentScore) {
-    	if (gameType.equals(MultiplayerRole.HOST) {
+    	if (gameType.equals(MultiplayerRole.HOST)) {
     		this.clientScore = opponentScore;
     	} else if (gameType.equals(MultiplayerRole.CLIENT)) {
     		this.hostScore = opponentScore;
