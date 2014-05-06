@@ -109,20 +109,11 @@ public class Altimeter implements EventHandler {
 	 * Draws the altimeter to the screen
 	 */
 	public void draw() {
-		drawRectangle();
 		if (isVisible) {
 			drawAircraftIcon();
 			drawAltitudes();
 			drawArrows();
 		}
-	}
-	
-	/**
-	 * Draws the box around the altimeter
-	 */
-	private void drawRectangle() {
-		graphics.setColour(0, 128, 0);
-		graphics.rectangle(false, positionX, positionY, width, height);
 	}
 	
 	/**

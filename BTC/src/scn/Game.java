@@ -426,7 +426,6 @@ public class Game extends Scene {
     @Override
     public void draw() {
         graphics.setColour(0, 128, 0);
-        graphics.rectangle(false, 16, 16, window.width() - 32, window.height() - 144);
         graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
         graphics.setColour(255, 255, 255, 60);
         graphics.drawq(background, backgroundQuad, 0, 0);
@@ -454,6 +453,7 @@ public class Game extends Scene {
        
         graphics.setColour(0, 128, 0);
         drawScore();
+        super.draw();
     }
    
     /**
@@ -520,7 +520,6 @@ public class Game extends Scene {
      */
     protected void drawAircraftInfo() {
         graphics.setColour(0, 128, 0);
-        graphics.rectangle(false, AIRCRAFT_INFO_X, AIRCRAFT_INFO_Y, AIRCRAFT_INFO_W, AIRCRAFT_INFO_H);
         if (selectedAircraft != null) {
             graphics.setViewport(AIRCRAFT_INFO_X, AIRCRAFT_INFO_Y, AIRCRAFT_INFO_W, AIRCRAFT_INFO_H);
             graphics.printCentred(selectedAircraft.name(), 0, 5, 2, AIRCRAFT_INFO_W);
