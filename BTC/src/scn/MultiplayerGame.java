@@ -147,9 +147,9 @@ public class MultiplayerGame extends Game {
 		// Update scores if aircraft have gone through waypoints
 		for (Aircraft aircraft : aircraftInAirspace) {
 			if (aircraft.owner() == 0) {
-				player2Score += aircraft.score();
-			} else if (aircraft.owner() == 1) {
 				player1Score += aircraft.score();
+			} else if (aircraft.owner() == 1) {
+				player2Score += aircraft.score();
 			}
 			aircraft.clearScore();
     	}
@@ -184,7 +184,7 @@ public class MultiplayerGame extends Game {
 		//Move line if it's been 5 seconds since the last move
 		if (System.currentTimeMillis() > lastMoveTime + 5000){
 			lastMoveTime = System.currentTimeMillis();
-			if (player2Score > player1Score + 30){
+			if (player1Score > player2Score + 30){
 				switch (gameType){
 				case HOST:
 					//move line right
@@ -198,7 +198,7 @@ public class MultiplayerGame extends Game {
 					}
 					break;
 				}
-			} else if (player2Score + 30 < player1Score) {
+			} else if (player1Score + 30 < player2Score) {
 				//Losing
 				switch (gameType){
 				case HOST:
@@ -271,16 +271,16 @@ public class MultiplayerGame extends Game {
 			}
 		}
 		if (splitLine == 380 || splitLine == 900 ){
-			multiGameOver(player2Score);
+			multiGameOver(splitLine,player1Score,player2Score);
 		}
 	}
 	
-	 public void multiGameOver(int score) {
+	 public void multiGameOver(int line, int score1, int score2) {
 	    main.closeScene();
-    	if (totalScore > player2Score){
-    		main.setScene(new MultiGameOver(main, score, 1, lobby, networkThread));
+    	if (line == 380){
+    		main.setScene(new MultiGameOver(main, score1, 1, lobby, networkThread));
     	} else {
-    		main.setScene(new MultiGameOver(main, score, 0, lobby, networkThread));
+    		main.setScene(new MultiGameOver(main, score2, 0, lobby, networkThread));
     	}
     }
 
