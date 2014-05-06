@@ -71,6 +71,7 @@ public class MultiGameOver extends Scene {
 		//crash = new Vector(aircraft1.position().x(), aircraft2.position().y(), 0);
 		this.networkThread = netThread;
 		this.lobby = lobby;
+		this.winner = winner;
 	}
 	
 	/**

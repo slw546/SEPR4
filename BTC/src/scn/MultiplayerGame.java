@@ -275,9 +275,9 @@ public class MultiplayerGame extends Game {
 		}
 	}
 	
-	 public void multiGameOver(int line, int score1, int score2) {
+	 public void multiGameOver(int linePos, int score1, int score2) {
 	    main.closeScene();
-    	if (line == 380){
+    	if (linePos == 380){
     		//Line is on the left
     		if (gameType.equals(MultiplayerRole.HOST)){
     			//Host lost
