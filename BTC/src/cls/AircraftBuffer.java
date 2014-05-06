@@ -42,7 +42,7 @@ public class AircraftBuffer implements Iterable<Aircraft> {
 		if (index < buffer.size()){
 			a = buffer.get(index);
 		} else {
-			a = buffer.get(-1);
+			a = buffer.get(buffer.size() - 1);
 		}
 		unlockBuffer();
 		return a;

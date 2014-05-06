@@ -184,7 +184,7 @@ public class MultiplayerGame extends Game {
 		//Move line if it's been 5 seconds since the last move
 		if (System.currentTimeMillis() > lastMoveTime + 5000){
 			lastMoveTime = System.currentTimeMillis();
-			if (player2Score > player1Score){
+			if (player2Score > player1Score + 30){
 				switch (gameType){
 				case HOST:
 					//move line right
@@ -198,7 +198,7 @@ public class MultiplayerGame extends Game {
 					}
 					break;
 				}
-			} else if (player2Score < player1Score) {
+			} else if (player2Score + 30 < player1Score) {
 				//Losing
 				switch (gameType){
 				case HOST:
