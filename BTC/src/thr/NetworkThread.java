@@ -60,6 +60,7 @@ public abstract class NetworkThread extends Thread {
 	 * @param aircraft the aircraft to be added
 	 */
 	public void addToBuffer(Aircraft aircraft){
+		if (aircraft == null) return;
 		System.out.println(aircraft.name() + " added to buffer.");
 		//if buffer empty, add new aircraft and return
 		if (aircraftBuffer.size() == 0){
