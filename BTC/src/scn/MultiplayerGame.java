@@ -701,7 +701,11 @@ public class MultiplayerGame extends Game {
     
     //Setters
     public void setOpponentScore(int opponentScore) {
-		this.hostScore = opponentScore;
+    	if (gameType.equals(MultiplayerRole.HOST)) {
+    		this.clientScore = opponentScore;
+    	} else if (gameType.equals(MultiplayerRole.CLIENT)) {
+    		this.hostScore = opponentScore;
+    	}
 	}
     
     public void setLastMoveTime(long moveTime){
