@@ -49,9 +49,9 @@
 			</div>
 			<div class="collapse navbar-collapse">
 				 <ul class="nav navbar-nav navbar-right">
-					<li><a href="#">Home</a></li>
+					<li><a href="index.html">Home</a></li>
 					<li class="active"><a href="#">User Manual</a></li>
-					<li><a href="#contact">Download</a></li>
+					<li><a href="download.html">Download</a></li>
 				 </ul>
 			</div><!--/.nav-collapse -->
 		</div>
@@ -68,16 +68,18 @@
 			            <li><a href="#sp_difficulty_selection">Difficulty Selection</a></li>
 			            <li><a href="#sp_interface">Single Player Interface</a></li>
 			            <li><a href="#sp_shop">Shop and Game Success Screen</a></li>
+						<li><a href="#sp_gameplay">Playing single player</a></li>
 			          </ul>
 			        </li>
 					<li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Multiplayer <b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Difficulty Selection</a></li>
-			            <li><a href="#">Single Player Interface</a></li>
-			            <li><a href="#">Shop and Game Success Screen</a></li>
+			            <li><a href="#mp_menu_interface">Starting a game</a></li>
+			            <li><a href="#mp_interface">Multiplayer Interface</a></li>
+			            <li><a href="#mp_gameplay">Playing Multiplayer</a></li>
 			          </ul>
 			        </li>
+					<li><a href="#controls">Controls</a></li>
 				 </ul>
 			</div><!--/.nav-collapse -->
 		</div>
@@ -117,13 +119,13 @@
 		
 		<hr>
 		
-		<div class="row">
+		<div class="row  scroll-adjust">
 			<div class="col-md-12">
 				<h2 id="singleplayer">Single Player Mode</h2>
 				
 				<p>&nbsp;</p>
 				
-				<h3 id="sp_difficulty_selection">Difficulty Selection Interface</h3>
+				<h3 class="scroll-adjust" id="sp_difficulty_selection">Difficulty Selection Interface</h3>
 				<p>Upon selecting the “PLAY GAME” button on the main menu, you are presented with the following difficulty select screen.</p>
 				<img style="width: 50%" src="img/screenshots/sp_difficulty_selection.png" />
 				<ol>
@@ -136,7 +138,7 @@
 				
 				<p>&nbsp;</p>
 				
-				<h3 id="sp_interface">Single Player Interface</h3>
+				<h3 class="scroll-adjust" id="sp_interface">Single Player Interface</h3>
 				<p>After selecting a difficulty you will be presented with the following interface.</p>
 				<img style="width: 50%" src="img/screenshots/sp_interface.png" />
 				<ol>
@@ -208,7 +210,7 @@
 				
 				<p>&nbsp;</p>
 				
-				<h3 id="sp_shop">Shop/Game Success Screen</h3>
+				<h3 class="scroll-adjust" id="sp_shop">Shop/Game Success Screen</h3>
 				<img style="width: 50%" src="img/screenshots/sp_shop.png" />
 				<p>The above screen is shown upon successful completion of the game, it ultimately decides the outcome of your bear’s story.</p>
 				<ol>
@@ -218,7 +220,7 @@
 				
 				<p>&nbsp;</p>
 				
-				<h3 id="sp_gameplay">Playing Singleplayer</h3>
+				<h3 class="scroll-adjust" id="sp_gameplay">Playing Singleplayer</h3>
 				
 				<h4>Objective</h4>
 				<p>The primary objective of Bear Traffic Control is to earn the maximum amount of money possible by instructing planes so as they travel safely through the airspace, along their intended path between point of origin and destination.</p>
@@ -273,14 +275,73 @@
 			
 		<div class="row">
 			<div class="col-md-12">
-				<h2 id="multiplayer">Multiplayer Mode</h2>
+				<h2 class="scroll-adjust" id="multiplayer">Multiplayer Mode</h2>
 				<p>Bear Traffic Control supports a two player multiplayer mode which allows two players to play against each other on a local area network.</p>
 				
-				<h3 id="mp_menu_interface">Multiplayer Menu Interface</h3>
+				<p>&nbsp;</p>
+				
+				<h3 class="scroll-adjust" id="mp_menu_interface">Multiplayer Menu Interface</h3>
 				<p>When the multiplayer button on the main menu is selected, the multiplayer menu is displayed. The escape key can be pressed to return to the main menu. </p>
+				<img style="width: 50%" src="img/screenshots/mp_menu_interface.png" />
+				<ol>
+					<li>Host LAN Game, this button will host a local game at your ip address using the default port 4444. The escape key can be pressed to stop waiting for a client and return to the main menu.</li>
+					<li>IP Address Box, entering an IP address here with the ip of the host you wish to connect to.</li>
+					<li>Start Client, this button will connect to the IP address entered into the IP Address Box, the game will start when the host selects the Start Game button.</li>
+					<li>Start Game, this button is only visible to the host and when a client has connected, it allows the host to start the game when both players are ready.</li>
+				</ol>
 				
+				<p>&nbsp;</p>
 				
+				<h3 class="scroll-adjust" id="mp_interface">Multiplayer Interface</h3>
+				<p>When the host selects the “Start Game” button, both players are presented with the main multiplayer interface. This is almost identical to the single player interface, however there are some important differences.</p>
+				<ol>
+					<li>Separating Line, this line divides the host’s airspace from the client’s airspace. The host can only select and control aircraft and flight plans on the left side of this line, and the client can only select and control aircraft and flight plans on the right side of this line.</li>
+					<li>Multiplayer Score, this displays your current score on the left and your opponents current score on the right.</li>
+				</ol>
 				
+				<p>&nbsp;</p>
+				
+				<h3 class="scroll-adjust" id="mp_gameplay">Playing Multiplayer</h3>
+				
+				<h4>Objective</h4>
+				<p>Unlike single player, you aren’t playing until the first collision between two aircraft, instead you will be playing against an opponent to expand your territory to cover the entire airspace. To expand your half of the airspace you must accumulate more points than your opponent, doing this will shift the dividing line between towards your opponents side.</p>
+				
+				</div>
+		</div>
+			
+			<hr>
+			
+		<div class="row">
+			<div class="col-md-12">
+				
+				<h2 class="scroll-adjust" id="controls">Controls</h2>
+				
+				<p>&nbsp;</p>
+				
+				<h4>Select a Plane</h4>
+				<p>To select a plane, simply left-click the plane. This will select it, update the Flight Display (2), and display the plane overlay (1.j). N.B. Planes are not selectable upon approach for landing and during take-off. When selecting a plane parked at the terminal, the plane overlay will not display (as you cannot directly control it), however the Flight Display will still update.</p>
+				
+				<h4>Yaw a Plane</h4>
+				<p>To alter a selected plane’s bearing, either left click any area within the bearing ring (1.j.I) to make the plane turn to face that bearing/direction, or use the arrow keys ←/→ to turn anti-clockwise (nose turns left, relatively) and clockwise (nose turns right, relatively) respectively.</p>
+				
+				<h4>Alter Altitude</h4>
+				<p>To change the altitude of the plane that is selected, either click 3.a or 3.b to increase/decrease altitude respectively, or by pressing the arrow keys ↑/↓ to increase/decrease.</p>
+				
+				<img style="width: 50%" src="img/screenshots/mp_flightpath.png" />
+				
+				<h4>Change Flightpath</h4>
+				<p>To modify the flightpath of a plane, with the plane selected, click and drag a waypoint 1.f that is along the flightpath 1.j.IV, releasing when the (darker) blue line is over another waypoint. Beware that doing this will incur a penalty as detailed in the money section previously, mostly due to the nausea caused to the passengers as the plane rolls to-and-fro while you zig and zag in your bewildered incompetence.</p>
+				
+				<h4>Landing</h4>
+				<p>To clear the currently selected plane to land, simply press the L key once it has passed through its landing point 1.g. Once you have cleared it to land, you will relinquish manual control, as it automatically approaches the runway (going offscreen if required). It will remain unselectable until it reaches and parks at the terminal. Once it has reached the terminal it is immediately selectable, due to an elaborate scam whereby passengers can be charged twice if they don’t have time to disembark.</p>
+				
+				<h4>Take-Off</h4>
+				<p>To take off, first select a parked plane, then press the T key. As with landing, the plane will deselect and cannot be selected until it has finished taking off and is at cruising altitude, at which point it is safe to use your in-flight electronics and refreshments will be served alongside a light lunch.</p>
+				
+				<p>&nbsp;</p>
+				
+				<h3 class="scroll-adjust" id="key_bindings">Key Bindings</h3>
+				<img style="width: 80%" src="img/screenshots/mp_key_bindings.png" />
 				
 			</div>
 		</div>
