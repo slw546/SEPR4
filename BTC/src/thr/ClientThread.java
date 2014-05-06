@@ -68,7 +68,7 @@ public class ClientThread extends NetworkThread {
 			String order = recieveString();
 			if (order.equals("start")){
 				lobby.setStartOrdered(true);
-				game.setLastMoveTime(System.currentTimeMillis());
+				game.setLastMoveTime(System.currentTimeMillis()- 100);
 				this.playing = true;
 				break;
 			}
