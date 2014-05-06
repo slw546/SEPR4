@@ -281,7 +281,10 @@ public class MultiplayerGame extends Game {
 		int numberOfWaypoints = 3;
 		int d = (new Random()).nextInt(flightExitPoints.length);
 		Waypoint destination = flightExitPoints[d];
-		aircraftList().get(i).findGreedyRoute(origin, destination, waypoints);
+		aircraftList().get(i).setRoute(aircraftList().get(i).findGreedyRoute(origin, destination, waypoints));
+		if (gameType.equals(MultiplayerRole.HOST)){
+			networkThread.addToBuffer(selectedAircraft);
+		}
 	}
 	
 	 public void multiGameOver(int linePos, int score1, int score2) {
