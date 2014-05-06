@@ -564,9 +564,9 @@ public class Game extends Scene {
         double seconds = timeElapsed % 60;
         java.text.DecimalFormat df = new java.text.DecimalFormat("00.00");
         String timePlayed = String.format("%d:%02d:", hours, minutes) + df.format(seconds);
-        graphics.print(timePlayed, window.width() - (timePlayed.length() * 8 + 32), 0);
+        graphics.print(timePlayed, window.width() - (timePlayed.length() * 8 + 32), 30);
         graphics.print(String.valueOf(aircraftInAirspace.size())
-        		+ " aircraft in the airspace.", 32, 0);
+        		+ " aircraft in the airspace.", 32, 30);
        
         // GOA CODE FOLLOWS
         
@@ -575,7 +575,7 @@ public class Game extends Scene {
         
         // Print previous string in bottom centre of display
         graphics.print(earnings, ((window.width()/2)-((earnings.length()*8)/2)),
-        		ORDERSBOX_Y - 20);
+        		ORDERSBOX_Y - 40);
     }
 
     /**
