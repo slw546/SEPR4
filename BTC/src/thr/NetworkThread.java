@@ -250,7 +250,7 @@ public abstract class NetworkThread extends Thread {
 		try {
 			Aircraft recieved;
 			//read an aircraft from the stream
-			recieved = (Aircraft) objInputStream.readObject();
+			recieved = (Aircraft) objInputStream.readUnshared();
 			return recieved;
 		} catch (ClassNotFoundException e) {
 			//set flags for lobby to report the error.
