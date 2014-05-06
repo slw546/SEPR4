@@ -278,9 +278,21 @@ public class MultiplayerGame extends Game {
 	 public void multiGameOver(int line, int score1, int score2) {
 	    main.closeScene();
     	if (line == 380){
-    		main.setScene(new MultiGameOver(main, score1, 1, lobby, networkThread));
+    		//Line is on the left
+    		if (gameType.equals(MultiplayerRole.HOST)){
+    			//Host lost
+    			main.setScene(new MultiGameOver(main, score1, 0, lobby, networkThread));
+    		} else {
+    			main.setScene(new MultiGameOver(main, score1, 1, lobby, networkThread));
+    		}
     	} else {
-    		main.setScene(new MultiGameOver(main, score2, 0, lobby, networkThread));
+    		//Line is on the right
+    		if (gameType.equals(MultiplayerRole.CLIENT)){
+    			//Client lost
+    			main.setScene(new MultiGameOver(main, score2, 0, lobby, networkThread));
+    		} else {
+    			main.setScene(new MultiGameOver(main, score2, 1, lobby, networkThread));
+    		}
     	}
     }
 
