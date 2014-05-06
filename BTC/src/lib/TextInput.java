@@ -150,7 +150,7 @@ public class TextInput implements lib.jog.input.EventHandler {
 	@Override
 	public void keyReleased(int key) { }
 	
-	public void draw() {
+	public void draw(double size) {
 		if (!active) return;
 		lib.jog.graphics.rectangle(false, x, y, width, height);
 		if (valid) {
@@ -158,9 +158,10 @@ public class TextInput implements lib.jog.input.EventHandler {
 		} else {
 			lib.jog.graphics.setColour(128, 32, 32);
 		}
-		lib.jog.graphics.print(text, x + 4, y + 8);
+		int textY = y + (int) ((height - 8*size) / 2);
+		lib.jog.graphics.print(text, x + 4, textY, size);
 		if (selected && cursorShown) {
-			lib.jog.graphics.rectangle(true, x + cursorLocation * charWidth + 4, y + 4, 2, height-8);
+			lib.jog.graphics.rectangle(true, x + cursorLocation * size * charWidth + 4, y + 8, 2, height - 16);
 		}
 	}
 	

@@ -37,8 +37,8 @@ public class ButtonText {
 		this.y = y;
 		width = w;
 		height = h;
-		this.ox = (w - (text.length() * 8)) / 2;
-		this.oy = (h - 8) / 2;
+		this.ox = 0;
+		this.oy = 0;
 		colourDefault = new org.newdawn.slick.Color(0, 128, 0);
 		colourHover = new org.newdawn.slick.Color(128, 128, 128);
 		colourUnavailable = new org.newdawn.slick.Color(64, 64, 64);
@@ -64,6 +64,10 @@ public class ButtonText {
 	}
 	
 	public void draw() {
+		draw(1);
+	}
+	
+	public void draw(double size) {
 		if (!available) {
 			graphics.setColour(colourUnavailable);
 		}
@@ -72,7 +76,19 @@ public class ButtonText {
 		} else {
 			graphics.setColour(colourDefault);
 		}
-		graphics.print(text, x + ox, y + oy);
+		graphics.printCentred(text, x + ox, y + oy + (height - 16) / 2, size, width);
+	}
+	
+	public void drawBorder() {
+		if (!available) {
+			graphics.setColour(colourUnavailable);
+		}
+		else if (isMouseOver()) {
+			graphics.setColour(colourHover);
+		} else {
+			graphics.setColour(colourDefault);
+		}
+		graphics.rectangle(false, x, y, width, height);
 	}
 
 }
