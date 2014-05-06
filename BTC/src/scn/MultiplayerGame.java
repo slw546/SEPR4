@@ -591,7 +591,9 @@ public class MultiplayerGame extends Game {
         
         // Deselect aircraft on right click
         if (key == input.MOUSE_RIGHT) {
+        	Aircraft temp =selectedAircraft;
         	deselectAircraft();	
+        	networkThread.addToBuffer(temp);
         }
         
         // Trigger altimeter actions - not in use?
