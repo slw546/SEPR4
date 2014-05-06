@@ -79,7 +79,11 @@ public class AircraftBuffer implements Iterable<Aircraft> {
 	 */
 	public void remove(int index){
 		lockBuffer();
+		try {
 		buffer.remove(index);
+		} catch (IndexOutOfBoundsException e) {
+			e.printStackTrace();
+		}
 		unlockBuffer();
 	}
 	

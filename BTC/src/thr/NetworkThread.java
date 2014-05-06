@@ -145,7 +145,7 @@ public abstract class NetworkThread extends Thread {
 		sendObject(order);
 		//get ack
 		String recv = recieveString();
-		if (!recv.equals(ack)){
+		if (recv == null || !recv.equals(ack)){
 			return;
 		}
 		//get buffSize early in case a flight is added during the send
@@ -192,7 +192,7 @@ public abstract class NetworkThread extends Thread {
 		//get order
 		String order = recieveString();
 		
-		if (!order.equals("aircraft")){
+		if (order == null || !order.equals("aircraft")){
 			return;
 		}
 		
