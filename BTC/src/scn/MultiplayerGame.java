@@ -485,17 +485,6 @@ public class MultiplayerGame extends Game {
 	public void keyReleased(int key) {
 		super.keyReleased(key);
         switch (key) {
-        	case input.KEY_Q:
-        	//	if (moveSplitLineTo > 0)
-        	//		moveSplitLineTo -= 1;
-        		player1Score += 25;
-        		break;
-
-        	case input.KEY_E:
-        		//if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
-        	//		moveSplitLineTo += 1;
-        		player2Score += 25;
-        		break;
         	case input.KEY_ESCAPE:
         		//main.closeScene() called in super.keyReleased.
         		networkThread.escapeThread();
