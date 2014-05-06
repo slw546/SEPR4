@@ -101,7 +101,7 @@ public class GameOver extends Scene {
 		textBox.newline();
 		textBox.newline();
 		textBox.delay(0.8);
-		textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((finalScore/20)) + " days.");
+		textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((Math.abs(finalScore/20))) + " days.");
 		textBox.newline();
 		textBox.newline();
 		textBox.delay(0.8);
