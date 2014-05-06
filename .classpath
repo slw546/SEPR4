@@ -12,7 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="BTC/ext/junit-4.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="BTC/ext/lwjgl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="BTC/BTC/ext/natives"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="baretrafficcontrol/BTC/ext/natives"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="BTC/ext/slick.jar"/>
