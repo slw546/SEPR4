@@ -83,8 +83,8 @@ public class MultiplayerGame extends Game {
 	/**
 	 * The opponent's score
 	 */
-	private int player1Score = 0;
-	private int player2Score = 0;
+	private int hostScore = 0;
+	private int clientScore = 0;
 	
 	public lib.ButtonText landButton;
 	public lib.ButtonText takeOffButton;
@@ -147,9 +147,9 @@ public class MultiplayerGame extends Game {
 		// Update scores if aircraft have gone through waypoints
 		for (Aircraft aircraft : aircraftInAirspace) {
 			if (aircraft.owner() == 0) {
-				player1Score += aircraft.score();
+				hostScore += aircraft.score();
 			} else if (aircraft.owner() == 1) {
-				player2Score += aircraft.score();
+				clientScore += aircraft.score();
 			}
 			aircraft.clearScore();
     	}
@@ -184,7 +184,7 @@ public class MultiplayerGame extends Game {
 		//Move line if it's been 5 seconds since the last move
 		if (System.currentTimeMillis() > lastMoveTime + 5000){
 			lastMoveTime = System.currentTimeMillis();
-			if (player1Score > player2Score + 30){
+			if (hostScore > clientScore + 30){
 				switch (gameType){
 				case HOST:
 					//move line right
@@ -198,7 +198,7 @@ public class MultiplayerGame extends Game {
 					}
 					break;
 				}
-			} else if (player1Score + 30 < player2Score) {
+			} else if (hostScore + 30 < clientScore) {
 				//Losing
 				switch (gameType){
 				case HOST:
@@ -230,7 +230,7 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the left side
 					// Player 1 looses points
-					player1Score -= 20; 
+					hostScore -= 20; 
 					// Generating a new route for the aircraft
 					Waypoint origin = tempAircraft.getRoute()[0];
 					Waypoint[] waypoints = tempAircraft.getRoute();
@@ -241,7 +241,7 @@ public class MultiplayerGame extends Game {
 				else{
 					// The aircraft has automatically flown over to the left side
 					// Player 0 gets points
-					player2Score += 10; 
+					clientScore += 10; 
 				}
 				aircraftList().get(i).setOwner(1);
 			}
@@ -250,7 +250,7 @@ public class MultiplayerGame extends Game {
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the right side
 					// Player 0 loses points
-					player2Score -= 20;
+					clientScore -= 20;
 					// Generating a new route
 					Waypoint origin = tempAircraft.getRoute()[0];
 					Waypoint[] waypoints = tempAircraft.getRoute();
@@ -261,7 +261,7 @@ public class MultiplayerGame extends Game {
 				else{
 					// The aircraft has been automatically flown over to the right side
 					// Player 1 gets points
-					player1Score += 10;
+					hostScore += 10;
 				}
 				// Remove selection of plane and manual control if the plane is selected while crossing the line
 				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft))
@@ -271,7 +271,7 @@ public class MultiplayerGame extends Game {
 			}
 		}
 		if (splitLine == 380 || splitLine == 900 ){
-			multiGameOver(splitLine,player1Score,player2Score);
+			multiGameOver(splitLine,hostScore,clientScore);
 		}
 	}
 	
@@ -334,9 +334,9 @@ public class MultiplayerGame extends Game {
         String earnings = "";
         // Write total score to string for printing
         if (gameType == MultiplayerRole.HOST) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", player1Score, player2Score);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", hostScore, clientScore);
         } else if (gameType == MultiplayerRole.CLIENT) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", player2Score, player1Score);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", clientScore, hostScore);
         }
         
         // Print previous string in bottom centre of display
@@ -680,7 +680,7 @@ public class MultiplayerGame extends Game {
     
     //Setters
     public void setOpponentScore(int opponentScore) {
-		this.player1Score = opponentScore;
+		this.hostScore = opponentScore;
 	}
     
     public void setLastMoveTime(long moveTime){
@@ -689,7 +689,7 @@ public class MultiplayerGame extends Game {
     
     @Override
     protected void crash(Aircraft aircraft, int collisionState) {
-    	player2Score -= 100; 
+    	clientScore -= 100; 
     	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
     	main.screenShake(24, 0.6);
     }
