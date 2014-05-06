@@ -275,7 +275,7 @@ public class Game extends Scene {
         		new Waypoint(1160, 311, Waypoint.WaypointType.AIRPORT),
         		new Waypoint(1183, 340, Waypoint.WaypointType.AIRPORT),
         		new Waypoint(1194, 374, Waypoint.WaypointType.AIRPORT),
-        		new Waypoint(1195, 412, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(1182, 412, Waypoint.WaypointType.AIRPORT),
         };
         takeoffWaypoints = new Waypoint[] {
         		new Waypoint(1145, 342, Waypoint.WaypointType.AIRPORT),
@@ -316,7 +316,7 @@ public class Game extends Scene {
         		new Waypoint(78, 497, Waypoint.WaypointType.AIRPORT),
         		new Waypoint(53, 464, Waypoint.WaypointType.AIRPORT),
         		new Waypoint(39, 424, Waypoint.WaypointType.AIRPORT),
-        		new Waypoint(44, 393, Waypoint.WaypointType.AIRPORT),
+        		new Waypoint(54, 389, Waypoint.WaypointType.AIRPORT),
         };
         takeoffWaypoints = new Waypoint[] {
         		new Waypoint(94, 462, Waypoint.WaypointType.AIRPORT),
