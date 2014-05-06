@@ -1,10 +1,13 @@
 package scn;
 
+import java.io.File;
+
 import lib.jog.audio;
 
 public abstract class Scene implements lib.jog.input.EventHandler {
 	
-
+	protected lib.jog.graphics.Image monitorImage;
+	
 	protected btc.Main main;
 	
 	/**
@@ -13,6 +16,7 @@ public abstract class Scene implements lib.jog.input.EventHandler {
 	 */
 	protected Scene(btc.Main main) {
 		this.main = main;
+		monitorImage = lib.jog.graphics.newImage("gfx" + File.separator + "monitor.png");
 	}
 	
 	/**
@@ -31,7 +35,10 @@ public abstract class Scene implements lib.jog.input.EventHandler {
 	 * Handles drawing of all drawable objects in the scene to the window
 	 * Runs regularly when called by main
 	 */
-	abstract public void draw();
+	public void draw() {
+		lib.jog.graphics.setColour(255, 255, 255);
+		lib.jog.graphics.draw(monitorImage, 0, 0);
+	}
 	
 	/**
 	 * Used to cleanly exit a scene, e.g. halting the scene's music so it does not overlap the next scene's music
