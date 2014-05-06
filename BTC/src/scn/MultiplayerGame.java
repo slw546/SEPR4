@@ -358,6 +358,7 @@ public class MultiplayerGame extends Game {
         graphics.line(splitLine, 0, splitLine, window.height() - 144);
         
         graphics.setColour(255, 255, 255);
+        
         for (Aircraft aircraft : aircraftInAirspace) {
             aircraft.draw(0);
         }
