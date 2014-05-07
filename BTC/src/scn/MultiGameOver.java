@@ -19,45 +19,14 @@ public class MultiGameOver extends Scene {
 	/**
 	 * Whether or not the player won.
 	 */
-	private int winner = 0;
+	private boolean winner = false;
 	
-	/**
-	 * The two crashed aircraft, passed to the scene by the scene
-	 * in which they crashed. Used to position the explosion, and
-	 * provide graphical feedback of how and where the player failed.
-	 */
-	//private Aircraft crashedAircraft1;
-	//private Aircraft crashedAircraft2;
 	private int finalScore;
 	
 	private MultiplayerSetUp lobby;
 	private NetworkThread networkThread;
 	
-	/**
-	 * A random number of deaths caused by the crash
-	 */
-	private int deaths;
-	
-	/**
-	 * The position of the crash - the vector midpoint of the positions
-	 * of the two crashed aircraft
-	 */
-	private Vector crash;
-	/**
-	 * A sprite animation to handle the frame by frame drawing of the explosion
-	 */
-	private SpriteAnimation explosionAnim;
-	/**
-	 * The explosion image to use for the animation
-	 */
-	private Image explosion;
-	
 	private int keyPressed;
-	
-	/**
-	 * Timer to allow for explosion and aircraft to be shown for a period, followed by the text box.
-	 */
-	private double timer;
 	
 	/**
 	 * Constructor for the Game Over scene
@@ -65,10 +34,9 @@ public class MultiGameOver extends Scene {
 	 * @param aircraft1 one of the aircraft involved in the crash
 	 * @param aircraft2 the second aircraft involved in the crash
 	 */
-	public MultiGameOver(Main main,int score, int winner, MultiplayerSetUp lobby, NetworkThread netThread) {
+	public MultiGameOver(Main main, int score, boolean winner, MultiplayerSetUp lobby, NetworkThread netThread) {
 		super(main);
 		finalScore = score;
-		//crash = new Vector(aircraft1.position().x(), aircraft2.position().y(), 0);
 		this.networkThread = netThread;
 		this.lobby = lobby;
 		this.winner = winner;
@@ -80,43 +48,7 @@ public class MultiGameOver extends Scene {
 	 */
 	@Override
 	public void start() {
-		/*if (!Main.testing) {
-			playSound(audio.newSoundEffect("sfx" + File.separator + "crash.ogg"));
-		}*/
-		switch (winner){
-		case 0:
-			deaths = (int)( Math.random() * 500) + 300;
-			timer = 0;
-			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
-			textBox.addText("Your airspace has been taken over");
-			textBox.delay(0.4);
-			textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
-			textBox.newline();
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("You earned `" + String.valueOf(finalScore) + ", a pitiful amount that will barely feed your family for " + String.valueOf((finalScore/20)) + " days.");
-			textBox.newline();
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("With no income, there is no way your family can survive the fast-approaching winter months.");
-			textBox.newline();
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("Your wife, Kseniya, leaves you, taking your children Dmitriy and Gustav with her. You spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
-			textBox.newline();
-			textBox.newline();
-			textBox.delay(0.8);
-			textBox.addText("Game Over.");
-			break;
-		case 1:
-			deaths = (int)( Math.random() * 500) + 300;
-			timer = 0;
+		if (winner) {
 			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
 			textBox.addText("You took over the opposing airspace");
 			textBox.delay(0.4);
@@ -143,17 +75,14 @@ public class MultiGameOver extends Scene {
 			textBox.newline();
 			textBox.delay(0.8);
 			textBox.addText("Game Over.");
-			break;
-		case 2:
-			deaths = (int)( Math.random() * 500) + 300;
-			timer = 0;
+		} else {
 			textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
-			textBox.addText("You somehow drew with the opponent ACTO.");
+			textBox.addText("Your airspace has been taken over");
 			textBox.delay(0.4);
-			textBox.addText("It seems neither of you succeeded in controlling and landing more planes than the other ACTO");
+			textBox.addText("It seems the other ATCO has succeeded in controlling and landing more planes than you");
 			textBox.newline();
 			textBox.delay(0.8);
-			textBox.addText("The airport expects better results. You are at risk of losing your job.");
+			textBox.addText("The inquery into your incompetance will lead to humanity discovering your true bear nature.");
 			textBox.newline();
 			textBox.delay(0.8);
 			textBox.addText("Your failure to pass as a human, will gnaw at you and you will have to revert to your drinking problem to attempt to cope.");
@@ -164,16 +93,15 @@ public class MultiGameOver extends Scene {
 			textBox.newline();
 			textBox.newline();
 			textBox.delay(0.8);
-			textBox.addText("If you lose your job, there is no way your family can survive the fast-approaching winter months.");
+			textBox.addText("With no income, there is no way your family can survive the fast-approaching winter months.");
 			textBox.newline();
 			textBox.newline();
 			textBox.delay(0.8);
-			textBox.addText("Your wife, Kseniya, will leave you, taking your children Dmitriy and Gustav with her. You will spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
+			textBox.addText("Your wife, Kseniya, leaves you, taking your children Dmitriy and Gustav with her. You spiral into decline until your problems drive you to take up a new, false identity, that you might once again direct air traffic.");
 			textBox.newline();
 			textBox.newline();
 			textBox.delay(0.8);
 			textBox.addText("Game Over.");
-			break;
 		}
 		
 	}
@@ -184,7 +112,6 @@ public class MultiGameOver extends Scene {
 	 * otherwise, update text box instead
 	 */
 	public void update(double dt) {
-			timer += dt;
 			textBox.update(dt);
 	}
 

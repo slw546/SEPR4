@@ -109,7 +109,7 @@ public class HostThread extends NetworkThread {
 		String recv = recieveString();
 		if (recv.equals(ack)){
 			//send our score
-			sendObject(game.getTotalScore());
+			sendObject(game.getSelfScore());
 			//get their score
 			oppScore = recieveInt();
 		}

@@ -120,7 +120,7 @@ public class ClientThread extends NetworkThread {
 		//get their score
 		int oppScore = recieveInt();
 		//send our score
-		sendObject(game.getTotalScore());
+		sendObject(game.getSelfScore());
 		if (oppScore == Integer.MAX_VALUE){
 			//Other player is quitting, and their quit signal has been picked up here.
 			//therefore, quit the game

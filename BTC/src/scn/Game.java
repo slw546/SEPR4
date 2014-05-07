@@ -351,9 +351,9 @@ public class Game extends Scene {
     	ordersBox.update(dt);
     	
     	for (Aircraft aircraft : aircraftInAirspace) {
-    		aircraft.update(dt);
-			totalScore += aircraft.score();
+    		totalScore += aircraft.score();
 			aircraft.clearScore();
+    		aircraft.update(dt);
     	}
 
     	checkCollisions(dt);

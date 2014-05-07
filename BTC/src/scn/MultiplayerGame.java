@@ -34,28 +34,40 @@ public class MultiplayerGame extends Game {
 	
 	/** Enumerator for the two players, constructed with the colour of their controlled waypoints **/
 	public enum Player {
-		LEFT(0, 0, 128),
-		RIGHT(128, 0, 0);
+		LEFT(0, 0, 128), // HOST
+		RIGHT(128, 0, 0); // CLIENT
 		
 		private double r, g, b;
+		private int score;
 		
 		private Player(double r, double g, double b) {
 			this.r = r;
 			this.g = g;
 			this.b = b;
+			this.score = 0;
 		}
 		
 		public double[] getColour() {
 			return new double[] { r, g, b, 128.0 };
 		}
+		
+		public int getScore() {
+			return this.score;
+		}
+		
+		public void setScore(int score) {
+			this.score = score;
+		}
+		
+		public void addScore(int score) {
+			System.out.println("Adding: " + score + " to " + this.score + ". New score: " + (this.score + score));
+			this.score += score;
+		}
+		
+		public void subtractScore(int score) {
+			this.score -= score;
+		}
 	}
-	
-	/**
-	 * Enum for the networkThread working with the instance of MultiplayerGame
-	 */
-	public enum MultiplayerRole {
-		CLIENT, HOST
-	} 
 	
 	/**
 	 * The last time a manually controlled aircraft was added to the buffer for sync
@@ -65,11 +77,13 @@ public class MultiplayerGame extends Game {
 	private long lastManualControlSync = 0l;
 	
 	/**
-	 * The gameType, ie. whether we are the HOST or CLIENT.
+	 * The gameType, ie. whether we are the Left (HOST) or Right (CLIENT) player.
 	 * Determined by the TYPE of networkThread associated with this instance
 	 * of MultiplayerGame
 	 */
-	private MultiplayerRole gameType;
+	private Player self;
+	
+	private Player opponent;
 	
 	/**
 	 * A handle to the associated networkThread
@@ -82,38 +96,36 @@ public class MultiplayerGame extends Game {
 	 */
 	private MultiplayerSetUp lobby;
 	
-	/**
-	 * The opponent's score
-	 */
-	private int hostScore = 0;
-	private int clientScore = 0;
-	
 	public lib.ButtonText landButton;
 	public lib.ButtonText takeOffButton;
 	
 	//Constructor
-	public MultiplayerGame(Main main, MultiplayerRole type, NetworkThread thread, MultiplayerSetUp lobby) {
+	public MultiplayerGame(Main main, Player type, NetworkThread thread, MultiplayerSetUp lobby) {
 		super(main, 0);
-		gameType = type;
+		if (type == Player.LEFT) {
+			self = Player.LEFT;
+			opponent = Player.RIGHT;
+		} else {
+			self = Player.RIGHT;
+			opponent = Player.LEFT;
+		}
 		this.lobby = lobby;
 		networkThread = thread;
 		lastManualControlSync = System.currentTimeMillis();
 		lib.ButtonText.Action landAction = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
-				// _selectedAircraft.manuallyControl();
 				landAircraft();
 			}
 		};
-		landButton = new lib.ButtonText("Land", landAction, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 32, 100, 25, 34, -6);
+		landButton = new lib.ButtonText("Land", landAction, self == Player.RIGHT ? 1062 : 118, 32, 100, 25, 34, -6);
 		lib.ButtonText.Action takeOffAction = new lib.ButtonText.Action() {
 			@Override
 			public void action() {
-				// _selectedAircraft.manuallyControl();
 				takeOffAircraft();
 			}
 		};
-		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 32, 128, 25, 18, -6);
+		takeOffButton = new lib.ButtonText("Take Off", takeOffAction, self == Player.RIGHT ? 1062 : 118, 32, 128, 25, 18, -6);
 	}
 	
 	/** 
@@ -121,7 +133,7 @@ public class MultiplayerGame extends Game {
 	 * @param waypoint the waypoint to decide upon
 	 * @return the player the waypoint is controlled by
 	 */
-	private Player controlledByPlayer(Waypoint waypoint) {
+	private Player controlledBy(Waypoint waypoint) {
 		if (waypoint.position().x() < splitLine) {
 			return Player.LEFT;
 		} else {
@@ -129,12 +141,32 @@ public class MultiplayerGame extends Game {
 		}
 	}
 	
-	private MultiplayerRole controlledByType(Waypoint waypoint) {
-		if (waypoint.position().x() < splitLine) {
-			return MultiplayerRole.HOST;
-		} else {
-			return MultiplayerRole.CLIENT;
-		}
+	private Player owner(Aircraft aircraft) {
+		if (aircraft.owner() == 0)
+			return leftPlayer();
+		else
+			return rightPlayer();
+	}
+	
+	private void setOwner(Aircraft aircraft, Player owner) {
+		if (owner == Player.LEFT)
+			aircraft.setOwner(0);
+		else
+			aircraft.setOwner(1);
+	}
+	
+	private Player leftPlayer() {
+		if (self == Player.LEFT)
+			return self;
+		else
+			return opponent;
+	}
+	
+	private Player rightPlayer() {
+		if (self == Player.RIGHT)
+			return self;
+		else
+			return opponent;
 	}
 	
 	//Update and draw
@@ -143,17 +175,15 @@ public class MultiplayerGame extends Game {
 		
 		//If we are the client, never allow a flight to be generated.
 		//Sidesteps the flight generator present in Game, which this class is inheriting from.
-		if (gameType.equals(MultiplayerRole.CLIENT)){
+		if (self == Player.RIGHT){
 			this.setFlightGenerationTimeElapsed(0);
 		}
 		// Update scores if aircraft have gone through waypoints
 		for (Aircraft aircraft : aircraftInAirspace) {
-			if (aircraft.owner() == 0) {
-				hostScore += aircraft.score();
-			} else if (aircraft.owner() == 1) {
-				clientScore += aircraft.score();
+			if (aircraft.score() > 0) {
+				owner(aircraft).addScore(aircraft.score());
+				aircraft.clearScore();
 			}
-			aircraft.clearScore();
     	}
 		
 		//Main game logic - uses update from scn.Game
@@ -186,35 +216,14 @@ public class MultiplayerGame extends Game {
 		//Move line if it's been 5 seconds since the last move
 		if (System.currentTimeMillis() > lastMoveTime + 5000){
 			lastMoveTime = System.currentTimeMillis();
-			if (hostScore > clientScore + 30){
-				switch (gameType){
-				case HOST:
-					//move line right
-					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
-						moveSplitLineTo += 1;
-					}
-					break;
-				case CLIENT:
-					if (moveSplitLineTo > 0){
-						moveSplitLineTo += 1;
-					}
-					break;
-				}
-			} else if (hostScore + 30 < clientScore) {
-				//Losing
-				switch (gameType){
-				case HOST:
-					//move line left
-					if (moveSplitLineTo > 0){
-						moveSplitLineTo -= 1;
-					}
-					break;
-				case CLIENT:
-					if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length){
-						moveSplitLineTo -= 1;
-					}
-					break;
-				}
+			if (leftPlayer().getScore() > rightPlayer().getScore() + 30){
+				// Move line right
+				if (moveSplitLineTo < SPLIT_LINE_POSITIONS.length)
+					moveSplitLineTo += 1;
+			} else if (leftPlayer().getScore() + 30 < rightPlayer().getScore()) {
+				// Move line left
+				if (moveSplitLineTo > 0)
+					moveSplitLineTo -= 1;
 			}
 		}
 		
@@ -227,51 +236,57 @@ public class MultiplayerGame extends Game {
 		// Updates the owners for each aircraft
 		for (int i = 0; i < aircraftList().size(); i ++){
 			Aircraft tempAircraft = aircraftList().get(i);
-			if ((tempAircraft.position().x() > splitLine) && (tempAircraft.owner() == 0)){
+			if ((tempAircraft.position().x() > splitLine) && (owner(tempAircraft) == Player.LEFT)){
 				// If right side player aircraft passes to left side
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the left side
 					// Player 1 looses points
-					hostScore -= 20; 
+					leftPlayer().subtractScore(20);
 					// Generating a new route for the aircraft
-					regenRoute(i, tempAircraft);
+					if (self == Player.LEFT)
+						regenRoute(i, tempAircraft);
+					tempAircraft.setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has automatically flown over to the left side
 					// Player 0 gets points
-					clientScore += 10; 
+					rightPlayer().addScore(10);
 				}
 				// Remove selection of plane and manual control if the plane is selected while crossing the line
-				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft))
-					networkThread.addToBuffer(selectedAircraft);
+				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft)) {
+					networkThread.addToBuffer(tempAircraft);
 					deselectAircraft();
-					aircraftList().get(i).setOwner(0);
-					aircraftList().get(i).setOwner(1);
+				}
+				setOwner(tempAircraft, rightPlayer());
 			}
-			else if ((tempAircraft.position().x()< splitLine) && (tempAircraft.owner() == 1)){
-				// If left side aircraft pases to right side
+			else if ((tempAircraft.position().x()< splitLine) && (owner(tempAircraft) == Player.RIGHT)){
+				// If left side aircraft passes to right side
 				if (tempAircraft.isManuallyControlled() == true){
 					// The aircraft has been manually flown over to the right side
 					// Player 0 loses points
-					clientScore -= 20;
+					rightPlayer().subtractScore(20);
 					// Generating a new route
-					regenRoute(i, tempAircraft);
+					if (self == Player.LEFT)
+						regenRoute(i, tempAircraft);
+					tempAircraft.setManuallyControlled(false);
 				}
 				else{
 					// The aircraft has been automatically flown over to the right side
 					// Player 1 gets points
-					hostScore += 10;
+					leftPlayer().addScore(10);
 				}
 				// Remove selection of plane and manual control if the plane is selected while crossing the line
-				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft))
-					networkThread.addToBuffer(selectedAircraft);
+				if (selectedAircraft != null && selectedAircraft.equals(tempAircraft)) {
+					networkThread.addToBuffer(tempAircraft);
 					deselectAircraft();
-					aircraftList().get(i).setOwner(0);
+				}
+				setOwner(tempAircraft, leftPlayer());
 			}
 		}
-		if (splitLine == 380 || splitLine == 900 ){
-			multiGameOver(splitLine,hostScore,clientScore);
-		}
+		if (splitLine == SPLIT_LINE_POSITIONS[0])
+			multiGameOver(true, leftPlayer().getScore(), rightPlayer().getScore());
+		else if (splitLine == SPLIT_LINE_POSITIONS[SPLIT_LINE_POSITIONS.length - 1])
+			multiGameOver(false, leftPlayer().getScore(), rightPlayer().getScore());
 	}
 	
 	private void regenRoute(int i, Aircraft tempAircraft){
@@ -287,28 +302,26 @@ public class MultiplayerGame extends Game {
 		}
 		Waypoint destination = flightExitPoints[d];
 		aircraftList().get(i).setRoute(aircraftList().get(i).findGreedyRoute(origin, destination, waypoints));
-		if (gameType.equals(MultiplayerRole.HOST)){
-			networkThread.addToBuffer(selectedAircraft);
-		}
+		networkThread.addToBuffer(selectedAircraft);
 	}
 	
-	 public void multiGameOver(int linePos, int score1, int score2) {
+	 public void multiGameOver(boolean leftSide, int score1, int score2) {
 	    main.closeScene();
-    	if (linePos == 380){
+    	if (leftSide) {
     		//Line is on the left
-    		if (gameType.equals(MultiplayerRole.HOST)){
+    		if (self.equals(Player.LEFT)){
     			//Host lost
-    			main.setScene(new MultiGameOver(main, score1, 0, lobby, networkThread));
+    			main.setScene(new MultiGameOver(main, score1, false, lobby, networkThread));
     		} else {
-    			main.setScene(new MultiGameOver(main, score1, 1, lobby, networkThread));
+    			main.setScene(new MultiGameOver(main, score1, true, lobby, networkThread));
     		}
     	} else {
     		//Line is on the right
-    		if (gameType.equals(MultiplayerRole.CLIENT)){
+    		if (self.equals(Player.RIGHT)){
     			//Client lost
-    			main.setScene(new MultiGameOver(main, score2, 0, lobby, networkThread));
+    			main.setScene(new MultiGameOver(main, score2, false, lobby, networkThread));
     		} else {
-    			main.setScene(new MultiGameOver(main, score2, 1, lobby, networkThread));
+    			main.setScene(new MultiGameOver(main, score2, true, lobby, networkThread));
     		}
     	}
     }
@@ -323,10 +336,10 @@ public class MultiplayerGame extends Game {
         
         for (Airport airport : airports) {
         	for (Waypoint w : airport.entryPoints()) {
-        		w.draw(controlledByPlayer(w).getColour());
+        		w.draw(controlledBy(w).getColour());
         	}
         	for (Waypoint w : airport.parkingPoints()) {
-        		w.draw(controlledByPlayer(w).getColour());
+        		w.draw(controlledBy(w).getColour());
         	}
         }
         
@@ -362,11 +375,7 @@ public class MultiplayerGame extends Game {
         // GOA CODE FOLLOWS
         String earnings = "";
         // Write total score to string for printing
-        if (gameType == MultiplayerRole.HOST) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, clientScore);
-        } else if (gameType == MultiplayerRole.CLIENT) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, hostScore);
-        }
+        earnings = String.format("`%d earned for family, `%d earned by opponent.", self.getScore(), opponent.getScore());
         
         // Print previous string in bottom centre of display
         graphics.print(earnings, ((window.width()/2)-((earnings.length()*8)/2)),
@@ -380,7 +389,7 @@ public class MultiplayerGame extends Game {
 	@Override
 	protected void drawMap() {
 		for (Waypoint waypoint : airspaceWaypoints) {
-            waypoint.draw(controlledByPlayer(waypoint).getColour());
+            waypoint.draw(controlledBy(waypoint).getColour());
         }
         
         graphics.setColour(255, 255, 255, 108);
@@ -403,16 +412,16 @@ public class MultiplayerGame extends Game {
         	}
         	if (selectedAircraft.status() == AirportState.WAITING) {
         		graphics.setColour(0, 0, 0);
-        		graphics.rectangle(true, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(true, self == Player.RIGHT ? 1062 : 118, 16, 100, 25);
         		graphics.setColour(0, 128, 0);
-        		graphics.rectangle(false, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(false, self == Player.RIGHT ? 1062 : 118, 16, 100, 25);
         		landButton.draw();
         	}
         	if (selectedAircraft.status() == AirportState.PARKED) {
         		graphics.setColour(0, 0, 0);
-        		graphics.rectangle(true, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(true, self == Player.RIGHT ? 1062 : 118, 16, 100, 25);
         		graphics.setColour(0, 128, 0);
-        		graphics.rectangle(false, gameType == MultiplayerRole.CLIENT ? 1062 : 118, 16, 100, 25);
+        		graphics.rectangle(false, self == Player.RIGHT ? 1062 : 118, 16, 100, 25);
         		takeOffButton.draw();
         	}
         }
@@ -478,11 +487,13 @@ public class MultiplayerGame extends Game {
 		// Check which player has control of aircraft
 		if(a.position().x() < splitLine){
 			// If the aircraft is left of the line, it belongs to the left player
-			a.setOwner(0);
+			setOwner(a, leftPlayer());
+			//a.setOwner(0);
 		}
 		else{
 			// If the aircraft is right of the line, it belongs to the right player
-			a.setOwner(1);
+			setOwner(a, rightPlayer());
+			//a.setOwner(1);
 		}
 
 		//add the aircraft to the list of the aircraft in the airspace
@@ -571,12 +582,8 @@ public class MultiplayerGame extends Game {
                            	
                 if (a.isMouseOver(x-16, y-16)){
                 	// Check for ownership
-                	if ((gameType.equals(MultiplayerRole.HOST) && (a.owner() == 0))){
-                        newSelected = a;
-                	}
-                	else if ((gameType.equals(MultiplayerRole.CLIENT) && (a.owner() == 1))){
+                	if (owner(a) == self)
                 		newSelected = a;
-                	}
                 }
             }
             
@@ -599,7 +606,7 @@ public class MultiplayerGame extends Game {
             if (selectedAircraft != null) {
                 for (Waypoint w : airspaceWaypoints) {
                     if ((w.type() == Waypoint.WaypointType.AIRSPACE)
-                    		&& controlledByType(w) == gameType
+                    		&& controlledBy(w) == self
                     		&& w.isMouseOver(x-16, y-16)
                     		&& selectedAircraft.flightPathContains(w) > -1) {
                         selectedWaypoint = w;
@@ -621,7 +628,7 @@ public class MultiplayerGame extends Game {
         
         // Deselect aircraft on right click
         if (key == input.MOUSE_RIGHT) {
-        	Aircraft temp =selectedAircraft;
+        	Aircraft temp = selectedAircraft;
         	deselectAircraft();	
         	networkThread.addToBuffer(temp);
         }
@@ -646,7 +653,7 @@ public class MultiplayerGame extends Game {
     			// entry or exit point, and when aircraft is in its
     			// 'normal' state
     			if (selectedAircraft.status() == AirportState.NORMAL) {
-    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && controlledByType(w) == gameType && w.isMouseOver(x-16, y-16)) {
+    				if ((w.type() == Waypoint.WaypointType.AIRSPACE) && controlledBy(w) == self && w.isMouseOver(x-16, y-16)) {
     					selectedAircraft.alterPath(selectedPathpoint, w);
     					ordersBox.addOrder(">>> " + selectedAircraft.name()
     							+ " please alter your course");
@@ -705,16 +712,14 @@ public class MultiplayerGame extends Game {
         compassDragged = false;
   
     }
- 
     
-    //Setters
     public void setOpponentScore(int opponentScore) {
-    	if (gameType.equals(MultiplayerRole.HOST)) {
-    		this.clientScore = opponentScore;
-    	} else if (gameType.equals(MultiplayerRole.CLIENT)) {
-    		this.hostScore = opponentScore;
-    	}
-	}
+    	opponent.setScore(opponentScore);
+    }
+    
+    public int getSelfScore() {
+    	return self.getScore();
+    }
     
     public void setLastMoveTime(long moveTime){
     	this.lastMoveTime = moveTime;
@@ -722,7 +727,7 @@ public class MultiplayerGame extends Game {
     
     @Override
     protected void crash(Aircraft aircraft, int collisionState) {
-    	clientScore -= 100; 
+    	self.subtractScore(100);
     	ordersBox.addOrder("<<< You crashed two planes! That is coming out of your pay!");
     	main.screenShake(24, 0.6);
     }
