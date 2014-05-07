@@ -363,9 +363,9 @@ public class MultiplayerGame extends Game {
         String earnings = "";
         // Write total score to string for printing
         if (gameType == MultiplayerRole.HOST) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, hostScore);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", hostScore, clientScore);
         } else if (gameType == MultiplayerRole.CLIENT) {
-        	earnings = String.format("`%d earned for family, `%d earned by opponent.", totalScore, hostScore);
+        	earnings = String.format("`%d earned for family, `%d earned by opponent.", clientScore, hostScore);
         }
         
         // Print previous string in bottom centre of display
