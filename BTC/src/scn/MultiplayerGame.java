@@ -279,7 +279,12 @@ public class MultiplayerGame extends Game {
 		Waypoint origin = tempAircraft.getRoute()[0];
 		Waypoint[] waypoints = this.airspaceWaypoints;
 		int numberOfWaypoints = 3;
-		int d = (new Random()).nextInt(flightExitPoints.length);
+		int d = new Random().nextInt(11);
+		if (d < 5){
+			d = (new Random()).nextInt(flightExitPoints.length);
+		} else {
+			d = (new Random()).nextInt(airports.length);
+		}
 		Waypoint destination = flightExitPoints[d];
 		aircraftList().get(i).setRoute(aircraftList().get(i).findGreedyRoute(origin, destination, waypoints));
 		if (gameType.equals(MultiplayerRole.HOST)){

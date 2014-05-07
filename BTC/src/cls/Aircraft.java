@@ -1136,5 +1136,5 @@ public class Aircraft implements Serializable {
 	public double getAltitude() {
 		return position.z();
 	}
-
+	
 }
