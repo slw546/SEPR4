@@ -313,7 +313,8 @@ public class MultiplayerGame extends Game {
     			//Host lost
     			main.setScene(new MultiGameOver(main, score1, false, lobby, networkThread));
     		} else {
-    			main.setScene(new MultiGameOver(main, score1, true, lobby, networkThread));
+    			//Client lost
+    			main.setScene(new MultiGameOver(main, score2, true, lobby, networkThread));
     		}
     	} else {
     		//Line is on the right
@@ -321,7 +322,8 @@ public class MultiplayerGame extends Game {
     			//Client lost
     			main.setScene(new MultiGameOver(main, score2, false, lobby, networkThread));
     		} else {
-    			main.setScene(new MultiGameOver(main, score2, true, lobby, networkThread));
+    			//Host lost
+    			main.setScene(new MultiGameOver(main, score1, true, lobby, networkThread));
     		}
     	}
     }
