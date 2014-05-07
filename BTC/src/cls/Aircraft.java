@@ -633,7 +633,6 @@ public class Aircraft implements Serializable {
 					currentTarget = destination.position();
 					score += 10;
 					
-					
 				}
 			} else {
 				if (status == AirportState.NORMAL) {

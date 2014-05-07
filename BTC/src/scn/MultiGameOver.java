@@ -1,12 +1,8 @@
 package scn;
 
 import thr.NetworkThread;
-import cls.Aircraft;
-import cls.Vector;
-import lib.SpriteAnimation;
 import lib.jog.audio.Sound;
 import lib.jog.graphics;
-import lib.jog.graphics.Image;
 import lib.jog.window;
 import btc.Main;
 

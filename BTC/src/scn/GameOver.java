@@ -49,11 +49,6 @@ public class GameOver extends Scene {
 	private int keyPressed;
 	
 	/**
-	 * Timer to allow for explosion and aircraft to be shown for a period, followed by the text box.
-	 */
-	private double timer;
-	
-	/**
 	 * Constructor for the Game Over scene
 	 * @param main the main containing the scene
 	 * @param aircraft1 one of the aircraft involved in the crash
@@ -87,7 +82,6 @@ public class GameOver extends Scene {
 		}
 		
 		deaths = (int)( Math.random() * 500) + 300;
-		timer = 0;
 		textBox = new lib.TextBox(64, 96, window.width() - 128, window.height() - 96, 32);
 		textBox.addText(String.valueOf(deaths) + " people died in the crash.");
 		textBox.delay(0.4);
@@ -123,7 +117,6 @@ public class GameOver extends Scene {
 	 */
 	public void update(double dt) {
 		if (explosionAnim.hasFinished()){
-			timer += dt;
 			textBox.update(dt);
 		} else {
 			explosionAnim.update(dt);

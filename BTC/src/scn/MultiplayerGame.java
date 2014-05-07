@@ -4,7 +4,6 @@ import java.util.Random;
 
 import thr.NetworkThread;
 import cls.Aircraft;
-import cls.AircraftBuffer;
 import cls.Airport;
 import cls.Waypoint;
 import cls.Aircraft.AirportState;
@@ -294,8 +293,7 @@ public class MultiplayerGame extends Game {
 	private void regenRoute(int i, Aircraft tempAircraft){
 		// Generating a new route for the aircraft
 		Waypoint origin = tempAircraft.getRoute()[0];
-		Waypoint[] waypoints = this.airspaceWaypoints;
-		int numberOfWaypoints = 3;
+		Waypoint[] waypoints = airspaceWaypoints;
 		int d = new Random().nextInt(11);
 		if (d < 5){
 			d = (new Random()).nextInt(flightExitPoints.length);

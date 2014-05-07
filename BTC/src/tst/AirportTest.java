@@ -113,60 +113,6 @@ public class AirportTest {
 	}
 
 	/**
-	 * Generates a test aircraft with altitude set to zero.
-	 * @return the test aircraft
-	 */
-	private Aircraft generateTestAircraftZeroAltitude() {
-		Waypoint[] waypointList = new Waypoint[] {
-			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
-			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
-			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
-			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
-			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
-		};
-		
-		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], waypointList[0], 10.0, waypointList, null);
-		
-		return testAircraft;
-	}
-
-	/**
-	 * Generates the second test aircraft.
-	 * @return the second test aircraft
-	 */
-	private Aircraft generateTestAircraft2() {
-		Waypoint[] waypointList = new Waypoint[] {
-			new Waypoint(0, 0, Waypoint.WaypointType.ENTRY),
-			new Waypoint(100, 100, Waypoint.WaypointType.EXIT), 
-			new Waypoint(25, 75, Waypoint.WaypointType.AIRSPACE),
-			new Waypoint(75, 25, Waypoint.WaypointType.AIRSPACE), 
-			new Waypoint(50, 50, Waypoint.WaypointType.AIRSPACE)
-		};
-		
-		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], waypointList[0], 10.0, waypointList, null);
-		
-		return testAircraft;
-	}
-
-	/**
-	 * Generates the third test aircraft.
-	 * @return the third test aircraft
-	 */
-	private Aircraft generateTestAircraft3() {
-		Waypoint[] waypointList = {
-			new Waypoint(767, 0, Waypoint.WaypointType.ENTRY),
-			new Waypoint(670, 44, Waypoint.WaypointType.EXIT), 
-		};
-
-		Aircraft testAircraft = new Aircraft(this.testAircraftDest, this.testAircraftOrigin,
-				waypointList[1], waypointList[0], null, 10.0, waypointList, testAirport, true);
-
-		return testAircraft;
-	}
-
-	/**
 	 * Tests that adding an aircraft to an airport functions correctly.
 	 */
 	@Test
