@@ -109,6 +109,8 @@ public class MultiplayerGame extends Game {
 			self = Player.RIGHT;
 			opponent = Player.LEFT;
 		}
+		self.setScore(0);
+		opponent.setScore(0);
 		this.lobby = lobby;
 		networkThread = thread;
 		lastManualControlSync = System.currentTimeMillis();
@@ -359,7 +361,7 @@ public class MultiplayerGame extends Game {
        
         graphics.setColour(0, 128, 0);
         drawScore();
-        super.draw();
+        super.draw(true);
     }
 	
 	@Override

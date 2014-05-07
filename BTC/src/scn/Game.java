@@ -419,40 +419,46 @@ public class Game extends Scene {
     		airport.update(dt);
     	}
     }
+    
+    @Override
+    public void draw() {
+    	draw(false);
+    }
    
     /**
      * Draw the scene GUI and all drawables within it, e.g. aircraft and waypoints
      */
-    @Override
-    public void draw() {
-        graphics.setColour(0, 128, 0);
-        graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
-        graphics.setColour(255, 255, 255, 60);
-        graphics.drawq(background, backgroundQuad, 0, 0);
-        
-        for (Airport airport : airports) {
-        	for (Waypoint w : airport.entryPoints()) {
-        		w.draw();
-        	}
-        	for (Waypoint w : airport.parkingPoints()) {
-        		w.draw();
-        	}
-        }
-        
-        drawMap();       
-        graphics.setViewport();
-       
-        if (selectedAircraft != null
-        		&& selectedAircraft.status() != AirportState.PARKED) {
-            selectedAircraft.drawCompass();
-        }
-       
-        ordersBox.draw();
-        altimeter.draw();
-        drawAircraftInfo();
-       
-        graphics.setColour(0, 128, 0);
-        drawScore();
+    public void draw(boolean fromMultiplayer) {
+    	if (!fromMultiplayer) {
+	        graphics.setColour(0, 128, 0);
+	        graphics.setViewport(16, 16, window.width() - 32, window.height() - 144);
+	        graphics.setColour(255, 255, 255, 60);
+	        graphics.drawq(background, backgroundQuad, 0, 0);
+	        
+	        for (Airport airport : airports) {
+	        	for (Waypoint w : airport.entryPoints()) {
+	        		w.draw();
+	        	}
+	        	for (Waypoint w : airport.parkingPoints()) {
+	        		w.draw();
+	        	}
+	        }
+	        
+	        drawMap();       
+	        graphics.setViewport();
+	       
+	        if (selectedAircraft != null
+	        		&& selectedAircraft.status() != AirportState.PARKED) {
+	            selectedAircraft.drawCompass();
+	        }
+	       
+	        ordersBox.draw();
+	        altimeter.draw();
+	        drawAircraftInfo();
+	       
+	        graphics.setColour(0, 128, 0);
+	        drawScore();
+    	}
         super.draw();
     }
    
